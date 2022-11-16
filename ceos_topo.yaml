@@ -9,5 +9,5 @@ topology:
       kind: ceos
     ceos2: 
       kind: ceos
-links:
+  links:
     - endpoints: ["ceos1:eth1", "ceos2:eth1"]
