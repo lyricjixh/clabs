@@ -9,5 +9,8 @@ topology:
       kind: ceos
     ceos2: 
       kind: ceos
+      env:
+        BOOT_DEALY: 60
+        
   links:
     - endpoints: ["ceos1:eth1", "ceos2:eth1"]
