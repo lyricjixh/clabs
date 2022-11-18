@@ -1,0 +1,77 @@
+---
+# tasks file for dellemc.enterprise_sonic interface
+
+- name: "Creat build directory on target host"
+  file:
+    path: "{{build_dir}}"
+    state: directory
+    mode: a+rx
+  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+  tags:
+    - cfggen
+    - intf
+    - bgp
+
+- name: "Generating interface configuration for SONiC"
+  template:
+    src: sonic-interface.j2
+    dest: "{{build_dir}}/interface_{{hostname}}.sh"
+    mode: 0755
+  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+  # delegate_to: localhost
+  # connection: local
+  register: generate_output
+  tags:
+    - cfggen
+    - intf
+
+- name: "Displaying the interface configuration to be applied"
+  debug:
+    var: generate_output
+  tags:
+    - cfggen
+    - intf
+
+- name: "Provisioning interface configuration for SONiC"
+  # sudo: true
+  shell: "{{build_dir}}/interface_{{hostname}}.sh"
+  # remote_src: yes
+  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+  register: output
+  tags:
+    - intf
+
+# # sonicos-ntp configuration task
+# - name: "Provision sonic NTP config task"
+#   include_tasks: service-ntp.yaml
+#   tags:
+#     - ntp
+
+#  tasks file for FRR Routing - BGP
+- name: "Initial config"
+  become: yes
+  become_user: root
+  become_method: sudo
+  command: "{{ item }}"
+  with_items:
+      - "config routing_config_mode split"
+      - "config save -y"
+  # tags:
+  #   - bgp
+
+- name: "Generating FRR configuration for Sonic"
+  template:
+      src: frr-bgp-customerized.j2
+      dest: "{{ build_dir }}/frr_candidate.conf"
+  tags:
+    - cfggen
+    - bgp
+
+- name: "Provisioning FRR configuration for Sonic"
+  template:
+      src: frr-bgp-customerized.j2
+      dest: "/etc/sonic/frr/frr.conf"
+  notify:
+    - Restart network FRR deamon
+  tags:
+    - bgp

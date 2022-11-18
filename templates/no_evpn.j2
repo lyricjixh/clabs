@@ -1,0 +1,44 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{###########################################
+
+Purpose:
+Remove EVPN Vxlan commands for dellos10 Devices
+############################################}
+no evpn
+!
+{% for vni in vxlans %}
+no interface vlan{{ vni.vlan }}
+!
+no interface virtual-network{{ vni.id }}
+!
+no virtual-network {{ vni.id }}
+!
+{% endfor %}
+{% if edge_vlans is defined and edge_vlans %}
+{% for vlan in edge_vlans %}
+no interface vlan{{ vlan.id }}
+{% endfor %}
+{% endif %}
+!
+{% if edge_links is defined and edge_links %}
+no interface vlan1991
+no interface vlan1992
+!
+{% for link in edge_links %}
+interface ethernet1/1/{{ link.port }}
+  no ip address
+  no ipv6 address
+  no ip vrf forwarding
+!
+{% endfor %}
+{% endif %}
+{% if vrfi.proto.bgp is defined and vrfi.proto.bgp %}
+router bgp {{ bgp.local_as }}
+{% for vrfi in evpn.vrf %}
+  no vrf {{ vrfi.name }}
+  !
+{% endfor %}
+!
+{% endif %}
+no nve
+!

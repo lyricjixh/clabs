@@ -1,0 +1,78 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{#
+###################################################
+Purpose:
+Configure EVPN Vxlan commands for dellos10 Devices
+###################################################
+#}
+interface loopback1
+ description "{{ lpbk1.desc }}"
+ no shutdown
+ ip address {{ lpbk1.addr_v4 }}/32
+{% if lpbk1.addr_v6 is defined and lpbk1.addr_v6 %}
+ ipv6 address {{ lpbk1.addr_v6 }}/128
+{% endif %}
+ exit
+!
+router bgp {{ bgp.local_as }}
+ template fabric_peer_v4
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  !
+ !
+ template tor_peer_v4
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  !
+ !
+ template sas_peer_v4
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  exit
+ exit
+!
+ip virtual-router mac-address {{ tor_pair_vmac }}
+!
+{% for vrfi in evpn.vrf %}
+ip vrf {{ vrfi.name }}
+!
+{% endfor %}
+evpn
+ router-mac {{ tor_pair_vmac }}
+ auto-evi
+ exit
+!
+{% for vni in vxlans %}
+virtual-network {{ vni.id }}
+  description "{{ vni.desc }}"
+  vxlan-vni {{ vni.id }}
+  exit
+!
+{% endfor %}
+{% for vni in vxlans %}
+interface virtual-network{{ vni.id }}
+  description "{{ vni.desc }}"
+  no shutdown
+  mtu {{ vxlan_mtu }}
+  ip vrf forwarding {{ vni.vrf }}
+  ip address {{ vni.netv4 | ipaddr(-(seq+1)) }}
+  ip virtual-router address {{ vni.netv4 | ipaddr('1') | ipaddr('address') }}
+{% if vni.netv6 is defined and vni.netv6 %}
+  ipv6 address {{ vni.netv6 | ipaddr(-(seq+1)) }}
+  ipv6 virtual-router address {{ vni.netv6 | ipaddr('1') | ipaddr('address') }}
+{% endif %}
+  exit
+!
+{% endfor %}
+{% for app_vlan in vlans.app_vlans %}
+interface vlan{{ app_vlan.id }}
+  description "{{ app_vlan.desc }}"
+  virtual-network {{ app_vlan.vni }}
+  mtu {{ vxlan_mtu }}
+  no shutdown
+  exit
+!
+{% endfor %}

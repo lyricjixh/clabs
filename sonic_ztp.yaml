@@ -1,0 +1,42 @@
+---
+- hosts: sonic
+  gather_facts: true
+  collections:
+     - dellemc.enterprise_sonic
+
+  tasks:
+  - name: Set ONIE Mode to Uninstall
+    vars:
+      ansible_connection: ssh
+    become: yes
+    command: "onie_mode_set -o uninstall"
+    tags:
+      - onie
+
+  - name: Reload the Switch
+    vars:
+      ansible_command_timeout: 10
+      ansible_connect_timeout: 20
+    dellos10_command:
+      commands:
+        - command: 'reboot'
+          prompt: '[confirm yes/no]: ?$'
+          answer: 'yes'
+    ignore_errors: yes
+
+  - name: "Wait 12 minutes for Switch coming up"
+    pause:
+      minutes: 12
+    delegate_to: localhost
+    tags: reset
+
+  # - name: Get Current OS Version
+  #   sonic_facts:
+  #     gather_subset: hardware
+  #   register: post_facts
+  #   tags: version
+
+  # - name: Display Version
+  #   debug: 
+  #     var: post_facts.ansible_facts.ansible_net_version
+  #   tags: version

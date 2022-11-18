@@ -1,0 +1,59 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{##############################################
+
+Purpose:
+Generating SONiC Cleanup Configuration
+###############################################}
+no interface vxlan vtep100
+!
+no ip anycast-mac-address {{ tor_pair_vmac }}
+!
+{% for vrfi in evpn.vrf %}
+{#
+no router bgp vrf Vrf_{{ vrfi.name }}
+!
+#}
+{% if vrfi.proto.static_v4 is defined and vrfi.proto.static_v4 %}
+{% for route in vrfi.proto.static_v4 %}
+no ip route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+!
+{% if vrfi.proto.static_v6 is defined and vrfi.proto.static_v6 %}
+{% for route in vrfi.proto.static_v6 %}
+no ipv6 route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+!
+{% for vrfi in evpn.vrf %}
+no ip vrf Vrf_{{ vrfi.name }}
+{% endfor %}
+!
+no router bgp
+!
+{% include 'no_rpol_sonic.j2' %}
+{% if edge_vlans is defined and edge_vlans %}
+{% for vlan in edge_vlans %}
+interface Eth 1/{{ vlan.port }}
+  no switchport mode trunk
+  no switchport access vlan {{ vlans.native_vlan.id }}
+!
+no interface Vlan {{ vlan.id }}
+!
+{% endfor %}
+{% endif %}
+{% if edge_links is defined and edge_links %}
+{% for link in edge_links %}
+interface Eth 1/{{ link.port }}
+  no ip address
+  no ipv6 address
+!
+{% endfor %}
+{% endif %}
+{% for vni in vxlans %}
+interface Vlan {{ vni.vlan }}
+  no ip anycast-address {{ vni.netv4 | ipaddr('1') }}
+  no ipv6 anycast-address {{ vni.netv6 | ipaddr('1') }}
+!
+{% endfor %}

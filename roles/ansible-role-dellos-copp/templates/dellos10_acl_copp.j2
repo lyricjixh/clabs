@@ -1,0 +1,54 @@
+#jinja2: trim_blocks: True,lstrip_blocks: True
+{#############################################
+
+Purpose:
+Configure CoPP commands for dellos10 Devices
+
+###############################################}
+
+!
+ip access-list VSTM-ACCESS
+ seq 10 permit ip 10.0.0.0/8 any
+ seq 20 permit ip 24.40.0.0/18 any
+ seq 30 permit ip 24.40.64.0/20 any
+ seq 35 permit ip 24.153.0.0/16 any
+ seq 40 permit ip 68.85.0.0/16 any
+ seq 50 permit ip 68.86.0.0/15 any
+ seq 60 permit ip 69.139.128.0/17 any
+ seq 65 permit ip 69.252.80.0/23 any
+ seq 70 permit ip 69.252.194.14/32 any
+ seq 80 permit ip 76.96.0.0/17 any
+ seq 90 permit ip 96.108.0.0/14 any
+ seq 100 permit ip 96.112.8.20/32 any
+ seq 105 permit ip 96.112.192.26/32 any
+ seq 110 permit ip 96.112.246.0/23 any
+ seq 120 permit ip 96.114.8.133/32 any
+ seq 125 permit ip 96.114.67.22/32 any
+ seq 130 permit ip 96.114.153.101/32 any
+ seq 140 permit ip 96.115.208.0/23 any
+ seq 150 permit ip 147.191.0.0/16 any
+ seq 160 permit ip 162.151.0.0/16 any
+ seq 170 permit ip 165.137.0.0/16 any
+ seq 180 permit ip 169.152.0.0/16 any
+ seq 190 permit ip 172.16.0.0/12 any
+ seq 200 deny ip any any
+!
+ipv6 access-list V6-VSTM-ACCESS
+ seq 10 permit ipv6 2001:558::/35 any
+ seq 20 permit ipv6 2001:558:fe16:103:69:252:194:14/128 any
+ seq 30 permit ipv6 2001:558:fe16:10c:96:114:8:133/128 any
+ seq 40 permit ipv6 2001:558:fe33:1001:f816:3eff:fed3:5d7a/128 any
+ seq 50 permit ipv6 2600:1f14:e0f:af00::/64 any
+ seq 60 permit ipv6 2600:1f18:6de:e800::/64 any
+ seq 70 deny ipv6 any any
+!
+line vty
+ no ip access-class VTY-ACCESS
+ no ipv6 access-class V6-VTY-ACCESS
+ no ip access-class VSTM-ACCESS
+ no ipv6 access-class V6-VSTM-ACCESS
+!
+control-plane
+ ip access-group VSTM-ACCESS in
+ ipv6 access-group V6-VSTM-ACCESS in
+!

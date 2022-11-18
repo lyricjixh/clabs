@@ -1,0 +1,30 @@
+network:
+  ethernets:
+{% for port in cali_ports %}
+   {{ port.name }}:
+      addresses:
+{% if port.addr_v4 is defined and port.addr_v4 %}
+      - {{ port.addr_v4 }}/{{ port.mask_v4 }}
+{% endif %}
+{% if port.addr_v6 is defined and port.addr_v6 %}
+      - {{ port.addr_v6 }}/{{ port.mask_v6 }}
+{% endif %}
+{% if port.gw_v4 is defined and port.gw_v4 %}
+      gateway4: {{ port.gw_v4 }}
+{% endif %}
+{% if port.gw_v6 is defined and port.gw_v6 %}
+      gateway6: {{ port.gw_v6 }}
+{% endif %}
+{% if port.dns_v4 is defined and port.dns_v4 %}
+      nameservers:
+        addresses:
+{% for server in port.dns_v4 %}
+        - {{ server }}
+{% endfor %}
+{% if port.domain_name is defined and port.domain_name %}
+        search:
+        - {{ port.domain_name }}
+{% endif %}
+{% endif %}
+{% endfor %}
+  version: 2

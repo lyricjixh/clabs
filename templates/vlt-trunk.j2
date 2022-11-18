@@ -1,0 +1,42 @@
+{#####################################################
+
+Purpose:
+Configure layer2 profile interface for dellos10 Devices.
+
+#####################################################}
+{% if trunk_bond.total is defined and trunk_bond.total %}
+{% set b_total = trunk_bond.total | int + 1 %}
+{% for i in range(1, b_total, 1) %}
+{% set bond_id = 100 + i %}
+interface port-channel{{ bond_id }}
+ description "VLT PO to Compute{{ i }}"
+ switchport mode trunk
+ switchport access vlan {{ vlans.native_vlan.id }}
+ switchport trunk allowed vlan {{ trunk_bond.vlan_list|join(",") }}
+ no shutdown
+{% if vlt is defined and vlt %}
+ vlt-port-channel {{ bond_id }}
+{% endif %}
+!
+{# Generate Port-Channel Member as Range CFG #}
+{% if trunk_bond.bmem_range is defined and trunk_bond.bmem_range %}
+{% set member = trunk_bond.bmem_range[i-1] %}
+interface range ethernet{{ member }}
+ channel-group {{ bond_id }} mode active
+ no switchport
+ no shutdown
+ mtu 9216
+!
+{% endif %}
+{% if trunk_bond.bmem_indiv is defined and trunk_bond.bmem_indiv %}
+{% set member = trunk_bond.bmem_indiv[i-1] %}
+interface ethernet1/1/{{ member }}
+ description "VLT PO{{ bond_id }} member"
+ channel-group {{ bond_id }} mode active
+ no switchport
+ no shutdown
+ mtu 9216
+!
+{% endif %}
+{% endfor %}
+{% endif %}

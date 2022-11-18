@@ -1,0 +1,18 @@
+---
+# Reboot B switches
+- hosts: func_b
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+    - include: ./tasks/switch_reload_vlt.yaml
+
+# Reboot A switches
+- hosts: func_a
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+    - include: ./tasks/switch_reload_vlt.yaml

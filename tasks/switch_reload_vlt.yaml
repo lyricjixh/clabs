@@ -1,0 +1,93 @@
+    - name: Get Switch Current OS Version
+      dellos10_facts:
+        gather_subset: hardware
+      register: pre_facts
+    
+    - block:
+        - debug: msg="Preparing {{inventory_hostname}} Rebooting..."
+
+        # Preparing: Shutdown ESXi Facing ports
+        - name: Shutdown {{inventory_hostname}} ESXi Facing ports 
+          dellos10_config:
+            lines:
+              - shutdown
+            parents: "interface range ethernet{{ item }}"
+          loop: "{{ esxi_port_range }}"
+
+        # Preparing: Shutdown Leaf/spine BGP peers
+        - name: Shut down {{inventory_hostname}} BGP peers
+          include: ./tasks/bgp_peer_shutdown.yaml
+
+        # # Preparing: Shutdown Front Panel ports
+        # - name: Shutdown {{inventory_hostname}} Frond Panel ports 
+        #   dellos10_config:
+        #     lines:
+        #       - shutdown
+        #     parents: "interface range ethernet{{ item }}"
+        #   loop: "{{ front_panel_port_range }}"
+
+        - name: Shutdown {{inventory_hostname}} VLTi ports 
+          dellos10_config:
+            lines:
+              - shutdown
+            parents: "interface ethernet1/1/{{ item }}"
+          loop: "{{ vlt.vlti }}"
+
+        - debug: msg="Now Start Rebooting {{inventory_hostname}}..."
+
+        - name : Reload {{inventory_hostname}} from standby partition
+          dellos10_command:
+            commands:
+                - write mem
+                - boot system standby
+                - command: 'reload'
+                  prompt: 'Proceed to reboot'
+                  answer: 'y'
+        
+        - name: Wait for {{inventory_hostname}} to reload
+          wait_for:
+            host: "{{ ansible_host }}"
+            port: 22
+            delay: 10
+            timeout: 600
+        
+        - debug: msg="Recovering {{inventory_hostname}}..."
+
+        # Re-enable Ports and BGP
+        - name: Unshut {{inventory_hostname}} VLTi ports 
+          dellos10_config:
+            lines:
+              - no shutdown
+            parents: "interface ethernet1/1/{{ item }}"
+          loop: "{{ vlt.vlti }}"
+
+        # Unshutdown Leaf/spine BGP peers
+        - name: Unshut {{inventory_hostname}} BGP peers
+          include: ./tasks/bgp_peer_unshut.yaml
+
+        - name: Unshut {{inventory_hostname}} ESXi Facing ports 
+          dellos10_config:
+            lines:
+              - no shutdown
+            parents: "interface range ethernet{{ item }}"
+          loop: "{{ esxi_port_range }}"
+
+        - name: Wait 2min for {{inventory_hostname}} to start traffic
+          pause:
+            minutes: 2
+          delegate_to: localhost
+
+        - name: Get {{inventory_hostname}} new facts 
+          dellos10_facts:
+            gather_subset: hardware
+          register: post_facts
+        
+        - name: Verify {{inventory_hostname}} OS is upgraded
+          assert:
+            that:
+              - dellos_image_upgrade.software_version == post_facts.ansible_facts.ansible_net_version
+            fail_msg: "switch {{inventory_hostname}} is still on OS version: {{post_facts.ansible_facts.ansible_net_version}}"
+      
+      when: dellos_image_upgrade.software_version != pre_facts.ansible_facts.ansible_net_version
+      tags: reboot
+      # ony reload if switch is on different os version and image install was successful

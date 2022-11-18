@@ -1,0 +1,54 @@
+---
+# tasks file for Dell-Networking.dellos-system
+ 
+ - name: "Generating Banner configuration for dellos10"
+   template:
+      src: dellos10_motd.j2
+      dest: "{{ build_dir }}/motd_{{hostname}}.conf.part"
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+#   notify: save config os10
+   register: generate_output
+   tags:
+    - sysserv
+    - cfggen
+
+ - name: "Gather Dell EMC OS10 Device Facts"
+   vars:
+      ansible_command_timeout: 60
+   dellos10_facts:
+      gather_subset: ["default"]
+   register: facts
+   tags:
+    - sysserv
+
+# - debug: var=facts
+
+ - name: "OS10 Show Service Tag Info"
+   dellos10_command:
+      commands:
+        - command: show license status | grep "Service Tag"
+   register: show_serv_tag
+   tags:
+    - sysserv
+
+ - set_fact:
+     serv_tag: "{{ show_serv_tag.stdout[0].split(':',1)[1].strip() }}"
+   tags:
+     - sysserv
+
+ - name: "Provisioning Banner configuration for dellos10"
+   dellos10_config:
+     commands:
+      - command: banner motd %
+        prompt: "\'%\'."
+        answer: |
+            \n
+            "{{ lookup('template', 'dellos10_motd.j2') }}"
+            %
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+#   notify: save config os10
+   register: handle_banner_prompt
+   tags:
+    - sysserv
+
+

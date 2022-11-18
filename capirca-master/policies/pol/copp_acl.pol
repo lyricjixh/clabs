@@ -1,0 +1,32 @@
+header {
+  target:: arista COPP_INBOUND_V4 extended
+
+}
+
+term accept-snmp {
+  comment:: "allow_only_SNMP_hosts"
+  source-address:: SNMP_HOSTS
+  protocol:: udp
+  destination-port:: SNMP
+  action:: accept
+}
+
+term accept-ntp {
+  comment:: "allow_only_NTP_hosts"
+  source-address:: VTSM_NTP_HOSTS
+  protocol:: udp tcp
+  destination-port:: NTP
+  action:: accept
+}
+
+term accept-infra {
+  comment:: "allow_infra"
+  source-address:: VTY_HOSTS
+  action:: accept
+}
+
+term default-deny {
+  comment:: "Deny_all_others."
+  action:: deny
+}
+

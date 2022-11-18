@@ -1,0 +1,34 @@
+Ansible Ad-Hoc
+
+ansible sw1003a -m debug -a "var=hostvars"
+ansible all -m debug -a "var=hostvars[hostname].l3_uplinks" -l sw1003a
+
+Asnible Gather_Facts
+# ansible all -m setup --tree /tmp/facts
+
+# Display only facts regarding memory found by ansible on all hosts and output them.
+# ansible all -m setup -a 'filter=ansible_*_mb'
+
+# Display only facts returned by factor.
+# ansible all -m setup -a 'filter=factor_*'
+
+# Collect only facts returned by factor.
+# ansible all -m setup -a 'gather_subset=!all,!any,factor'
+
+- name: Collect only facts returned by factor
+  setup:
+    gather_subset:
+      - '!all'
+      - '!any'
+      - factor
+
+# Display only facts about certain interfaces.
+# ansible all -m setup -a 'filter=ansible_eth[0-2]'
+
+# Restrict additional gathered facts to network and virtual (includes default minimum facts)
+# ansible all -m setup -a 'gather_subset=network,virtual'
+
+
+Convert outpout to readable JSON
+cat /tmp/facts/s1g1 | json_pp -json_opt pretty,canonical
+

@@ -1,0 +1,54 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{#######################################
+
+#Purpose:
+Create FRR configuration for SONiC devices
+
+#######################################}
+hostname {{ hostname }}
+log syslog informational
+service integrated-vtysh-config
+!
+router bgp {{ bgp.local_as }}
+{% if bgp.peer_template is defined and bgp.peer_template %}
+{% for peer_grp in bgp.peer_template %}
+  neighbor {{ peer_grp.name }} peer-group
+  neighbor {{ peer_grp.name }} description "{{ peer_grp.desc }}"
+  neighbor {{ peer_grp.name }} bfd
+  neighbor {{ peer_grp.name }} ebgp-multihop 5
+  neighbor {{ peer_grp.name }} advertisement-interval {{ peer_grp.advertisement_interval }}
+  neighbor {{ peer_grp.name }} timers {{ peer_grp.timers.keepalive }} {{ peer_grp.timers.holdtime }}
+    {% if peer_grp.capability is defined and peer_grp.capability %}
+    {% for capa in peer_grp.capability %}
+  neighbor {{ peer_grp.name }} capability {{ capa }}
+    {% endfor %}
+    {% endif %}
+  !
+    {% if peer_grp.afi is defined and peer_grp.afi == "ipv4" %}
+  address-family ipv4 unicast
+    neighbor {{ peer_grp.name }} activate
+  !
+  address-family l2vpn evpn
+    neighbor {{ peer_grp.name }} activate
+    advertise-all-vni
+  !
+    {% elif peer_grp.afi == "ipv6" %}
+  address-family ipv4 unicast
+    no neighbor {{ peer_grp.name }} activate
+  !
+  address-family ipv6 unicast
+    neighbor {{ peer_grp.name }} activate
+  !
+    {% endif %}
+    {% if peer_grp.peers is defined and peer_grp.peers %}
+    {% for peer in peer_grp.peers %}
+  neighbor {{ peer.peer_addr }} peer-group {{ peer_grp.name }}
+  neighbor {{ peer.peer_addr }} description "{{ peer.desc }}"
+  neighbor {{ peer.peer_addr }} remote-as {{ peer.remote_as }}
+    {% endfor %}
+    {% endif %}
+  {% endfor %}
+  {% endif %}
+!
+line vty
+!

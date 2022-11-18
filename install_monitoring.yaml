@@ -1,0 +1,48 @@
+- hosts: netserv04
+  become: yes
+  gather_facts: yes
+  vars:
+    ansible_ssh_user: "lab"
+    ansible_ssh_pass: "{{ vault_lab_password }}"
+    ansible_become_pass: "{{ vault_lab_password }}"
+    local_user: "{{ lookup('env', 'USER') }}"
+    prometheus_components:
+      - prometheus
+      - alertmanager
+      - blackbox_exporter
+      - node_exporter
+      - snmp_exporter
+    prometheus_port: 10000
+    prometheus_extra_opts:
+     - '--storage.tsdb.retention=90d'
+  roles:
+    - mesaguy.prometheus
+  tags: prometheus
+
+- hosts: netserv04
+  become: yes
+  gather_facts: yes
+  vars:
+    ansible_ssh_user: "lab"
+    ansible_ssh_pass: "{{ vault_lab_password }}"
+    ansible_become_pass: "{{ vault_lab_password }}"
+    local_user: "{{ lookup('env', 'USER') }}"
+  roles:
+    - role: cloudalchemy.grafana
+      vars:
+        grafana_security:
+          admin_user: admin
+          admin_password: "{{ vault_lab_password }}"
+  tags: grafana
+
+- hosts: netserv04
+  become: yes
+  gather_facts: yes
+  vars:
+    ansible_ssh_user: "lab"
+    ansible_ssh_pass: "{{ vault_lab_password }}"
+    ansible_become_pass: "{{ vault_lab_password }}"
+    local_user: "{{ lookup('env', 'USER') }}"
+  roles:
+    - role: softasap.sa_loki
+  tags: PromTail

@@ -1,0 +1,142 @@
+interface loopback1
+ description "{{ lpbk1.desc }}"
+ no shutdown
+{% if lpbk1.addr_v4 is defined and lpbk1.addr_v4 %}
+ ip address {{ lpbk1.addr_v4 }}/32
+{% endif %}
+{% if lpbk1.addr_v6 is defined and lpbk1.addr_v6 %}
+ ipv6 address {{ lpbk1.addr_v6 }}/128
+{% endif %}
+ exit
+!
+router bgp {{ bgp.local_as }}
+ template fabric_peer_v4
+  send-community extended
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  !
+ !
+ template tor_peer_v4
+  send-community extended
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  !
+ !
+ template sas_peer_v4
+  send-community extended
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  exit
+ exit
+!
+ip virtual-router mac-address {{ tor_pair_vmac }}
+!
+{% for vrfi in evpn.vrf %}
+ip vrf {{ vrfi.name }}
+!
+{% endfor %}
+evpn
+ router-mac {{ tor_pair_vmac }}
+ !
+ no auto-evi
+{% for vrfi in evpn.vrf %}
+ vrf {{ vrfi.name }}
+  vni {{ vrfi.l3_vni }}
+  route-target {{ rack04_asn }}:{{ vrfi.l3_vni }} both
+{% for route in vrfi.type5 %}
+{% if route.r_map is defined and route.r_map %}
+  advertise ipv4 {{ route.proto }} route-map {{ route.r_map }}
+{% else %}
+  advertise ipv4 {{ route.proto }}
+{% endif %}
+{% endfor %}
+ !
+{% endfor %}
+!
+{% if edge_vlans is defined and edge_vlans %}
+{% for vlan in edge_vlans %}
+interface vlan{{ vlan.id }}
+  description "{{ vlan.desc }}"
+  ip vrf forwarding {{ vlan.vrf }}
+{% if vlan.netv4 is defined and vlan.netv4 %}
+  ip address {{ vlan.netv4 | ipaddr(1) }}
+{% endif %}
+{% if vlan.netv6 is defined and vlan.netv6 %}
+  ipv6 address {{ vlan.netv6 | ipaddr(1) }}
+{% endif %}
+  mtu {{ vxlan_mtu }}
+  no shutdown
+  exit
+!
+interface ethernet1/1/{{ vlan.port }}
+  description "{{ vlan.desc }}-trunk port"
+  no shutdown
+  switchport mode trunk
+  switchport access vlan {{ vlans.native_vlan.id }}
+  switchport trunk allowed vlan {{ vlan.id }}
+  mtu 9216
+  flowcontrol receive off
+!
+{% endfor %}
+{% endif %}
+{% if edge_links is defined and edge_links %}
+{% for link in edge_links %}
+interface ethernet1/1/{{ link.port }}
+  description "{{ link.desc }}"
+  no switchport
+  ip vrf forwarding {{ link.vrf }}
+{% if link.netv4 is defined and link.netv4 %}
+  ip address {{ link.netv4 | ipaddr(1) }}
+{% endif %}
+{% if link.netv6 is defined and link.netv6 %}
+  ipv6 address {{ link.netv6 | ipaddr(1) }}
+{% endif %}
+  mtu {{ vxlan_mtu }}
+  no shutdown
+  exit
+!
+{% endfor %}
+{% endif %}
+{% for vrfi in evpn.vrf %}
+{% if vrfi.proto is defined and vrfi.proto %}
+{% if vrfi.proto.bgp is defined and vrfi.proto.bgp %}
+router bgp {{ bgp.local_as }}
+  vrf {{ vrfi.name }}
+{% if vrfi.proto.bgp.gw_peer_v4 is defined and vrfi.proto.bgp.gw_peer_v4 %}
+{% for gwpeer in vrfi.proto.bgp.gw_peer_v4 %}
+    neighbor {{ gwpeer.addr }}
+      remote-as {{ gwpeer.asn }}
+      no shutdown
+    !
+{% endfor %}
+{% endif %}
+  !
+{% if vrfi.proto.bgp.gw_peer_v6 is defined and vrfi.proto.bgp.gw_peer_v6 %}
+{% for gwpeer in vrfi.proto.bgp.gw_peer_v6 %}
+    neighbor {{ gwpeer.addr }}
+      remote-as {{ gwpeer.asn }}
+      no shutdown
+    !
+{% endfor %}
+{% endif %}
+  !
+!
+{% endif %}
+{% if vrfi.proto.static_v4 is defined and vrfi.proto.static_v4 %}
+{% for route in vrfi.proto.static_v4 %}
+ip route vrf {{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+!
+{% if vrfi.proto.static_v6 is defined and vrfi.proto.static_v6 %}
+{% for route in vrfi.proto.static_v6 %}
+ipv6 route vrf {{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endfor %}
+!
+{% include 'dellos10_evpn_vlan.j2' %}

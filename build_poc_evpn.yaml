@@ -1,0 +1,169 @@
+---
+- hosts: poc_evpn
+  connection: network_cli
+  # serial: 8
+  gather_facts: False
+
+  collections:
+     - dellemc.os10
+
+  tasks:
+  - name: Cancel ZTD
+    dellos10_command:
+      commands:
+        - "ztd cancel"
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+    tags:
+    - ztdoff
+
+  - name: "Provision Underlay Confiration"
+    block:
+    # when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+      - name: "Generating Routing Policy configuration"
+        template:
+            src: dellos10_rpol.j2
+            dest: "{{ build_dir }}/rpol_{{hostname}}.conf.part"
+        tags:
+          - cfggen
+          - rpol
+
+      - name: "Clearing Legacy Routing Policy configuration"
+        os10_config:
+            src: dellos10_no_rpol.j2
+        ignore_errors: yes
+        tags:
+          - cfgpush
+          - rpol
+
+      - name: "Provisioning Routing Policy configuration"
+        os10_config:
+            src: dellos10_rpol.j2
+        tags:
+          - cfgpush
+          - rpol
+
+      - name: "CFGGEN: Generating Underlay configuration for Dellos10"
+        template:
+            src: evpn_underlay_os10.j2
+            dest: "{{ build_dir }}/os10_underlay_{{hostname}}.conf.part"
+        tags:
+          - underlay
+          - cfggen
+
+      - name: "CFGPUSH: Provisioning Underlay configuration for Dellos10"
+        os10_config:
+            src: evpn_underlay_os10.j2
+        register: output
+        tags:
+          - underlay
+          - cfgpush
+
+  - name: "Provision EVPN Overlay Configration"
+    block:
+      # when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+      - name: "CFGGEN: Generating EVPN VXLAN configuration for dellos10"
+        template:
+            src: dellos10_evpn.j2
+            dest: "{{ build_dir }}/EVPN10_{{hostname}}.conf.part"
+        tags:
+          - cfggen
+          - evpn
+
+      - name: "CFGGEN: Generating NOEVPN Config for dellos10"
+        template:
+            src: no_evpn.j2
+            dest: "{{ build_dir }}/NOEVPN10_{{hostname}}.conf.part"
+        #   notify: save config os10
+        #   register: output
+        tags:
+          - cfggen
+          - evpn
+
+      - name: "CFGPUSH: Cleaning Residual EVPN Config for EVPN Deployment"
+        os10_config:
+            src: no_evpn.j2
+        ignore_errors: yes
+        tags:
+          - cfgpush
+          - evpn
+
+      # - name: "CFGPUSH: Cleaning Residual Vxlan Config for EVPN Deployment"
+      #   os10_config:
+      #       src: no_vxlan.j2
+      #   when: ( rack_no != "04" )
+      #   ignore_errors: yes
+      #   tags:
+      #     - cfgpush
+      #     - evpn
+
+      - name: "CFGPUSH: Enable Loopback1 for EVPN Overlay"
+        os10_config:
+            lines:
+              - description "{{ lpbk1.desc }}"
+              - ip address {{ lpbk1.addr_v4 }}/32
+              - no shutdown
+            parents: ['interface loopback1']
+            match: exact
+            save: no
+            replace: block
+        register: output
+        tags:
+            - evpn
+            - cfgpush
+
+      - name: "CFGPUSH: Enable NVE for EVPN Overlay"
+        os10_config:
+            lines:
+              - source-interface loopback1
+            parents: ['nve']
+            match: exact
+            save: no
+            replace: block
+        register: output
+        tags:
+            - evpn
+            - cfgpush
+
+      - name: "Provisioning EVPN VXLAN configuration for dellos10"
+        os10_config:
+            src: dellos10_evpn.j2
+            save: "yes"
+            replace: "block"
+        register: output
+        tags:
+            - evpn
+            - cfgpush
+
+  - name: "Reload Switch for fresh restart"
+    block:
+      - name : Reloading OS10 switch to enable IPv6 forwarding
+        dellos10_command:
+          commands:
+              - write mem
+              - command: 'reload'
+                prompt: 'Proceed to reboot'
+                answer: 'y'
+        tags: reload
+
+      - name: Wait for the reboot to complete.
+        wait_for_connection:
+          connect_timeout: 20
+          sleep: 5
+          delay: 10
+          timeout: 360
+        tags: reload
+                    
+      - name: Wait 1 mins for Switch coming up
+        pause:
+          seconds: 60
+        delegate_to: localhost
+        tags: reload
+
+      - name: Checking the version
+        dellos10_facts:
+          gather_subset: hardware
+        register: post_facts
+        tags: reload
+
+      - debug: var=post_facts.ansible_facts.ansible_net_version
+        tags: reload

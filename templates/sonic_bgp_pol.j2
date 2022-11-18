@@ -1,0 +1,7 @@
+!
+route-map drain_ingress_tfk permit 10
+ set as-path prepend {{ bgp.local_as }},{{ bgp.local_as }},{{ bgp.local_as }}
+!
+route-map drain_egress_tfk permit 10
+ set local-preference 90
+!

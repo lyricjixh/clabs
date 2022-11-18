@@ -1,0 +1,21 @@
+---
+# tasks file to add/update sonicos-interface
+ 
+- name: "Generating interface configuration for sonic"
+  template:
+    src: sonic-interface.j2
+    dest: "{{build_dir}}/interface_{{hostname}}.sh"
+  when: (ansible_network_os is defined and ansible_network_os == "sonic")
+  register: generate_output
+  tags:
+    - cfggen
+    - intf
+
+- name: "Provisioning interface configuration for sonic"
+  # sudo: true
+  script: "{{build_dir}}/interface_{{hostname}}.sh"
+  when: (ansible_network_os is defined and ansible_network_os == "sonic")
+  register: output
+  tags:
+    - intf
+ 

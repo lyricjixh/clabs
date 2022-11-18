@@ -1,0 +1,69 @@
+---
+- hosts: poc_work
+  connection: network_cli
+  gather_facts: No
+  collections:
+     - dellemc.os10
+
+  tasks:
+  - name: "CFGGEN: Generating Underlay Cleanup configuration"
+    template:
+        src: no_underlay.j2
+        dest: "{{ build_dir }}/os10_del_underlay_{{hostname}}.conf.part"
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+  #   notify: save config os10
+  #   register: generate_output
+    tags:
+    - cfggen
+
+  - name: "CFGGEN: Generating L2 VLT Port Channel Cleanup configuration"
+    template:
+        src: no_vlt_pc.j2
+        dest: "{{ build_dir }}/os10_del_vlt_pc_{{hostname}}.conf.part"
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+  #   notify: save config os10
+  #   register: generate_output
+    tags:
+    - cfggen
+
+  - name: "CFGGEN: Generating RVI/VRRP Cleanup Configuration"
+    template:
+        src: no_vxlan.j2
+        dest: "{{ build_dir }}/os10_clean_vlan_{{hostname}}.conf.part"
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+  #   notify: save config os10
+  #   register: generate_output
+    tags:
+    - cfggen
+
+  - name: "CFGPUSH: Eliminating Underlay configuration for Dellos10"
+    os10_config:
+        src: no_underlay.j2
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+  #   notify: save config os10
+    register: output
+    tags:
+    - cfgpush
+
+  #- name: Display all variables/facts for output
+  #  debug:
+  #    var: output
+  #    verbosity: 4
+
+  - name: "CFGPUSH: Cleaning VLT Port Channel configuration for dellos10"
+    os10_config:
+        src: "no_vlt_pc.j2"
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+  #   notify: save config os10
+  #   register: output
+    tags:
+    - cfgpush
+
+  - name: "CFGPUSH: Cleaning Vxlan configuration for dellos10"
+    os10_config:
+        src: "no_vxlan.j2"
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+  #   notify: save config os10
+  #   register: output
+    tags:
+    - cfgpush

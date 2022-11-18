@@ -1,0 +1,12 @@
+---
+# handlers file for sonic-oper
+- name: Restart network FRR deamon
+  systemd:
+    name: bgp
+    state: restarted
+
+- name: Restart NTP
+  systemd:
+    name: ntpd
+    enabled: yes
+    state: started

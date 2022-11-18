@@ -1,0 +1,18 @@
+# PRE-CONFIG
+# POST-CONFIG
+configure terminal
+hostname tor-3b
+interface mgmt 1/1/1
+ no ip address
+ no ip address dhcp
+ no ipv6 address
+ no ipv6 address autoconfig
+exit
+ip vrf management
+ interface management
+exit
+interface mgmt 1/1/1
+ ip address 172.17.60.18/24
+exit
+management route 0.0.0.0/0 172.17.60.254
+exit

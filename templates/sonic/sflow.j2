@@ -1,0 +1,36 @@
+{###########################################
+
+Purpose:
+Generating Syslog Configuration
+############################################}
+{% if sflow.sflow_enable == "false" %}
+no sflow enable
+{% elif sflow.sflow_enable == "true" %}
+{% for collector in sflow.collector %}
+{% if collector.state == "absent" %}
+no sflow collector {{ collector.collector_ip }}
+{% elif collector.state == "present" %}
+{% if sflow.vrf is defined and sflow.vrf %}
+sflow collector {{ collector.collector_ip }} vrf {{ sflow.vrf }} {{ collector.udp_port }}
+{% else %}
+sflow collector {{ collector.collector_ip }} {{ collector.udp_port }}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% if sflow.polling_interval is defined and sflow.polling_interval %}
+sflow polling-interval {{ sflow.polling_interval }}
+{% endif %}
+!
+{% endif %}
+{% for port in sflow.port %}
+interface {{ port.id }}
+{% if port.state == "absent" %}
+ no sflow enable
+{% elif port.state == "present" %}
+ sflow enable
+{% endif %}
+{% if port.sample_rate is defined and port.sample_rate %}
+ sflow sample-rate {{ port.sample_rate }}
+{% endif %}
+!
+{% endfor %}

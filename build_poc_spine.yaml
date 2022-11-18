@@ -1,0 +1,10 @@
+---
+- hosts: poc_spine
+  connection: network_cli
+  gather_facts: No
+  vars:
+    ansible_connection: ssh
+
+  roles:
+    - sonic-baseline
+    - sonic-oper

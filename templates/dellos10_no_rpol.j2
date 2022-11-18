@@ -1,0 +1,31 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{###########################################
+
+Purpose:
+Delete Routing Policy for dellos10 Devices
+############################################}
+!
+{% if policy.comm_list is defined and policy.comm_list %}
+{% for list in policy.comm_list %}
+no ip community-list standard {{ list.name }}
+{% endfor %}
+{% endif %}
+!
+{% if policy.as_path is defined and policy.as_path %}
+{% for aspath in policy.as_path %}
+no ip as-path access-list {{ aspath.name }}
+{% endfor %}
+{% endif %}
+!
+{% if policy.prefix_list is defined and policy.prefix_list %}
+{% for plist in policy.prefix_list %}
+no ip prefix-list {{ plist.name }}
+{% endfor %}
+{% endif %}
+!
+{% if policy.route_map is defined and policy.route_map %}
+{% for rmap in policy.route_map %}
+no route-map {{ rmap.name }}
+{% endfor %}
+{% endif %}
+!

@@ -1,0 +1,9 @@
+apiVersion: projectcalico.org/v3
+kind: BGPPeer
+metadata:
+  name: {{ item.name }}
+spec:
+  peerIP: {{ item.peer_addrv4 }}
+  node: {{ calico.node_name }}
+  asNumber: {{ item.remote_asn }}
+  sourceAddress: None

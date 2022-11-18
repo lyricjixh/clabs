@@ -1,0 +1,23 @@
+{###########################################
+
+Purpose:
+Generating Static Vxlan Configuration
+############################################}
+{% if breakout_10g is defined and breakout_10g %}
+{% for bport in range(breakout_10g.start, breakout_10g.end+1) %}
+interface breakout port 1/{{n}} mode 4x10G
+{% endfor %}
+!
+{% endif %}
+{% if breakout_25g is defined and breakout_25g %}
+{% for n in range(breakout_25g.start,breakout_25g.end+1) %}
+interface breakout port 1/{{n}} mode 4x25G
+{% endfor %}
+!
+{% endif %}
+{% if breakout_40g is defined and breakout_40g %}
+{% for n in range(breakout_40g.start,breakout_40g.end+1) %}
+interface breakout port 1/{{n}} mode 1x40G
+{% endfor %}
+!
+{% endif %}

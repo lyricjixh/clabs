@@ -1,0 +1,8 @@
+---
+- hosts: leaf
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: "Changing boot to standby"
+      dellos10_command:
+        commands: 'boot system standby'

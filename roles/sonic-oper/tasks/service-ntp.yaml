@@ -1,0 +1,14 @@
+# tasks file for sonicos-ntp
+ 
+  - name: "Generating ntp configuration for sonic"
+    template:
+      src: service-ntp.j2
+      dest: "{{build_dir}}/ntp_{{inventory_hostname}}.json"
+  
+  - name: "Loading NTP configuration"
+    become: yes
+    become_user: root
+    become_method: sudo
+    command: "{{ item }}"
+    with_items:
+        - config load {{build_dir}}/ntp_{{inventory_hostname}}.json -y

@@ -1,0 +1,92 @@
+---
+- hosts: poc_leaf
+  connection: network_cli
+  gather_facts: no
+  any_errors_fatal: True
+
+  tasks:
+  - name: Get Current OS Version
+    dellos10_facts:
+      gather_subset: hardware
+    register: pre_facts
+
+  - debug: var=pre_facts
+
+  - name : Reload {{inventory_hostname}} from standby partition
+    dellos10_command:
+      commands:
+          - write mem
+          - boot system standby
+          - command: 'reload'
+            prompt: 'Proceed to reboot'
+            answer: 'y'
+
+  # - name : Reloading OS10 switch
+  #   dellos10_command:
+  #     commands:
+  #         - write mem
+  #         - command: 'reload'
+  #           prompt: 'Proceed to reboot'
+  #           answer: 'y'
+
+  - name: Wait for the reboot to complete.
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 10
+      timeout: 360
+    tags: check-skip
+                
+  - name: Wait 60 secs for Switch coming up
+    pause:
+      seconds: 60
+    delegate_to: localhost
+
+
+  # - name: Checking the version
+  #   dellos10_facts:
+  #     gather_subset: hardware
+  #   register: post_facts
+  #   tags: reload
+
+  # - debug: var=post_facts.ansible_facts.ansible_net_version
+
+
+- hosts: poc_spine
+  connection: network_cli
+  gather_facts: No
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: admin
+    ansible_become: yes
+    ansible_become_method: sudo
+    ansible_become_pass: "{{ vault_os10_password }}"
+
+  tasks:
+# Reboot switches and check coming back after 5 mins
+  - name: Save SONiC Configuration
+    expect:
+      command: "config save"
+      timeout: 5
+      responses: 
+        ":": 'y'
+    tags: cfgsave
+
+  # Reboot switches and check coming back after 2 mins
+  - name: Finally Reboot to make a fresh start
+    shell: "sleep 5 && reboot"
+    async: 1
+    poll: 0
+    tags: check-skip
+
+  - name: Wait for the reboot to complete.
+    wait_for_connection:
+      connect_timeout: 20
+      sleep: 5
+      delay: 10
+      timeout: 360
+    tags: check-skip
+    
+  - name: Check the switch coming back
+    ping:
+

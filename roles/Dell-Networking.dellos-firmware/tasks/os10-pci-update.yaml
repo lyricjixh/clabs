@@ -1,0 +1,82 @@
+---
+- name : "Copy PCIe image to the home directory"
+  dellemc.os10.os10_command:
+    commands: ['copy http://{{file_server}}/{{pcie_bin_file_name}} home://{{pcie_bin_file_name}}']
+
+- pause:
+    seconds: 10
+    prompt: "Now a break ..."
+
+- name: "Get pci version"
+  vars:
+    pci_command: "'pciephy fw version'"
+    sudo_command: '"sudo hshell -c {{ pci_command }}"'
+  dellemc.os10.os10_command:
+    commands:
+       - command: "system {{ sudo_command }}"
+         prompt: '{{ ansible_user }}:\s?$'
+         answer: "{{ ansible_password }}"
+  register: pci_version
+
+- name: "Install pci bin"
+  vars:
+    pci_command: "'pciephy fw load /home/admin/{{pcie_bin_file_name}}'"
+    sudo_command: '"sudo hshell -c {{ pci_command }}"'
+  dellemc.os10.os10_command:
+    commands:
+       - command: "system {{ sudo_command }}"
+         prompt: '{{ ansible_user }}:\s?$'
+         answer: "{{ ansible_password }}"
+  register: pci_install
+
+- pause:
+    seconds: 15
+    prompt: "Now a break before a ride..."
+
+- debug: var=pci_install
+
+- name: Wait for switches ready
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 22
+    delay: 10
+    timeout: 600
+
+- pause:
+    seconds: 30
+    prompt: "Ensure Switches All ready ..."
+
+- name: Wait for {{inventory_hostname}} to reload
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 22
+    delay: 10
+    timeout: 600
+
+- debug: msg="Recovering {{inventory_hostname}}..."
+
+- name: "Get pci version"
+  vars:
+    pci_command: "'pciephy fw version'"
+    sudo_command: '"sudo hshell -c {{ pci_command }}"'
+  dellemc.os10.os10_command:
+    commands:
+       - command: "system {{ sudo_command }}"
+         prompt: '{{ ansible_user }}:\s?$'
+         answer: "{{ ansible_password }}"
+  register: pci_version
+
+  #- debug: var=pci_version
+
+- set_fact:
+    output: "{{ item.split(': ')[1]|trim }}"
+  when: item.find("loader ") > -1
+  with_items: "{{ pci_version.stdout_lines.0 }}"
+  no_log: True
+
+- debug: var=output
+- debug: var=validation.expected_pci_version
+
+- name: "validate pci version"
+  fail: msg="PCI update operation Failed"
+  when: output|float != validation.expected_pci_version|float

@@ -1,0 +1,65 @@
+{#####################################################
+
+Purpose:
+Configure layer2 profile interface for dellos10 Devices.
+
+#####################################################}
+spanning-tree vlan 1-4093 priority 57344
+!
+{% if vrrp is defined and vrrp %}
+vrrp version 3
+!
+{% endif %}
+!
+{% if native_vlan is defined and native_vlan %}
+interface vlan{{ native_vlan.id }}
+ description "{{ native_vlan.desc }}"
+ shutdown
+!
+{% endif %}
+!
+{% if vlan_ranges is defined and vlan_ranges %} 
+{% for vrange in vlan_ranges %}
+{% set r_start = vrange.start | int %}
+{% set r_end = vrange.end | int + 1 %}
+{% for vid in range(r_start, r_end, 1) %}
+interface vlan{{ vid }}
+ description "{{ vrange.desc }}{{ vid }}"
+ no shutdown
+{%- if vrange.addr_v4 is defined and vrange.addr_v4 %} 
+ ip address {{ vrange.addr_v4 }}
+{%- endif %} 
+{%- if vrange.addr_v6 is defined and vrange.addr_v6 %} 
+ ipv6 address {{ vrange.addr_v6 }}
+{%- endif %} 
+ !
+{%- if vrange.addr_vip is defined and vrange.addr_vip %} 
+ vrrp-group 1
+  priority {{ vrange.prio }}
+  virtual-address {{ vrange.addr_vip }}
+{%- endif %} 
+!
+{% endfor %}
+{%- endfor %}
+!
+{% endif %} 
+{% if vlans is defined and vlans %} 
+{% for vlan in vlans %} 
+interface vlan{{ vlan.id }}
+ description "{{ vlan.desc }}"
+ no shutdown
+{%- if vlan.addr_v4 is defined and vlan.addr_v4 %} 
+ ip address {{ vlan.addr_v4 }}
+{%- endif %} 
+{%- if vlan.addr_v6 is defined and vlan.addr_v6 %} 
+ ipv6 address {{ vlan.addr_v6 }}
+{%- endif %} 
+ !
+{%- if vlan.addr_vip is defined and vlan.addr_vip %} 
+ vrrp-group 1
+  priority {{ vlan.prio }}
+  virtual-address {{ vlan.addr_vip }}
+{%- endif %} 
+!
+{%- endfor %}
+{% endif %} 

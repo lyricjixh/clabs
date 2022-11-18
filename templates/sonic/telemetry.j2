@@ -1,0 +1,8 @@
+{###########################################
+
+Purpose:
+Generating Syslog Configuration
+############################################}
+{% if telemetry is defined and telemetry %}
+authentication telemetry {{ telemetry.auth|join(',') }}
+{% endif %}

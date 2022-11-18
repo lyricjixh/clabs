@@ -1,0 +1,14 @@
+#jinja2: trim_blocks: True,lstrip_blocks: True
+{#############################################
+
+Purpose:
+Configure Username commands for dellos10 Devices
+
+###############################################}
+
+system-user linuxadmin password {{ sysuser_passwd }}
+{% if user is defined and user %}
+{% for user in users %}
+username {{user.name}} password {{ user.passwd }} role {{ user.role }}
+{% endfor %}
+{% endif %}

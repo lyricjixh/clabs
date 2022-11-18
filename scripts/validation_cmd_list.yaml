@@ -1,0 +1,27 @@
+---
+dellos10:
+    - terminal length 0
+    - show version
+    - show lldp neighbors
+    - show ip bgp summary
+    - show ip bgp ipv6 unicast summary
+    - show vlan
+    - show vrrp brief
+    - show vlt 1
+    - show vlt 1 backup-link
+    - show vlt 1 vlt-port-detail
+    - show running-configuration bgp
+    - show running-configuration interface vlan
+    - show running-configuration compressed
+    - show hardware l3
+    - show mac address-table address 00:00:5e:00:01:01
+    - show running-configuration spanning-tree
+    - show port-channel summary
+    - show version
+    - show boot detail
+sonic:
+    - show version
+    - show lldp table
+    - show ip interface
+    - show ipv6 interface
+    - show ip route 0.0.0.0

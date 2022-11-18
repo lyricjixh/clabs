@@ -1,0 +1,48 @@
+---
+# tasks file for dellos10
+
+-  name: "Generating the Cleanup the RVI/VRRP Configuration"
+   template:
+      src: no_vxlan.j2
+      dest: "{{ build_dir }}/os10_clean_vlan_{{hostname}}.conf.part"
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+#   notify: save config os10
+#   register: generate_output
+   tags:
+     - novxlan
+     - cfggen
+
+-  name: "Generating VXLAN configuration for dellos10"
+   template:
+      src: dellos10_vxlan.j2
+      dest: "{{ build_dir }}/os10_vxlan_{{hostname}}.conf.part"
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+#   notify: save config os10
+#   register: generate_output
+   tags:
+     - vxlan
+     - cfggen
+
+-  name: "Cleaning Vxlan configuration for dellos10"
+   os10_config:
+      src: no_vxlan.j2
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+#   notify: save config os10
+#   register: output
+   tags:
+     - novxlan
+
+-  name: "Provisioning VXLAN configuration for dellos10"
+#   debugger: on_failed
+   os10_config:
+      src: dellos10_vxlan.j2
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+#   notify: save config os10
+   register: output
+   tags:
+     - vxlan
+
+#-  name: Display all variables/facts for output
+#   debug:
+#    var: output
+#    verbosity: 4

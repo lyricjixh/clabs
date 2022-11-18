@@ -1,0 +1,17 @@
+{
+	"ztp": {
+		"01-configdb-json": {
+            "url": {
+                "source": "http://172.17.60.81/init_config_db.json"
+            },
+			"clear-config": false
+		},
+		"02-set-passwd":{
+			"plugin": {
+				"url":{
+					"source":"http://172.17.60.81/set-password.sh"
+				}
+			}
+		}
+	}
+}

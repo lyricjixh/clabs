@@ -1,0 +1,71 @@
+{#
+##########################################
+
+Purpose:
+Generating Switch Configuration for Calico
+###########################################
+#}
+{% for cvlan in vlans.cali_vlans %}
+{% if seq is odd and cvlan.id is odd %}
+interface vlan{{ cvlan.id }}
+ description "{{ cvlan.desc }}"
+ no shutdown
+ mtu 9216
+ ip address {{ cvlan.netv4 | ipaddr(-2) }}
+ ipv6 address {{ cvlan.netv6 | ipaddr(-2) }}
+!
+{% elif seq is even and cvlan.id is even %}
+interface vlan{{ cvlan.id }}
+ description "{{ cvlan.desc }}"
+ no shutdown
+ mtu 9216
+ ip address {{ cvlan.netv4 | ipaddr(-2) }}
+ ipv6 address {{ cvlan.netv6 | ipaddr(-2) }}
+!
+{% endif %}
+{% endfor %}
+{% for port_range in esxi_port_range %}
+interface range ethernet{{ port_range }}
+ no ip address
+ no ipv6 address
+ switchport mode trunk
+{% for cvlan in vlans.cali_vlans %}
+{% if seq is odd and cvlan.id is odd %}
+ switchport trunk allowed vlan {{ cvlan.id }}
+{% elif seq is even and cvlan.id is even %}
+ switchport trunk allowed vlan {{ cvlan.id }}
+{% endif %}
+{% endfor %}
+!
+{% endfor %}
+router bgp {{ bgp.local_as }}
+ template cali_peer_v4
+  description "Calico Peer Group V4"
+{% if seq is odd %}
+  listen {{ v141_netv4 }}
+{% else %}
+  listen {{ v142_netv4 }}
+{% endif %}
+  remote-as {{ calico_asn }}
+  send-community extended
+  !
+  address-family ipv4 unicast
+ !
+ template cali_peer_v6
+  description "Calico Peer Group V6"
+{% if seq is odd %}
+  listen {{ v141_netv6 }}
+{% else %}
+  listen {{ v142_netv6 }}
+{% endif %}
+  remote-as {{ calico_asn }}
+  send-community extended
+  !
+  address-family ipv4 unicast
+   no activate
+  !
+  address-family ipv6 unicast
+   activate
+  !
+ !
+!

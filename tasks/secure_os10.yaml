@@ -1,0 +1,21 @@
+---
+- name: "Generating DellOS10 Security Configuration"
+  template:
+      src: secure_os10.j2
+      dest: "{{ build_dir }}/os10_secure_{{hostname}}.conf.part"
+  when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+#   notify: save config os10
+  register: generate_output
+  tags:
+   - secure
+   - cfggen
+
+- name: "Provisioning DellOS10 Security Configuration"
+  dellos10_config:
+   src: secure_os10.j2
+  when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+#   notify: save config os10
+  register: output
+  tags:
+   - secure
+   - cfgpush

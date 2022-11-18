@@ -1,0 +1,142 @@
+# Suite01: Reboot one switches
+- hosts: leaf01
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+  - include: ./tasks/test_reload_os10.yaml
+    tags: suite01
+
+# Suite02: Reboot Entire Rack
+- hosts: poc_rack02
+  gather_facts: no
+  serial: 2
+  any_errors_fatal: True
+
+  tasks:
+  - include: ./tasks/test_reload_os10.yaml
+    tags: suite02
+
+# Suite03: Flipping single Leaf/ESXi breakout port
+- hosts: leaf02
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+  - name: Shutdown {{inventory_hostname}} ESXi Facing ports 
+    dellos10_config:
+      lines:
+        - shutdown
+      parents: "interface range ethernet{{ item }}"
+    loop: "{{ esxi_port_range }}"
+    tags: suite03
+
+  - name: Wait 5 sec for {{inventory_hostname}}
+    pause:
+      seconds: 5
+    delegate_to: localhost
+    tags: suite03
+
+  - name: Unshut {{inventory_hostname}} ESXi Facing ports 
+    dellos10_config:
+      lines:
+        - no shutdown
+      parents: "interface range ethernet{{ item }}"
+    loop: "{{ esxi_port_range }}"
+    tags: suite03
+
+# Suite04: Flipping all Front Panel ports
+- hosts: leaf02
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+  - name: Shutdown {{inventory_hostname}} Frond Panel ports 
+    dellos10_config:
+      lines:
+        - shutdown
+      parents: "interface range ethernet{{ item }}"
+    loop: "{{ front_panel_port_range }}"
+    tags: suite04
+
+  - name: Wait 5 sec for {{inventory_hostname}}
+    pause:
+      seconds: 5
+    delegate_to: localhost
+    tags: suite04
+
+  - name: Unshut {{inventory_hostname}} Frond Panel ports 
+    dellos10_config:
+      lines:
+        - no shutdown
+      parents: "interface range ethernet{{ item }}"
+    loop: "{{ front_panel_port_range }}"
+    tags: suite04
+
+# Suite05: Traffic Drain with BGP Policy
+- hosts: leaf02
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+  - name: Apply the BGP policy for traffic drain
+    include: ./tasks/traffic_drain.yaml
+    tags: suite05
+
+  - name: Remove the BGP policy for traffic drain
+    include: ./tasks/traffic_undrain.yaml
+    tags: suite05
+
+# Suite06: Flipping Leaf/spine BGP Peers
+- hosts: leaf02
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+  - name: Shut down {{inventory_hostname}} BGP peers
+    include: ./tasks/bgp_peer_shutdown.yaml
+    tags: suite06
+
+  - name: Wait 5 sec for {{inventory_hostname}}
+    pause:
+      seconds: 5
+    delegate_to: localhost
+    tags: suite06
+
+  - name: Unshut {{inventory_hostname}} BGP peers
+    include: ./tasks/bgp_peer_unshut.yaml
+    tags: suite06
+
+# Suite07: Flipping VLT peer control link, VLTi
+- hosts: leaf02
+  gather_facts: no
+  serial: 1
+  any_errors_fatal: True
+
+  tasks:
+  - name: Shutdown {{inventory_hostname}} VLTi ports 
+    dellos10_config:
+      lines:
+        - shutdown
+      parents: "interface ethernet1/1/{{ item }}"
+    loop: "{{ vlt.vlti }}"
+    tags: suite07
+
+  - name: Wait 1 sec for {{inventory_hostname}}
+    pause:
+      seconds: 1
+    delegate_to: localhost
+    tags: suite07
+
+  - name: Unshutdown {{inventory_hostname}} VLTi ports 
+    dellos10_config:
+      lines:
+        - no shutdown
+      parents: "interface ethernet1/1/{{ item }}"
+    loop: "{{ vlt.vlti }}"
+    tags: suite07

@@ -1,0 +1,12 @@
+---
+- hosts: poc_leaf
+  connection: network_cli
+  gather_facts: No
+  collections:
+     - dellemc.os10
+  vars:
+    ansible_network_os: dellemc.os10.os10
+    os10_cfg_generate: true
+
+  roles:
+     - dellemc.os10.os10_snmp

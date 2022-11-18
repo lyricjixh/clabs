@@ -1,0 +1,30 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{###########################################
+
+Purpose:
+Generating Static Vxlan Configuration
+############################################}
+{% for vrfi in evpn.vrf %}
+no router bgp vrf Vrf_{{ vrfi.name }}
+{% endfor %}
+!
+no router bgp
+!
+no mclag domain {{ vlt.domain_id }}
+!
+no interface Vlan {{ vlans.pair_vlan.id }}
+!
+no interface Vlan {{ vlans.vxrail_vlan.id }}
+!
+{% for vni in vxlans %}
+no interface vlan{{ vni.vlan }}
+!
+{% endfor %}
+{% for port in vlt.vlti %}
+interface Eth 1/{{ port }}
+ no channel-group 100
+ exit
+!
+{% endfor %}
+no interface PortChannel 100
+!

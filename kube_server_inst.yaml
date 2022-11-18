@@ -1,0 +1,35 @@
+---
+- name: Install Kubernetes Server
+  hosts: k8s
+  become: true
+  gather_facts: yes
+  tasks:
+  - name: Disable SWAP K8S will not work with swap enabled (1/2)
+    command: swapoff -a
+    when: ansible_swaptotal_mb > 0
+
+  - name: Debian | Remove SWAP from fstab K8S will not work with swap enabled (2/2)
+    mount:
+      name: "{{ item }}"
+      fstype: swap
+      state: absent
+    with_items:
+    - swap
+    - none
+
+  - name: Debian | Add GPG Key
+    apt_key:
+      url: "{{ k8s_url_apt_key }}"
+
+  - name: Debian | Add Kubernetes Repository
+    apt_repository: 
+      repo: "{{ k8s_repository }}"
+      update_cache: yes
+
+  - name: Debian | Install Dependencies
+    package: name={{ item }} state=present force=yes install_recommends=no
+    loop: "{{ k8s_dependencies }}"
+
+  - name: Debian | Install Kubernetes Packages
+    package: name={{ item }} state=present force=yes install_recommends=no
+    loop: "{{ k8s_packages }}"

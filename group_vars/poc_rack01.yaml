@@ -1,0 +1,19 @@
+# Location:
+rack_no: 1
+
+vlt_primary_priority: 1
+vlt_backup_destination: "{{ hostvars['sw1001b-x']['ansible_host'] }}"
+
+vxlan_rvtep:
+    - 10.10.0.2
+    - 10.10.0.3
+
+# trunk_port: 
+#    desc: "trunk memeber port"
+#    total:
+#    vlan_list: [101,201,301,3939]
+#    port_range:
+#    # port-range in same trunk
+#    port_indiv: ["8:1", "8:2", "8:3", "8:4",
+#                 "9:1", "9:2", "9:3", "9:4"]
+#    # individual port under the same trunk

@@ -1,0 +1,59 @@
+---
+- hosts: sonic
+  gather_facts: false
+  collections:
+     - dellemc.enterprise_sonic
+
+  tasks:
+  - name: "Clean up the legacy Configuration"
+    block:
+      - name : Reset Switch Configuration
+        sonic_command:
+          commands:
+            - command: 'write erase boot'
+              prompt: 'continue'
+              answer: 'y'
+        tags: test
+
+      - name: Reload the Switch
+        vars:
+          ansible_timeout: 120
+          ansible_command_timeout: 10
+          ansible_connect_timeout: 20
+        sonic_command:
+          commands:
+            # - 'reboot -f'
+            - command: 'reboot'
+              prompt: '[confirm yes/no]: ?$'
+              answer: 'yes'
+        ignore_errors: yes
+
+      - name: "Wait 15 secs for Switch coming up"
+        pause:
+          seconds: 15
+        delegate_to: localhost
+        tags: reset
+
+      - name: "Wait for Switch ready"
+        wait_for_connection:
+          sleep: 5
+          delay: 10
+          timeout: 240
+        ignore_errors: yes
+
+      - name: "Wait 60 secs for Switch coming up"
+        pause:
+          seconds: 60
+        delegate_to: localhost
+        tags: reset
+
+      - name: Disable ZTP
+        vars:
+          ansible_connection: ssh
+        become: yes
+        ansible.builtin.expect:
+          command: ztp disable
+          responses:
+            ".*[yes/NO]": "Yes"
+    tags:
+      - reset

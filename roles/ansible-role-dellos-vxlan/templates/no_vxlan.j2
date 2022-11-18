@@ -1,0 +1,30 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{#########################################################
+
+Purpose:
+Remove Static Vxlan Configuration for Dellos10 Devices
+
+##########################################################}
+!
+{% for vlan in vlans.app_vlans %} 
+interface vlan{{ vlan.id }}
+ !
+ no vrrp-group 1
+ no vrrp-ipv6-group 1
+ no virtual-network
+ !
+ no ip address
+ no ipv6 address
+!
+{% endfor %}
+{% for vni in vxlans %}
+no interface virtual-network{{ vni.id }}
+!
+no virtual-network {{ vni.id }}
+!
+{% endfor %}
+!
+no nve
+!
+no interface loopback1
+!

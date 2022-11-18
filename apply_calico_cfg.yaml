@@ -1,0 +1,190 @@
+---
+- name: Generate Calico ToR Interface CFG
+  hosts: poc_leaf
+  connection: network_cli
+  gather_facts: No
+  collections:
+     - dellemc.os10
+
+  tasks:
+  - name: "CFGGEN: Generating Calico Configuration"
+    template:
+        src: dellos10_calico.j2
+        dest: "{{ build_dir }}/os10_calico_{{hostname}}.conf.part"
+    # when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+    register: cfggen_output
+    tags:
+    - cfggen
+
+  - name: Display ToR CFG Changes
+    debug:
+      var: cfggen_output
+      verbosity: 1
+    tags:
+    - cfggen
+
+  - name: "CFGPUSH: Provisioning Calcio configuration"
+    os10_config:
+      src: dellos10_calico.j2
+      save: "yes"
+    # when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+    # register: generate_output
+    tags:
+    - cfgpush
+
+- name: Generate Calico Node Interface CFG
+  hosts: k8s
+  gather_facts: yes
+
+  tasks:
+  - name: generate network template and set read permission
+    template:
+        src: templates/ubuntu_intf.j2
+        dest: /etc/netplan/00-installer-config.yaml
+        mode: a+r
+    register: cfggen_output
+    tags:
+    - cfggen
+
+  - name: Display ToR CFG Changes
+    debug:
+      var: cfggen_output
+      verbosity: 1
+    tags:
+    - cfggen
+
+  - name: Netplan Apply Calico Interface CFG
+    command: netplan apply
+    become: yes
+    register: output  
+
+  - name: Check Calicoctl exists
+    stat:
+      path: "~{{ k8s_user }}/calicoctl"
+    register: stat_result
+    tags:
+      - cali_ctrl
+
+  - name: Download Calicoctl on Node
+    get_url:
+      url: "{{ calico_ctrl }}"
+      dest: "~{{ k8s_user }}/calicoctl"
+      mode: a+rx
+    when: not stat_result.stat.exists
+    tags:
+      - cali_ctrl
+
+  - name: Create Calico CFG Directory
+    become: false
+    file:
+      path: "{{ calico.cfg_dir }}"
+      state: directory
+      mode: a+r
+
+  - name: Generate Calico Node CFG
+    become: true
+    template:
+      src: templates/cali_node.j2
+      dest: "{{ calico.cfg_dir }}/node-{{ calico.node_name }}.yaml"
+      mode: a+r
+    tags:
+      - cali_node
+
+  - name: Fetch Calico Node CFG to Ansible Server
+    become: true
+    fetch:
+      dest: files/calico/
+      src: "{{ calico.cfg_dir }}/node-{{ calico.node_name }}.yaml"
+      flat: yes
+    when:  ansible_hostname != 'vm11'
+    tags:
+      - cali_node
+
+  - name: Generate Calico Peer CFG
+    become: true
+    template:
+      src: templates/cali_peer.j2
+      dest: "{{ calico.cfg_dir }}/peer-{{ item.name }}.yaml"
+      mode: a+r
+    loop: "{{ calico.peers }}"
+    tags:
+      - cali_node
+
+  - name: Fetch Calico Peer CFG to Ansible Server
+    become: true
+    fetch:
+      dest: files/calico/
+      src: "{{ calico.cfg_dir }}/peer-{{ item.name }}.yaml"
+      mode: a+r
+      flat: yes
+    loop: "{{ calico.peers }}"
+    tags:
+      - cali_node
+
+- name: Apply Calico CFG on Master Node
+  hosts: s03_vm11
+  gather_facts: yes
+
+  tasks:
+  - name: Upload Calico CFG from Ctrl to Master
+    become: false
+    copy:
+      src: "{{ item }}"
+      dest: "{{ calico.cfg_dir }}/"
+      mode: a+r
+    with_fileglob:
+      - "files/calico/*"
+    tags:
+      - cfg_upload
+
+  - name: Collect Calico Node CFG 
+    find: 
+      paths="{{ calico.cfg_dir }}"
+      recurse=no
+      patterns="node-*"
+    register: node_cfg
+    tags:
+      - cfg_apply
+
+  - name: Display Node Files
+    debug: var="{{ node_cfg.files }}"
+    tags:
+      - cfg_apply
+
+  - name: Apply Calico Node Config
+    command: "~lab/calicoctl apply -f {{ item.path }}"
+    become: false
+    with_items:
+      - "{{ node_cfg.files }}"
+    tags:
+      - cfg_apply
+
+  - name: Collect Calico Peer CFG 
+    find: 
+      paths="{{ calico.cfg_dir }}"
+      recurse=no
+      patterns="peer-*"
+    register: peer_cfg
+    tags:
+      - cfg_apply
+
+  - name: Display Peer Files
+    debug: var="{{ peer_cfg.files }}"
+    tags:
+      - cfg_apply
+
+  - name: Apply Calico Node Config
+    command: "~lab/calicoctl apply -f {{ item.path }}"
+    become: false
+    with_items:
+      - "{{ peer_cfg.files }}"
+    tags:
+      - cfg_apply
+
+  # - name: Apply Calico Node Config
+  #   command: "~lab/calicoctl apply -f {{ item }}"
+  #   become: false
+  #   with_fileglob:
+  #     - "files/calico/peer-*"
+  #   tags:
+  #     - cfg_apply

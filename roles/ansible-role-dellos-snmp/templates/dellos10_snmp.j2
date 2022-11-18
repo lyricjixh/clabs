@@ -1,0 +1,24 @@
+#jinja2: trim_blocks: True,lstrip_blocks: True
+{#############################################
+
+Purpose:
+Configure snmp version3 commands for dellos10 Devices
+
+###############################################}
+
+snmp-server vrf management
+{% for view in snmp.view %}
+snmp-server view {{ view.name }} {{ view.oid }} included
+{% endfor %}
+{% for group in snmp.group %}
+{% for level in group.sec_level %}
+snmp-server group {{ group.name }} {{ group.version }} {{ level.name }} {{ level.view_type }} {{ level.view_name }}
+{% endfor %}
+{% endfor %}
+{% for user in snmp.user %}
+snmp-server user {{ user.name }} {{ user.group }} {{ user.version }} auth {{ user.auth }} {{ user.passwd }} priv {{ user.encry }} {{ user.passwd }}
+{% endfor %}
+{% for host in snmp.host %}
+snmp-server host {{ host.addr }} traps version {{ host.version }} {{ host.sec_level }} {{ host.user }}
+{% endfor %}
+!

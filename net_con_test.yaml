@@ -1,0 +1,12 @@
+---
+- hosts: photonos
+  become: yes
+  gather_facts: no
+  vars:
+    ansible_ssh_user: "lab"
+    ansible_ssh_pass: "{{ vault_lab_password }}"
+    ansible_become_pass: "{{ vault_lab_password }}"
+    local_user: "{{ lookup('env', 'USER') }}"
+  
+  roles:
+    - connectivity_test

@@ -1,0 +1,62 @@
+---
+    - debug: msg="Start Undraining {{inventory_hostname}} ingress traffic"
+
+    - name: Removal Drain Policy
+      dellos10_config:
+        lines:
+          - "no route-map drain_ingress_tfk out"
+          - "no route-map drain_egress_tfk in"
+        parents: ['address-family ipv4 unicast']
+        before:
+        - 'router bgp {{ bgp.local_as }}'
+        - 'template fabric_peer_v4'
+        match: exact
+        replace: block
+
+    - name: Flipping the BGP Peers under the template
+      dellos10_command:
+        commands:
+          - "clear ip bgp peer-template fabric_peer_v4"
+
+    - name: Wait for 10 sec to get bgp peer ready
+      pause:
+        seconds: 10
+      delegate_to: localhost
+
+    - name: Show BGP Peer route annoucement
+      dellos10_command:
+        commands:
+          - 'show ip bgp neighbor {{ item }} advertised-routes'
+      register: bgp_routes
+      loop: "{{ bgp.fabric_peer_v4 }}"
+    
+    - name: Display {{inventory_hostname}} BGP annouced routes
+      debug: var=bgp_routes.stdout[0]
+
+    - name: Wait for 1min to drain the traffic
+      pause:
+        minutes: 1
+      delegate_to: localhost
+
+    - debug: msg="Start Undraining {{inventory_hostname}} egress traffic"
+
+    - name: Unshut {{inventory_hostname}} ESXi Facing ports 
+      dellos10_config:
+        lines:
+          - no shutdown
+        parents: "interface range ethernet{{ item }}"
+      loop: "{{ esxi_port_range }}"
+
+    - name: Show {{inventory_hostname}} port status
+      dellos10_command:
+        commands:
+          - 'show interface status'
+      register: intf_status
+    
+    - name: Display {{inventory_hostname}} interface status
+      debug: var=intf_status.stdout[0]
+
+    - name: Wait for 5 sec for {{inventory_hostname}} ready
+      pause:
+        seconds: 5
+      delegate_to: localhost

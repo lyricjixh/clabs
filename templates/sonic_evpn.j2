@@ -1,0 +1,183 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{###########################################
+
+Purpose:
+Generating SONiC EVPN Configuration
+############################################}
+interface Loopback 1
+ description "{{ lpbk1.desc }}"
+{% if lpbk1.addr_v4 is defined and lpbk1.addr_v4 %}
+ ip address {{ lpbk1.addr_v4 }}/32
+{% endif %}
+{% if lpbk1.addr_v6 is defined and lpbk1.addr_v6 %}
+ ipv6 address {{ lpbk1.addr_v6 }}/128
+{% endif %}
+!
+ip anycast-address enable
+ip anycast-mac-address {{ tor_pair_vmac }}
+!
+{% for vrfi in evpn.vrf %}
+ip vrf Vrf_{{ vrfi.name }}
+!
+interface Vlan {{ vrfi.l3_vni_vlan }}
+  description "VRF {{ vrfi.name }} Vlan"
+  ip vrf forwarding Vrf_{{ vrfi.name }}
+exit
+{% endfor %}
+!
+interface vxlan vtep100
+  source-ip {{ lpbk1.addr_v4 }}
+  !
+{% for vni in vxlans %}
+  map vni {{ vni.id }} vlan {{ vni.vlan }}
+{% endfor %}
+{% for vrfi in evpn.vrf %}
+  map vni {{ vrfi.l3_vni }} vlan {{ vrfi.l3_vni_vlan }}
+  map vni {{ vrfi.l3_vni }} vrf Vrf_{{ vrfi.name }}
+{% endfor %}
+  !
+!
+{% for vni in vxlans %}
+interface Vlan {{ vni.vlan }}
+  description "{{ vni.desc }}"
+  ip vrf forwarding Vrf_{{ vni.vrf }}
+{% if vni.netv4 is defined and vni.netv4 %}
+  ip anycast-address {{ vni.netv4 | ipaddr('1') }}
+{% endif %}
+{% if vni.netv6 is defined and vni.netv6 %}
+  ipv6 anycast-address {{ vni.netv6 | ipaddr('1') }}
+{% endif %}
+  mtu {{ vxlan_mtu }}
+  neigh-suppress
+!
+{% endfor %}
+{% if edge_vlans is defined and edge_vlans %}
+{% for vlan in edge_vlans %}
+interface Vlan {{ vlan.id }}
+  description "{{ vlan.desc }}"
+  ip vrf forwarding Vrf_{{ vlan.vrf }}
+{% if vlan.netv4 is defined and vlan.netv4 %}
+  ip address {{ vlan.netv4 | ipaddr(1) }}
+{% endif %}
+{% if vlan.netv6 is defined and vlan.netv6 %}
+  ipv6 address {{ vlan.netv6 | ipaddr(1) }}
+{% endif %}
+  mtu {{ vxlan_mtu }}
+!
+interface Eth 1/{{ vlan.port }}
+  description "{{ vlan.desc }}-trunk port"
+  no shutdown
+  switchport mode trunk
+  switchport access vlan {{ vlans.native_vlan.id }}
+  switchport trunk allowed vlan {{ vlan.id }}
+  mtu 9216
+!
+{% endfor %}
+{% endif %}
+{% if edge_links is defined and edge_links %}
+{% for link in edge_links %}
+interface Eth 1/{{ link.port }}
+  description "{{ link.desc }}"
+  ip vrf forwarding Vrf_{{ link.vrf }}
+{% if link.netv4 is defined and link.netv4 %}
+  ip address {{ link.netv4 | ipaddr(1) }}
+{% endif %}
+{% if link.netv6 is defined and link.netv6 %}
+  ipv6 address {{ link.netv6 | ipaddr(1) }}
+{% endif %}
+  mtu {{ vxlan_mtu }}
+  no shutdown
+!
+{% endfor %}
+{% endif %}
+{% for vrfi in evpn.vrf %}
+{% if vrfi.proto.static_v4 is defined and vrfi.proto.static_v4 %}
+{% for route in vrfi.proto.static_v4 %}
+ip route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+!
+{% if vrfi.proto.static_v6 is defined and vrfi.proto.static_v6 %}
+{% for route in vrfi.proto.static_v6 %}
+ipv6 route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+!
+router bgp {{ bgp.local_as }}
+ address-family l2vpn evpn
+  advertise-all-vni
+  advertise-default-gw
+  advertise ipv4 unicast
+  !
+{% for vni in vxlans %}
+  vni {{ vni.id }}
+    rd {{ lpbk1.addr_v4 }}:{{ vni.id }}
+    route-target both {{ vni.id }}:{{ vni.id }}
+  !
+{% endfor %}
+ !
+ peer-group fabric_peer_v4
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  !
+ !
+ peer-group tor_peer_v4
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  !
+ !
+ peer-group sas_peer_v4
+  address-family l2vpn evpn
+   activate
+   allowas-in 1
+  !
+ !
+!
+router bgp {{ bgp.local_as }} vrf Vrf_{{ vrfi.name }}
+  address-family ipv4 unicast
+{% if vrfi.type5 is defined and vrfi.type5 %}
+{% for redist in vrfi.type5 %}
+{% if redist.r_map is defined and redist.r_map %}
+    redistribute {{ redist.proto }} route-map {{ redist.r_map }}
+{% else %}
+    redistribute {{ redist.proto }}
+{% endif %}
+{% endfor %}
+{% endif %}
+  !
+  address-family l2vpn evpn
+    advertise ipv4 unicast
+  !
+{% if vrfi.proto.bgp.gw_peer_v4 is defined and vrfi.proto.bgp.gw_peer_v4 %}
+{% for gwpeer in vrfi.proto.bgp.gw_peer_v4 %}
+  neighbor {{ gwpeer.addr }}
+    remote-as {{ gwpeer.asn }}
+    no shutdown
+    !
+    address-family ipv4 unicast
+      activate
+    !
+  !
+{% endfor %}
+{% endif %}
+{% if vrfi.proto.bgp.gw_peer_v6 is defined and vrfi.proto.bgp.gw_peer_v6 %}
+{% for gwpeer in vrfi.proto.bgp.gw_peer_v6 %}
+  neighbor {{ gwpeer.addr }}
+    remote-as {{ gwpeer.asn }}
+    no shutdown
+    !
+    address-family ipv4 unicast
+      no activate
+    !
+    address-family ipv6 unicast
+      allowas-in 2
+      activate
+    !
+  !
+{% endfor %}
+{% endif %}
+  !
+!
+{% endfor %}

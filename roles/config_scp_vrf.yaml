@@ -1,0 +1,11 @@
+---
+- hosts: leaf
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: "Enabling scp client for management vrf"
+      dellos10_config:
+        commands:
+          - command: 'ip scp vrf management'
+            prompt: 'yes/no'
+            answer: 'yes'

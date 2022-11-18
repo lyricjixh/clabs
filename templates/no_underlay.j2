@@ -1,0 +1,61 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{####################################################
+
+Purpose:
+Remove Underlay Configuration for dellos10 Devices
+
+#####################################################}
+{% if breakout_10g is defined and breakout_10g %}
+interface range ethernet1/1/{{breakout_10g.start}}:1-1/1/{{breakout_10g.end}}:4
+ switchport mode access
+ no switchport trunk allowed vlan {{ trunk_port.vlan_list | join(',') }}
+!
+{% for bport in range(breakout_10g.start, breakout_10g.end+1) %}
+no interface breakout 1/1/{{ bport }}
+{% endfor %}
+!
+{% endif %}
+!
+{% if breakout_25g is defined and breakout_25g %}
+{% for bport in range(breakout_25g.start, breakout_25g.end+1) %}
+interface range ethernet1/1/{{breakout_25g.start}}:1-1/1/{{breakout_25g.end}}:4
+ switchport mode access
+ no switchport trunk allowed vlan {{ trunk_port.vlan_list | join(',') }}
+!
+no interface breakout 1/1/{{ bport }}
+{% endfor %}
+!
+{% endif %}
+!
+{% if breakout_40g is defined and breakout_40g %}
+{% for bport in range(breakout_40g.start, breakout_40g.end+1) %}
+interface range ethernet1/1/{{breakout_40g.start}}:1-1/1/{{breakout_40g.end}}:1
+ switchport mode access
+ no switchport trunk allowed vlan {{ trunk_port.vlan_list | join(',') }}
+!
+no interface breakout 1/1/{{ bport }}
+{% endfor %}
+!
+{% endif %}
+
+{% for vlan in vlans.app_vlans %}
+no interface vlan{{ vlan.id }}
+!
+{% endfor %}
+no interface vlan{{ vlans.pair_vlan.id }}
+!
+no interface vlan{{ vlans.vxrail_vlan.id }}
+!
+{% for intf in l3_uplinks %}
+interface ethernet1/1/{{ intf.name }}
+ no ip address
+ no ipv6 address
+!
+{% endfor %}
+no router bgp
+!
+interface loopback0
+ no ip address
+ no ipv6 address
+!
+no vlt-domain 1

@@ -1,0 +1,17 @@
+{#####################################################
+
+Purpose:
+Configure layer2 profile interface for dellos10 Devices.
+
+#####################################################}
+{% include 'port_breakout.j2' %}
+
+{% include './roles/ansible-role-dellos-vlan/templates/dellos10_vlan.j2' %}
+
+{% include 'port_channel.j2' %}
+
+{% include 'port_trunk.j2' %}
+
+{% include 'port_native.j2' %}
+
+{% include 'port_layer3.j2' %}

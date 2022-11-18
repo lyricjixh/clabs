@@ -1,0 +1,10 @@
+---
+- hosts: leaf
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: "Configuring mld querier in VLAN 3939"
+      dellos10_config:
+        commands:
+          - command: ['interface vlan 3939', 'ipv6 mld snooping querier']
+            

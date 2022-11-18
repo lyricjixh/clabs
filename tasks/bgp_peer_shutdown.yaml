@@ -1,0 +1,19 @@
+---
+    - name: Shut down bgpv4 neighbor connection
+      dellos10_config:
+        lines:
+          - "shutdown"
+        parents: ['neighbor {{ item }}']
+        before: ['router bgp {{ bgp.local_as }}']
+        match: exact
+        replace: block
+      loop: "{{ bgp.fabric_peer_v4 }}"
+    - name: Shut down bgpv6 neighbor connection
+      dellos10_config:
+        lines:
+          - "shutdown"
+        parents: ['neighbor {{ item }}']
+        before: ['router bgp {{ bgp.local_as }}']
+        match: exact
+        replace: block
+      loop: "{{ bgp.fabric_peer_v6 }}"

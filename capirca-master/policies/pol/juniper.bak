@@ -1,0 +1,55 @@
+header {
+  comment:: "edge input filter for sample network."
+  target:: juniper edge-inbound
+}
+
+#include 'includes/untrusted-networks-blocking.inc'
+
+term discard-spoofs {
+  source-address:: RFC1918
+  action:: deny
+}
+term permit-ipsec-access {
+  source-address:: REMOTE_OFFICES
+  destination-address:: VPN_HUB
+  protocol:: 50
+  action:: accept
+}
+term permit-ike-access {
+  source-address:: REMOTE_OFFICES
+  destination-address:: VPN_HUB
+  protocol:: udp
+  destination-port:: IKE
+  action:: accept
+}
+term permit-public-web-access {
+  destination-address:: WEB_SERVERS
+  destination-port:: HTTP HTTPS HTTP_8080
+  protocol:: tcp
+  action:: accept
+}
+term permit-tcp-replies {
+  option:: tcp-established
+  protocol:: tcp
+  action:: accept
+}
+term default-deny {
+  action:: deny
+}
+
+header {
+  comment:: "edge output filter for sample network."
+  target:: juniper edge-outbound
+}
+term drop-internal-sourced-outbound {
+  destination-address:: INTERNAL
+  destination-address:: RESERVED
+  action:: deny
+}
+term reject-internal {
+  source-address:: INTERNAL
+  action:: reject
+}
+term default-accept {
+  action:: accept
+}

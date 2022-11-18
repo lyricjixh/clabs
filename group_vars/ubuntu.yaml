@@ -1,0 +1,30 @@
+---
+ansible_ssh_user: lab
+ansible_ssh_pass: "{{vault_lab_password}}"
+ansible_sudo_pass: "{{vault_lab_password}}"
+ansible_linux_os: photonos
+vendor: "VMWare ESXi"
+
+ansible_python_interpreter: /usr/bin/python3
+
+photon_yum_repo: https://vmware.bintray.com/photon_pre_release_1.0_x86_64
+photon_yum_repo_enabled: yes
+
+ubuntu_packages:
+  - lldpd
+  - iperf
+  - dkms
+  - build-essential
+  - python3-pip
+  - net-tools
+#   - network-manager
+
+ubuntu_users:
+  - name: "jayb"
+    groups: "devops"
+    password: "{{ vault_jayb_password }}"
+    state: "present"
+  - name: "xji"
+    groups: "devops"
+    password: "{{ vault_xji_password }}"
+    state: "present"

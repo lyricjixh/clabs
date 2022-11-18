@@ -1,0 +1,34 @@
+{#####################################################
+
+Purpose:
+Configure layer2 profile interface for dellos10 Devices.
+
+#####################################################}
+{% if breakout_10g is defined and breakout_10g %}
+{% set b_start = breakout_10g.start | int %}
+{% set b_end = breakout_10g.end | int +1 %}
+{% for i in range(b_start, b_end, 1) %}
+interface breakout 1/1/{{ i }} map 10g-4x
+{% endfor %}
+{% endif %}
+!
+{% if breakout_25g is defined and breakout_25g %}
+{% set b_start = breakout_25g.start | int %}
+{% set b_end = breakout_25g.end | int +1 %}
+{% for i in range(b_start, b_end, 1) %}
+interface breakout 1/1/{{ i }} map 25g-4x
+port-group 1/1/{{ i }}
+ profile restricted
+{% set p_num = ( i-1 ) * 2 + 1 %}
+ port 1/1/{{ p_num }} mode Eth 25g-4x
+!
+{% endfor %}
+{% endif %}
+!
+{% if breakout_40g is defined and breakout_40g %}
+{% for bp in breakout_40g.portgp %}
+port-group 1/1/{{ bp.id }}
+ mode Eth 40g-1x
+!
+{% endfor %}
+{% endif %}

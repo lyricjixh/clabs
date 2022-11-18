@@ -1,0 +1,41 @@
+---
+- name: ansible-role-dellos-acl
+  src: https://github.com/Dell-Networking/ansible-role-dellos-acl
+  version: c0f7ccb00
+
+- name: ansible-role-dellos-bgp
+  src: https://github.com/Dell-Networking/ansible-role-dellos-bgp
+  version: 0113c29d49e6
+
+- name: ansible-role-dellos-lldp
+  src: https://github.com/Dell-Networking/ansible-role-dellos-lldp
+  version: 4ff1d25ea0c7326da1ee0d0d01b69788de55e25e
+
+- src: https://github.com/Dell-Networking/ansible-role-dellos-system
+  name: ansible-role-dellos-system
+  version: f4d73133ee130a2f0a51046f4fff84c804abb370
+
+- name: ansible-role-dellos-vlan
+  src: https://github.com/Dell-Networking/ansible-role-dellos-vlan
+  version: 968556aa653a8a25c80d495f1cf6c08b249ba2dc
+
+- src: https://github.com/Dell-Networking/ansible-role-dellos-vlt
+  name: ansible-role-dellos-vlt
+  version: 60185bf58e1b1ddaffdc65eae38227267c62e64f
+
+- name: ansible-role-dellos-vxlan
+  src: https://github.com/Dell-Networking/ansible-role-dellos-vxlan
+  version: 7ac0fd116ff29e71c81942685fb1066c175ed12c
+
+- name: ansible-role-dellos-vrrp
+  src: https://github.com/Dell-Networking/ansible-role-dellos-vrrp.git
+  version: c41f93e21362b3221a3853e8b8bdc20721810645
+
+- name: Dell-Networking.dellos-image-upgrade
+
+- name: ansible-role-dellos-route-map
+  src: https://github.com/sc68cal/ansible-role-dellos-route-map.git
+  scm: git
+  version: prefix_support
+
+- name: Dell-Networking.dellos-lag

@@ -1,0 +1,9 @@
+## File Managed by Ansible ##
+## /etc/rsyslog.d/90-remotesyslog.conf
+
+## Copy all messages to the remote syslog servers indicated below
+{% if logging.server is defined and logging.server -%}
+{% for server in logging.server %}
+*.* @[{{ server.addr }}]:514;SONiCForwardingFormat
+{% endfor %}
+{% endif -%}

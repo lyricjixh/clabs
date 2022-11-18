@@ -1,0 +1,213 @@
+---
+# Reboot switches and check coming back after 2 mins
+# - name: Start with Reboot for a fresh start
+#   shell: "sleep 5 && reboot"
+#   async: 1
+#   poll: 0
+#   tags: check-skip
+
+# - name: Wait for connection.
+#   wait_for_connection:
+#     connect_timeout: 20
+#     sleep: 10
+#     delay: 10
+#     timeout: 360
+#   tags: check-skip
+
+# - name: Check the all switch reachable.
+#   ping:
+
+# - name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+#   apt:
+#     update_cache: yes
+#     cache_valid_time: 3600
+
+#  - name: Install a list of packages
+#  apt:
+#    name: "{{ packages }}"
+#  vars:
+#    packages:
+#    - tcpreplay
+#    - htop
+
+# Configure Hostname
+- name: Configure Hostname
+  shell: config hostname {{ inventory_hostname }}
+  when: (features.debian.hostname is defined and features.debian.hostname|lower == "yes")
+
+# - name: Write the Hostname to File
+#   shell: echo "{{ inventory_hostname }}" > /etc/hostname
+
+# - name: Apply Hostname
+#   shell: hostname -F /etc/hostname
+
+# - name: Add Local DNS Resolution for our Hostname
+#   lineinfile: dest=/etc/hosts line="127.0.1.1    {{inventory_hostname}}" regexp=^.*127.0.1.1
+
+- name: Make sure we have a 'sudo' group
+  group:
+    name: sudo
+    state: present
+  when: (features.debian.sudoer is defined and features.debian.sudoer|lower == "yes")
+
+- name: Ensure group "lab" exists
+  group:
+    name: lab
+    state: present
+  when: (features.debian.user is defined and features.debian.user|lower == "yes")
+    
+#- name: Remove the user 'lab'
+#  user:
+#    name: lab
+#    state: absent
+#    remove: yes
+
+- name: Add lab user and add it to sudo
+  user: 
+    name: "lab"
+    password: "$1$A2BdvCtP$z0Es8C57XrmnK.ETqUtob/"  #openssl passwd -1
+    comment: "Dell Lab User"
+    groups: sudo
+    shell: /bin/bash
+    state: present
+    create_home: yes
+    append: yes
+  when: (features.debian.user is defined and features.debian.user|lower == "yes")
+
+- name: Create a 2048-bit SSH key for user lab in ~lab/.ssh/id_rsa
+  user:
+    name: "lab"
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: .ssh/id_rsa
+  when: (features.debian.user is defined and features.debian.user|lower == "yes")
+
+- name: Copy Lab's local pub key to switches 
+  copy: src=~/.ssh/id_rsa.pub dest=~lab/.ssh/authorized_keys
+  # ignore_errors: yes
+  when: (features.debian.user is defined and features.debian.user|lower == "yes")
+
+- name: Make a ".ssh" Directory for the Lab user
+  file: 
+    path=/home/lab/.ssh
+    state=directory
+    mode=0755
+  when: (features.debian.user is defined and features.debian.user|lower == "yes")
+
+# Configure MOTD
+- name: Configure MOTD
+  copy: 
+    src=motd
+    dest=/etc/motd
+  when: (features.debian.motd is defined and features.debian.motd|lower == "yes")
+
+- name: Configure Login Warning Message (Banner)
+  copy: 
+    src=banner
+    dest=/etc/issue.net
+  when: (features.debian.banner is defined and features.debian.banner|lower == "yes")
+
+- name: Enable Usage of Banner by SSH
+  lineinfile: 
+    dest=/etc/ssh/sshd_config
+    line="Banner /etc/issue.net" regexp=^.*Banner
+  notify:
+    - Restart SSH Daemon
+  when: (features.debian.banner is defined and features.debian.banner|lower == "yes")
+
+# - name: Enable en_AU.UTF-8 Locale
+#   community.general.locale_gen:
+#     name: en_AU.UTF-8
+#     state: present
+#   when: (features.debian.locale is defined and features.debian.locale|lower == "yes")
+
+# Configure Syslog
+- name: Set a list of syslog server
+  ansible.builtin.set_fact:
+    log_server: "{{ logging.server | map(attribute='addr') }}"
+  when: (features.debian.syslog is defined and features.debian.syslog|lower == "yes")
+  tags:
+    - log
+
+- name: Configure Syslog server
+  shell: config syslog add {{ item }}
+  loop: "{{ log_server }}"
+  when: (features.debian.syslog is defined and features.debian.syslog|lower == "yes")
+  tags:
+    - log
+
+# - name: Configure Syslog
+#   template: 
+#     src=syslog.conf.j2
+#     dest=/etc/rsyslog.d/90-remotesyslog.conf
+#     owner=root
+#     group=root
+#   notify: 
+#     - Restart Syslog Service
+
+# # Configure Locale
+# - name: Install NTP
+#   apt: name=ntp update_cache=yes
+
+# - name: Apply Timezone
+#   shell: /usr/sbin/dpkg-reconfigure --frontend noninteractive tzdata
+
+# Configure TimeZone
+# Choose a Timezone from the list here:
+# https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+- name: Write Timezone File
+  timezone:
+    name: "America/New_York"
+  when: (features.debian.timezone is defined and features.debian.timezone|lower == "yes")
+  tags:
+    - time
+
+#  Configure NTP
+- name: Set a list of ntp server
+  ansible.builtin.set_fact:
+    ntp_server: "{{ ntp.server | map(attribute='addr') }}"
+  when: (features.debian.ntp is defined and features.debian.ntp|lower == "yes")
+  tags:
+    - ntp
+
+- name: Configure NTP server
+  shell: config ntp add {{ item }}
+  loop: "{{ ntp_server }}"
+  when: (features.debian.ntp is defined and features.debian.ntp|lower == "yes")
+  tags:
+    - ntp
+
+# - name: Generate and Push NTP Config File
+#   template: src=ntp.conf.j2 dest=/etc/ntp.conf
+#   notify: 
+#     - Restart NTP Service
+
+# # Enable License and retart switchd
+# - name: Copy the License file onto local
+#   copy: 
+#     src: sonic_trial.lic
+#     dest: /home/sonic/sonic_trial.lic
+#     owner: "sonic"
+#     group: "sonic"
+#     mode: '0644'
+
+# - name: Apply the License
+#   shell: cl-license -i /home/sonic/sonic_trial.lic
+
+# # Reboot switches and check coming back after 2 mins
+# - name: Finally Reboot to make a fresh start
+#   shell: "sleep 5 && reboot"
+#   async: 1
+#   poll: 0
+#   tags: check-skip
+
+# - name: Wait for the reboot to complete.
+#   wait_for_connection:
+#     connect_timeout: 20
+#     sleep: 5
+#     delay: 10
+#     timeout: 360
+#   tags: check-skip
+  
+# - name: Check the switch coming back
+#   ping:

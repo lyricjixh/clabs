@@ -1,0 +1,22 @@
+---
+  - name: CAPTURE SHOW IP VRF
+    dellos10_command:
+      commands:
+        - show ip vrf
+    register: output
+
+  - name: DISPLAY THE OUTPUT
+    debug: var=output.stdout
+
+  - name: INSTALL TEXTFSM
+    import_tasks: textfsm.yaml
+
+  - name: PARSE THE OUTPUT for {{ ansible_network_os }} show_ip_vrf
+    textfsm_parser:
+      src: "{{lookup('file', './templates/{{ansible_network_os}}/show_ip_vrf.template')}}" 
+      content: "{{ output.stdout[0]  }}"
+      name: vrf_facts
+    register: result
+    vars:
+      - ansible_network_os: dellos10
+

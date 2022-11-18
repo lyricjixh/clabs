@@ -1,0 +1,149 @@
+SNMP_HOSTS =
+ 10.150.6.62/32  ## SNMP-ACL-MLX-Primary-Server-in-AUDC01
+ 10.150.6.63/32  ## SNMP-ACL-MLX-Secondary-Server-in-AUDC01
+10.150.70.62/32  ## SNMP-ACL-MLX-Primary-Server-in-AUDC02
+10.150.70.63/32  ## SNMP-ACL-MLX-Secondary-Server-in-AUDC02
+192.168.120.105/32  ## SNMP-ACL-MLX-Primary-Server-in-DEDC01
+192.168.120.106/32  ## SNMP-ACL-MLX-Secondary-Server-in-DEDC01
+192.168.124.105/32  ## SNMP-ACL-MLX-Primary-Server-in-DEDC03
+192.168.124.106/32  ## SNMP-ACL-MLX-Secondary-Server-in-DEDC03
+192.168.12.90/32  ## SNMP-ACL-MLX-Primary-Server-in-FRDC01
+192.168.12.91/32  ## SNMP-ACL-MLX-Secondary-Server-in-FRDC01
+10.150.134.62/32  ## SNMP-ACL-MLX-Primary-Server-in-JPDC01
+10.150.134.63/32  ## SNMP-ACL-MLX-Secondary-Server-in-JPDC01
+10.150.198.62/32  ## SNMP-ACL-MLX-Primary-Server-in-JPDC02
+10.150.198.63/32  ## SNMP-ACL-MLX-Secondary-Server-in-JPDC02
+192.168.16.90/32  ## SNMP-ACL-MLX-Primary-Server-in-NLDC01
+192.168.16.91/32  ## SNMP-ACL-MLX-Secondary-Server-in-NLDC01
+192.168.16.96/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-1-in-NLDC01
+192.168.16.97/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-2-in-NLDC01
+192.168.16.98/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-3-in-NLDC01
+192.168.16.99/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-4-in-NLDC01
+192.168.16.101/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-5-in-NLDC01
+192.168.3.99/32  ## SNMP-ACL-MLX-Primary-Server-in-UKDC01
+192.168.3.101/32  ## SNMP-ACL-MLX-Secondary-Server-in-UKDC01
+192.168.3.96/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-1-in-UKDC01
+192.168.3.97/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-2-in-UKDC01
+192.168.3.98/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-3-in-UKDC01
+192.168.60.103/32  ## SNMP-ACL-MLX-Primary-Server-in-USDC03
+192.168.60.104/32  ## SNMP-ACL-MLX-Secondary-Server-in-USDC03
+192.168.60.110/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-1-in-USDC03
+192.168.60.111/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-2-in-USDC03
+192.168.60.112/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-3-in-USDC03
+192.168.60.114/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-4-in-USDC03
+192.168.60.115/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-5-in-USDC03
+192.168.60.117/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-6-in-USDC03
+192.168.60.166/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-7-in-USDC03
+192.168.60.167/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-8-in-USDC03
+192.168.60.168/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-9-in-USDC03
+192.168.60.60/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-10-in-USDC03
+192.168.60.65/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-11-in-USDC03
+192.168.60.66/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-12-in-USDC03
+192.168.60.106/32  ## SNMP-ACL-MLX-Infra-Server-1-in-USDC03
+192.168.60.137/32  ## SNMP-ACL-MLX-Infra-Server-2-in-USDC03
+192.168.60.138/32  ## SNMP-ACL-MLX-Infra-Server-3-in-USDC03
+192.168.60.139/32  ## SNMP-ACL-MLX-Infra-Server-4-in-USDC03
+192.168.61.50/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-1-in-USDC03
+192.168.61.51/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-2-in-USDC03
+ 100.64.21.4/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-3-in-USDC03
+ 100.64.21.5/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-4-in-USDC03
+100.64.35.18/32  ## SNMP-ACL-MLX-Primary-Server-in-USDC04
+100.64.35.17/32  ## SNMP-ACL-MLX-Secondary-Server-in-USDC04
+100.64.35.31/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-1-in-USDC04
+100.64.35.32/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-2-in-USDC04
+100.64.35.33/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-3-in-USDC04
+100.64.35.34/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-4-in-USDC04
+100.64.35.35/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-5-in-USDC04
+100.64.35.36/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-6-in-USDC04
+100.64.35.45/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-7-in-USDC04
+100.64.35.46/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-8-in-USDC04
+100.64.35.47/32  ## SNMP-ACL-MLX-Additional-vpoller-Server-9-in-USDC04
+100.64.35.22/32  ## SNMP-ACL-MLX-Infra-Server-1-in-USDC04
+100.64.35.23/32  ## SNMP-ACL-MLX-Infra-Server-2-in-USDC04
+100.64.35.24/32  ## SNMP-ACL-MLX-Infra-Server-3-in-USDC04
+100.64.35.25/32  ## SNMP-ACL-MLX-Infra-Server-4-in-USDC04
+100.64.35.50/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-1-in-USDC04
+100.64.35.51/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-2-in-USDC04
+  10.48.5.62/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-1-in-USDC07
+  10.48.5.63/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-2-in-USDC07
+ 10.48.69.62/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-1-in-USDC08
+ 10.48.69.63/32  ## SNMP-ACL-MLX-HCS-Proxy-Server-2-in-USDC08
+ 10.152.6.62/32  ## SNMP-ACL-MLX-Primary-Server-in-USDC09
+ 10.152.6.63/32  ## SNMP-ACL-MLX-Secondary-Server-in-USDC09
+10.150.15.203/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-AUDC01
+10.150.15.204/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-AUDC01
+10.150.79.203/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-AUDC02
+10.150.79.204/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-AUDC02
+192.168.120.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-DEDC01
+192.168.120.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-DEDC01
+192.168.124.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-DEDC03
+192.168.124.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-DEDC03
+192.168.12.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-FRDC01
+192.168.12.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-FRDC01
+10.150.143.203/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-JPDC01
+10.150.143.204/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-JPDC01
+10.150.207.203/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-JPDC02
+10.150.207.204/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-JPDC02
+192.168.16.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-NLDC01
+192.168.16.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-NLDC01
+192.168.3.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-UKDC01
+192.168.3.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-UKDC01
+192.168.60.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-USDC03
+192.168.60.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-USDC03
+192.168.64.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-USDC04
+192.168.64.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-USDC04
+ 10.48.3.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-USDC07
+ 10.48.3.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-USDC07
+10.48.67.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-USDC08
+10.48.67.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-USDC08
+10.152.4.205/32  ## SNMP-ACL-NETOPS-Network-Management-Server-1-in-USDC09
+10.152.4.206/32  ## SNMP-ACL-NETOPS-Network-Management-Server-2-in-USDC09
+100.64.36.157/32  ## SNMP-ACL-SECOPS-Tenable-DMZ-Scanner
+10.150.8.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-AUDC01
+10.150.8.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-AUDC01
+10.150.72.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-AUDC02
+10.150.72.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-AUDC02
+100.64.230.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-DEDC01
+100.64.230.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-DEDC01
+100.64.150.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-DEDC03
+100.64.150.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-DEDC03
+100.64.54.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-FRDC01
+100.64.54.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-FRDC01
+10.150.136.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-JPDC01
+10.150.136.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-JPDC01
+10.150.200.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-JPDC02
+10.150.200.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-JPDC02
+100.64.102.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-NLDC01
+100.64.102.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-NLDC01
+100.64.147.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-UKDC01
+100.64.147.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-UKDC01
+100.64.131.28/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-USDC03
+100.64.131.33/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-USDC03
+100.64.131.34/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-3-in-USDC03
+192.168.60.124/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-4-in-USDC03
+100.64.38.14/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-USDC04
+100.64.38.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-USDC04
+100.64.38.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-3-in-USDC04
+ 10.48.7.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-USDC07
+ 10.48.7.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-USDC07
+100.64.135.123/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-3-in-USDC07
+10.48.71.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-USDC08
+10.48.71.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-USDC08
+100.64.135.223/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-3-in-USDC08
+10.152.8.245/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-1-in-USDC09
+10.152.8.246/32  ## SNMP-ACL-SECOPS-Tenable-Scanner-2-in-USDC09
+192.168.60.158/32  ## SNMP-ACL-ENGINEERING-NMS-Server-1-in-USDC03
+192.168.64.69/32  ## SNMP-ACL-ENGINEERING-NMS-Server-2-in-USDC04
+10.0.144.190/32  ## SNMP-ACL-NETOPS-xsmz-nms01-usdc4-Server-in-USDC04
+10.0.144.180/32  ## SNMP-ACL-NETOPS-xsmz-nms02-usdc4-Server-in-USDC04
+10.65.160.190/32  ## SNMP-ACL-NETOPS-xsmz-nms01-slgh02-Server-in-SLGH02
+192.168.64.249/32  ## SNMP-ACL-NETOPS-SVN-Server-in-USDC04
+192.168.64.251/32  ## SNMP-ACL-NETOPS-NSTK-Server-in-USDC04
+192.168.64.252/32  ## SNMP-ACL-NETOPS-Rancid-Server-in-USDC04
+192.168.64.254/32  ## SNMP-ACL-NETOPS-Cacti-Server-in-USDC04
+192.168.64.248/32  ## SNMP-ACL-NETOPS-Smokeping-Server-in-USDC04
+ 10.48.41.32/32  ## SNMP-ACL-NETOPS-MRTG01-Server-in-USDC07
+10.48.105.32/32  ## SNMP-ACL-NETOPS-MRTG02-Server-in-USDC08
+  10.48.3.17/32  ## SNMP-ACL-NETOPS-Solarwinds-Server-in-USDC07
+ 10.48.67.17/32  ## SNMP-ACL-NETOPS-Solarwinds-Server-in-USDC08
+192.168.3.36/32  ## SNMP-ACL-NETOPS-Rancid-Server-in-SLGH02

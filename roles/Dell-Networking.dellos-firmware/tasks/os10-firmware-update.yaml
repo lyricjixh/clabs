@@ -1,0 +1,53 @@
+---
+- name : "Install BIOS firmware image"
+  dellemc.os10.os10_command:
+    commands: ['image install http://{{file_server}}/{{onie_firmware}}']
+
+- name: "Check image status till it succeed"
+  dellemc.os10.os10_command:
+    commands: ['show image status | display-xml']
+  register: result
+  until: result.stdout.0.find("Success") != -1
+  retries: 5
+  delay: 10
+
+- name : "Reload the Device" 
+  dellemc.os10.os10_command:
+    commands:
+      - write mem
+      - command: 'reload'
+        prompt: 'Proceed to reboot'
+        answer: 'y'
+
+- pause:
+    minutes: 25
+    prompt: "Waiting Firmware upgrade completing ..."
+
+- name: Wait for switches ready
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 22
+    delay: 10
+    timeout: 360
+  tags: waitfor
+
+- pause:
+    minutes: 2
+    prompt: "Ensure Switches All ready ..."
+
+- name: "Wait for firmware image version"
+  dellemc.os10.os10_command:
+    commands: "show system"
+  register: show_system
+  tags: showlog
+
+- set_fact:
+    output: "{{ item.split(': ')[1]|trim }}"
+  when: item.find("BIOS") > -1
+  with_items: "{{ show_system.stdout_lines }}"
+  no_log: True
+  #- debug: var=output
+
+- name: "validate software version"
+  fail: msg="Image update operation Failed"
+  when: output != validation.expected_os10_bios_version

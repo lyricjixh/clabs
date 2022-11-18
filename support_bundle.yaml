@@ -1,0 +1,81 @@
+---
+- hosts: poc_rack01
+  gather_facts: No
+    
+  tasks:
+    # - name: RUNNING SUPPORT GENERATION
+    #   dellos10_command:
+    #     commands: generate support-bundle
+
+    # - name: WAITING FOR 10 MINUTES
+    #   pause:
+    #     minutes: 10
+
+    - name: GRABBING OUTPUT
+      dellos10_command:
+        commands: show logging log-file | grep "BUNDLE_COMPLETED"
+      register: show_log
+
+    - name: WAITING MORE IF SUPPORT BUNDLE IS NOT COMPLETED
+      when: not show_log.stdout_lines
+    
+      block:
+        - name: WAITING FOR 3 MINUTES
+          pause:
+            minutes: 3
+      
+        - name: GRABBING OUTPUT
+          dellos10_command:
+            commands: show logging log-file | grep "BUNDLE_COMPLETED"
+          register: show_log2
+
+    - name: COLLECTING OUTPUT IF SUPPORT BUNDLE IS COMPLETED
+      when: show_log.stdout_lines is defined or show_log2.stdout_lines is defined
+    
+      block:
+        - name: RUNNING SUPPORT GENERATION
+          dellos10_command:
+            commands: dir supportbundle
+          register: show_output
+
+    - name: debug supportbundle
+      debug:
+        var: show_output.stdout_lines
+
+    - name: supportbundle 
+      set_fact:
+        support_bundle_filename: "{{ show_output.stdout_lines[0][-2] | regex_replace('^\\S+\\s+\\S+\\s+(\\S+)\\s+$', '\\1') }}"
+
+    - name: Changing extensions
+      cli_command:
+        command: system "sudo chmod 755 /var/opt/dell/os10/support_bundle/bundle/{{support_bundle_filename}}"
+        prompt: "{{ansible_user}}: "
+        answer: "{{ansible_password}}"
+
+- hosts: poc_rack01
+  gather_facts: no
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: linuxadmin
+    ansible_become: yes
+    ansible_become_method: sudo
+    ansible_become_pass: linuxadmin
+
+  tasks:
+    - name: Fetch supportbundle from switch to Ansible host 
+      ansible.builtin.fetch:
+        src: /var/opt/dell/os10/support_bundle/bundle/{{support_bundle_filename}}
+        dest: /home/lab/supportbundle/
+        flat: yes
+      # become: yes
+      # become_method: 'system "sudo su"'
+      # become_password: "{{ansible_password}}"
+
+    # - name: Copying support bundle
+    #   delegate_to: localhost
+    #   no_log: true
+    #   expect:
+    #     command: scp {{ansible_user}}@{{ansible_host}}:/var/opt/dell/os10/support_bundle/bundle/{{support_bundle_filename}} /home/lab/supportbundle/.
+    #     responses:
+    #       (?i)password: "{{ansible_password}}"
+...

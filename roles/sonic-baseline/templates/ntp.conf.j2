@@ -1,0 +1,37 @@
+## File Managed by Ansible ##
+# /etc/ntp.conf
+
+driftfile /var/lib/ntp/ntp.drift
+
+# Enable this if you want statistics to be logged.
+statistics loopstats peerstats clockstats
+filegen loopstats file loopstats type day enable
+filegen peerstats file peerstats type day enable
+filegen clockstats file clockstats type day enable
+
+# You do need to talk to an NTP server or two (or three).
+# Define NTP Servers
+{% if ntp.server is defined and ntp.server -%}
+{% for server in ntp.server %}
+server {{ server.addr }} iburst
+{% endfor %}
+{% endif -%}
+
+# set global variable for configured source interface name
+# set global boolean to indicate if the ip of the configured source interface is configured
+# if the source interface is configured but no ip on that interface, then listen on another
+# interface based on existing logic
+
+interface listen {{ ansible_host }}
+interface listen 127.0.0.1
+
+# By default, exchange time with everybody, but don't allow configuration.
+restrict -4 default kod notrap nomodify nopeer noquery
+restrict -6 default kod notrap nomodify nopeer noquery
+
+# Local users may interrogate the ntp server more closely.
+restrict 127.0.0.1
+restrict ::1
+
+# Specify interfaces, don't listen on switch ports
+interface listen eth0

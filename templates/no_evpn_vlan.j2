@@ -1,0 +1,24 @@
+{#########################################################
+
+Purpose:
+Remove EVPN Vlan Configuration for Dellos10 Devices
+
+##########################################################}
+{#
+{% for vlan in vlans.app_vlans %} 
+no interface vlan{{ vlan.id }}
+!
+{% endfor %}
+#}
+{% if vxlans is defined and vxlans %}
+{% for vni in vxlans %}
+{% if vni.state == "present" %}
+no interface vlan{{ vni.vlan }}
+!
+no interface virtual-network{{ vni.id }}
+!
+no virtual-network {{ vni.id }}
+!
+{% endif %}
+{% endfor %}
+{% endif %}

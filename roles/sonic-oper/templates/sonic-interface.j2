@@ -1,0 +1,45 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{#######################################
+
+#Purpose:
+Create interface configuration for SONiC devices
+This configuration is used to update interface details
+
+#######################################}
+config hostname {{ hostname }}
+{% if lpbk0 is defined and lpbk0 %}
+config loopback add Loopback0
+config interface ip add Loopback0 {{ lpbk0.addr_v4 }}/32
+      {% if v.addr_v6 is defined and lpbk0.addr_v6 %}
+config interface ip add Loopback0 {{ lpbk0.addr_v6 }}/127
+      {% endif %}
+{% endif %}
+{% if fabric_links is defined and fabric_links %}
+  {% for interface in fabric_links %}
+    {% if interface.name is defined and interface.name %}
+      {% if interface.addr_v4 is defined and interface.addr_v4 %}
+        {% if interface.state == "present" %}
+config interface ip add Ethernet{{ interface.name }} {{ interface.addr_v4 }}/{{ fabric_ptp_netmaskv4 }}
+        {% else %}
+config interface ip remove {{ interface.ifname }} {{ interface.addr_v4 }}/{{ fabric_ptp_netmaskv4 }}
+        {% endif %}
+      {% endif %}
+      {% if interface.addr_v6 is defined and interface.addr_v6 %}
+        {% if interface.state == "present" %}
+config interface ip add Ethernet{{ interface.name }} {{ interface.addr_v6 }}/{{ fabric_ptp_netmaskv6 }}
+        {% else %}
+config interface ip remove Ethernet{{ interface.name }} {{ interface.addr_v6 }}/{{ fabric_ptp_netmaskv6 }}
+        {% endif %}
+      {% endif %}
+      {% if interface.admin_state is defined and interface.admin_state %}
+        {% if interface.admin_state == "up" %}
+config interface startup Ethernet{{ interface.name }}
+        {% else %}
+config interface shutdown Ethernet{{ interface.name }}
+        {% endif %}
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+{% endif %}    
+
+

@@ -1,0 +1,16 @@
+{###########################################
+
+Purpose:
+Generating Vlan Interface Configuration
+############################################}
+interface Vlan {{ vlans.vxrail_vlan.id }}
+  description {{ vlans.vxrail_vlan.desc }}
+  ipv6 enable
+!
+{% for vni in vxlans %}
+interface vlan{{ vni.vlan }}
+  description "{{ vni.desc }}"
+  mtu {{ vxlan_mtu }}
+  exit
+!
+{% endfor %}

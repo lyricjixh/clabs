@@ -1,0 +1,30 @@
+{% set port=ports[item] %}
+[Match]
+Name={{ item }}
+
+[Network]
+Address={{ port.addr_v4 }}
+{% if port.addr_v6 is defined and port.addr_v6 %}
+Address={{ port.addr_v6 }}
+{% endif %}
+{% if port.dns is defined and port.dns %}
+DNS={{ port.dns | join(' ') }}
+{% endif %}
+{% if port.routes_v4 is defined and port.routes_v4 == "default" %}
+Gateway={{ port.gw_v4 }}
+{% elif port.routes_v4 is defined and port.routes_v4 %}
+{% for route in port.routes_v4 %}
+[Route]
+Destination={{ route.dst }}
+Gateway={{ port.gw_v4 }}
+{% endfor %}
+{% endif %}
+{% if port.routes_v6 is defined and port.routes_v6 == "default" %}
+IPV6_DEFAULTGW={{ port.gw_v6 }}
+{% elif port.routes_v6 is defined and port.routes_v6 %}
+{% for route in port.routes_v6 %}
+[Route]
+Destination={{ route.dst }}
+Gateway={{ port.gw_v6 }}
+{% endfor %}
+{% endif %}

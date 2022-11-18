@@ -1,0 +1,106 @@
+crypto fips enable
+secure-boot verify {kernel | file-system-integrity | startup-config}
+image verify image-filepath {sha256 signature signature-filepath | gpg signature signature-filepath | pki signature signature-filepath public-key key-file}
+crypto cert generate request cert-file cert-path key-file {private | keypath} country 2-letter code state state locality city organization organization-name orgunit unit-name cname common-name email email-address validity days length length altname alt-name]
+
+configure terminal
+username admin password new-password role sysadmin
+system-user linuxadmin password {clear-text-password | hashed-password}
+{# 
+system-user linuxadmin disable
+system-cli disable
+#}
+
+no service simple-password
+password-attributes {[min-length number] [character-restriction {[upper number] [lower number][numeric number] [special-char number]}}
+service obscure-password
+{# Enable and configure secure boot #}
+secure-boot enable
+secure-boot protect startup-config
+!
+{# privilege mode priv-lvl privilege-level command-string #}
+privilege exec priv-lvl 12 "show version"
+privilege exec priv-lvl 12 "configure terminal"
+privilege configure priv-lvl 12 "interface ethernet"
+privilege interface priv-lvl 12 "ip address"
+username username password password role role priv-lvl privilege-level
+enable password sha-256 $5$2uThib1o$84p.tykjmz/w7j26ymoKBjrb7uepkUB priv-lvl 12
+!
+switchport port-security
+!
+interface range ethernet 1/1/10-1/1/32
+  switchport port-security
+    no disable
+    mac-learn limit 100
+	sticky
+	mac-learn limit violation shutdown
+	mac-move allow
+	mac-move violation log
+	mac-move violation drop
+	mac-move violation shutdown-original
+	mac-move violation shutdown-offending
+	mac-move violation shutdown-both
+  !
+  shutdown
+!
+aaa authentication login {console | default} local
+aaa accounting commands all {console | default} {start-stop | stop-only | none} [logging] [group tacacs+]
+
+radius-server host {hostname | ip-address} tls security-profile profile-name [auth-port port-number] key {0 authentication-key | 9 authentication-key | authentication-key}
+radius-server retransmit retries
+
+tacacs-server host {hostname | ip-address} key {0 authentication-key | 9 authentication-key | authentication-key} [auth-port port-number]
+tacacs-server timeout seconds
+ip tacacs source-interface loopback 0
+!
+ip ssh server enable
+ip ssh server max-auth-tries 4
+no ip telnet server enable
+!
+ip access-list permit10
+ permit ip 172.16.0.0 255.255.0.0 any
+!
+line vty
+ ip access-class permit10
+!
+exec-timeout timeout-value
+login concurrent-session limit-number
+password-attributes max-retry number lockout-period minutes
+login-statistics enable
+!
+banner login %
+DellEMC S4148U-ON login 
+Enter your username and password
+%
+!
+snmp-server community name {ro | rw} acl acl-name
+!
+ip access-list snmp-read-only-acl
+  permit ip 172.16.0.0 255.255.0.0 any
+!
+snmp-server community public ro acl snmp-read-only-acl
+!
+clock timezone standard-timezone UTC
+!
+logging console enable
+logging console severity log-crit
+logging server {hostname | ipv4–address | ipv6–address} tls [port-number] [severity severity-level] [vrf {management | vrf-name]
+logging audit enable
+!
+ntp server ntp1-server-ip-address
+ntp source loopback 0
+!
+control-plane
+ ip access-group acl_name in
+!
+ip access-list deny-private-external
+ deny ip source-ip-address mask any log
+!
+!
+ip access-list deny-source-external
+ permit ip internal-ip-address mask any
+!
+interface ethernet 1/1/1
+ ip access-group deny-source-external in
+!
+

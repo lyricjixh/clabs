@@ -1,0 +1,46 @@
+---
+- hosts: poc_evpn
+  connection: network_cli
+  gather_facts: No
+
+  collections:
+     - dellemc.os10
+
+  tasks:
+  - name: "Day2 Changing EVPN Overlay Vlan"
+    block:
+      # when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+      - name: "CFGGEN: Generating EVPN VLAN configuration for dellos10"
+        template:
+            src: dellos10_evpn_vlan.j2
+            dest: "{{ build_dir }}/os10_evpn_vlan_{{hostname}}.conf.part"
+        tags:
+          - cfggen
+
+      - name: "CFGGEN: Generating No EVPN VLAN Config for dellos10"
+        template:
+            src: no_evpn_vlan.j2
+            dest: "{{ build_dir }}/no_os10_evpn_vlan_{{hostname}}.conf.part"
+        #   notify: save config os10
+        #   register: output
+        tags:
+          - cfggen
+          - noapply
+
+      - name: "CFGPUSH: Cleaning Residual EVPN Vlan Config"
+        os10_config:
+            src: no_evpn_vlan.j2
+        ignore_errors: yes
+        tags:
+            - cfgpush
+            - noapply
+
+      - name: "Push EVPN VLAN"
+        os10_config:
+            src: dellos10_evpn_vlan.j2
+            save: "yes"
+            replace: "block"
+        register: output
+        tags:
+            - evpn
+            - cfgpush

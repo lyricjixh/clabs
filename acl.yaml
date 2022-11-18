@@ -1,0 +1,478 @@
+---
+- hosts: poc_rack01
+  gather_facts: No
+  collections:
+    - dellemc.os10
+
+  vars:
+    dellos_acl:
+      # This ACL is applied against the VTY
+      - name: SWITCH-VTY-ACCESS
+        type: ipv4
+        entries:
+            - number: 5
+              permit: true
+              protocol: ip
+              source: 172.17.60.81/32
+              destination: any
+            # - number: 10
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.54.35.208/32
+            #   destination: any
+            # # Autobahn jump server
+            # - number: 20
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.124.71.105/32
+            #   destination: any
+            # - number: 30
+            #   permit: true
+            #   protocol: ip
+            #   source: 68.87.23.34/32
+            #   destination: any
+            # - number: 40
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.41.192.122/32
+            #   destination: any
+            # - number: 50
+            #   permit: true
+            #   protocol: ip
+            #   source: 165.137.122.210/32
+            #   destination: any
+            # - number: 60
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.97.0/24
+            #   destination: any
+            # - number: 70
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.98.0/26
+            #   destination: any
+            # - number: 80
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.105.0/24
+            #   destination: any
+            # - number: 90
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.106.0/26
+            #   destination: any
+            # - number: 100
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.177.0/24
+            #   destination: any
+            # - number: 110
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.178.0/26
+            #   destination: any
+            # - number: 120
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.161.0/24
+            #   destination: any
+            # - number: 130
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.162.0/26
+            #   destination: any
+            # - number: 140
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.113.0/24
+            #   destination: any
+            # - number: 150
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.114.0/26
+            #   destination: any
+            # - number: 160
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.121.0/24
+            #   destination: any
+            # - number: 170
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.122.0/26
+            #   destination: any
+            # - number: 200
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.60.39.55/32
+            #   destination: any
+            # # TODO - figure out why network_cli doesn't work
+            # # with -e ansible_ssh_executable=jump-noargs
+            # #
+            # # So for now, add the VPN blocks
+            # #
+            # # Corporate VPN IP blocks
+            # - number: 210
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.30.0.0/16
+            #   destination: any
+            # # Corporate VPN block
+            # - number: 220
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.53.0.0/16
+            #   destination: any
+            # # Corporate VPN block
+            # - number: 230
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.166.0.0/16
+            #   destination: any
+            # # Corporate VPN block
+            # - number: 240
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.132.0.0/16
+            #   destination: any
+            # # SWITCH CTC / CEIC block for office access
+            # - number: 250
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.6.28.0/22
+            #   destination: any
+            # # new autobahn jump servers to account for in the near future
+            # - number: 260
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.116.133.104/32
+            #   destination: any
+            # - number: 270
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.118.251.70/32
+            #   destination: any
+            # - number: 280
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.118.251.38/32
+            #   destination: any
+            # - number: 290
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.116.134.8/32
+            #   destination: any                    
+            # - number: 1000
+            #   permit: false
+            #   protocol: ip
+            #   source: any
+            #   destination: any
+      - name: V6-SWITCH-VTY-ACCESS
+        type: ipv6
+        entries:
+            # More permissive ACL rule until we can figure out
+            # the issues with network_cli and autobahn
+            - number: 10
+              permit: true
+              protocol: ipv6
+              source: 2001:558::/35
+              destination: any
+            # # Autobahn IPv6 jumpserver
+            # - number: 11
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:1031:13::a36:23d0/128
+            #   destination: any
+            #   state: present
+            # # Autobahn IPv6 jumpserver
+            # - number: 20
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:1436:4:10:124:71:105/128
+            #   destination: any
+            # # new autobahn jump servers to account for in the near future
+            # - number: 30
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:fc0c:0:f816:3eff:fe2b:7e9f/128
+            #   destination: any
+            # - number: 40
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:fc0c:0:f816:3eff:fe2d:f8c0/128
+            #   destination: any
+            # - number: 50
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:fc18:2:f816:3eff:fea9:fec9/128
+            #   destination: any
+            # - number: 60
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:fc18:2:f816:3eff:fe86:aa73/128
+            #   destination: any                                    
+            # - number: 1000
+            #   permit: false
+            #   protocol: ipv6
+            #   source: any
+            #   destination: any
+      # This ACL existed on the switches previously
+      # and was applied against control-plane
+      - name: SWITCH-ACCESS
+        type: ipv4
+        entries:
+            ## SWITCH Internal Space
+            - number: 5
+              permit: true
+              protocol: ip
+              source: 172.17.60.81/32
+              destination: any
+            # - number: 10
+            #   permit: true
+            #   protocol: ip
+            #   source: 10.0.0.0/8
+            #   destination: any
+            # ## Newer SWITCH Internal Space
+            # ## Remove this in favor of larger /13
+            # - number: 15
+            #   permit: true
+            #   protocol: ip
+            #   source: 100.92.0.0/14
+            #   destination: any
+            #   state: absent
+            # ## Larger SWITCH Internal Space supersedes earlier /14
+            # ## Note that re-using sequence numbers immediately after a delete
+            # ## has unpredictable results
+            # - number: 16
+            #   permit: true
+            #   protocol: ip
+            #   source: 100.88.0.0/13
+            #   destination: any
+            # - number: 20
+            #   permit: true
+            #   protocol: ip
+            #   source: 24.40.0.0/18
+            #   destination: any
+            # - number: 30
+            #   permit: true
+            #   protocol: ip
+            #   source: 24.40.64.0/20
+            #   destination: any
+            # - number: 35
+            #   permit: true
+            #   protocol: ip
+            #   source: 24.153.0.0/16
+            #   destination: any
+            # - number: 40
+            #   permit: true
+            #   protocol: ip
+            #   source: 68.85.0.0/16
+            #   destination: any
+            # - number: 50
+            #   permit: true
+            #   protocol: ip
+            #   source: 68.86.0.0/15
+            #   destination: any
+            # - number: 60
+            #   permit: true
+            #   protocol: ip
+            #   source: 69.139.128.0/17
+            #   destination: any
+            # - number: 65
+            #   permit: true
+            #   protocol: ip
+            #   source: 69.252.80.0/23
+            #   destination: any
+            # - number: 70
+            #   permit: true
+            #   protocol: ip
+            #   source: 69.252.194.14/32
+            #   destination: any
+            # - number: 80
+            #   permit: true
+            #   protocol: ip
+            #   source: 76.96.0.0/17
+            #   destination: any
+            # - number: 90
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.108.0.0/14
+            #   destination: any
+            # - number: 100
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.112.8.20/32
+            #   destination: any
+            # - number: 105
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.112.192.26/32
+            #   destination: any
+            # - number: 110
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.112.246.0/23
+            #   destination: any
+            # - number: 120
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.114.8.133/32
+            #   destination: any
+            # - number: 125
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.114.67.22/32
+            #   destination: any
+            # - number: 130
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.114.153.101/32
+            #   destination: any
+            # - number: 140
+            #   permit: true
+            #   protocol: ip
+            #   source: 96.115.208.0/23
+            #   destination: any
+            # - number: 150
+            #   permit: true
+            #   protocol: ip
+            #   source: 147.191.0.0/16
+            #   destination: any
+            # - number: 160
+            #   permit: true
+            #   protocol: ip
+            #   source: 162.151.0.0/16
+            #   destination: any
+            # - number: 170
+            #   permit: true
+            #   protocol: ip
+            #   source: 165.137.0.0/16
+            #   destination: any
+            # - number: 180
+            #   permit: true
+            #   protocol: ip
+            #   source: 169.152.0.0/16
+            #   destination: any
+            # - number: 190
+            #   permit: true
+            #   protocol: ip
+            #   source: 172.16.0.0/12
+            #   destination: any
+            # ## Remove last Deny from 200
+            # - number: 200
+            #   permit: false
+            #   protocol: ip
+            #   source: any
+            #   destination: any
+            #   state: absent
+            # ## New Roles to Allow DHCP BOOTPS
+            # - number: 210
+            #   permit: true
+            #   protocol: udp
+            #   source: any
+            #   destination: any
+            #   dest_condition: eq 67
+            # ## New Roles to Allow DHCP BOOTPC
+            # - number: 220
+            #   permit: true
+            #   protocol: udp
+            #   source: any
+            #   destination: any
+            #   dest_condition: eq 68
+            # ## Allow NTP 
+            # - number: 230
+            #   permit: true
+            #   protocol: udp
+            #   source: any
+            #   destination: any
+            #   dest_condition: eq 123
+            # ## Extend last Deny to 1000
+            # - number: 1000
+            #   permit: false
+            #   protocol: ip
+            #   source: any
+            #   destination: any
+
+      - name: V6-SWITCH-ACCESS
+        type: ipv6
+        entries:
+            - number: 5
+              permit: true
+              protocol: ipv6
+              source: fe80::/10
+              destination: any
+            # - number: 10
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558::/35
+            #   destination: any
+            # - number: 20
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:fe16:103:69:252:194:14/128
+            #   destination: any
+            # - number: 30
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:fe16:10c:96:114:8:133/128
+            #   destination: any
+            # - number: 40
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2001:558:fe33:1001:f816:3eff:fed3:5d7a/128
+            #   destination: any
+            # - number: 50
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2600:1f14:e0f:af00::/64
+            #   destination: any
+            # - number: 60
+            #   permit: true
+            #   protocol: ipv6
+            #   source: 2600:1f18:6de:e800::/64
+            #   destination: any
+            # - number: 70
+            #   permit: false
+            #   protocol: ipv6
+            #   source: any
+            #   destination: any
+  tasks:
+    # - name: Upload ACL rules to switches
+    #   include_role:
+    #     name: ansible-role-dellos-acl
+    - name: "Generating ACL configuration for dellos10"
+      template:
+          src: dellos10_acl.j2
+          dest: "{{ build_dir }}/acl_{{hostname}}.conf.part"
+      when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+    #   notify: save config os10
+      register: generate_output
+      tags:
+        - sysserv
+        - cfggen
+
+    - name: "Provisioning ACL configuration for dellos10"
+      os10_config:
+          src: dellos10_acl.j2
+      when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+    #   notify: save config os10
+      register: output
+      tags:
+        - sysserv
+
+    - name: Ensure that control plane has the ACLs associated with it
+      os10_config:
+        lines:
+          # TODO: once we have serial console access, uncomment
+          # https://github.SWITCH.com/SWITCH/vxrail-automation/issues/82
+          - ip access-group SWITCH-ACCESS in
+          - ipv6 access-group V6-SWITCH-ACCESS in
+        parents: 'control-plane'
+
+    - name: Ensure that VTY has ACLs associated with it
+      os10_config:
+        lines:
+          # TODO: once we have serial console access, uncomment
+          - ip access-class SWITCH-VTY-ACCESS
+          - ipv6 access-class V6-SWITCH-VTY-ACCESS
+        parents: 'line vty'

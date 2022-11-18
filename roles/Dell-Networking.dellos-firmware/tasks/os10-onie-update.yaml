@@ -1,0 +1,44 @@
+- name: "Get Current onie version"
+  dellemc.os10.os10_command:
+    commands:
+       - command: "system /mnt/onie-boot/onie/tools/bin/onie-version"
+  register: onie_version
+
+- debug: var=onie_version
+
+- name : "Install ONIE updater image"
+  dellemc.os10.os10_command:
+    commands: ['image install http://{{file_server}}/{{onie_updater}}']
+
+- name: "Check image status till it succeed"
+  dellemc.os10.os10_command:
+    commands: ['show image status | display-xml']
+  register: result
+  until: result.stdout.0.find("Success") != -1
+  retries: 5
+  delay: 10
+
+- name : "Reload the Device"
+  dellemc.os10.os10_command:
+    commands:
+      - command: 'reload'
+        prompt: 'Proceed to reboot'
+        answer: 'y'
+
+- pause:
+    minutes: 4
+
+- name: Wait for switch to load up
+  wait_for:
+    host: "{{ ansible_host }}"
+    port: 22
+    delay: 10
+    timeout: 600
+
+- name: "Get New onie version"
+  dellemc.os10.os10_command:
+    commands:
+       - command: "system /mnt/onie-boot/onie/tools/bin/onie-version"
+  register: onie_version
+
+- debug: var=onie_version

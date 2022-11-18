@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  gather_facts: No
+  vars:
+    jsonVar: "{{ lookup('file', './group_vars/lld.json') | from_json }}"
+  
+  tasks:
+  # - name: Display Input Json
+  #   ansible.builtin.debug:
+  #     var: jsonVar
+
+  # - name: Display all server names
+  #   ansible.builtin.debug:
+  #     var: item
+  #   loop: "{{ jsonVar | json_query('domain.server[*].name') }}"
+
+  - name: Display all ports from rack1
+    vars:
+      rack1_query: "[? Local_Rack=='Rack01' && Function=='OOB']"
+    ansible.builtin.debug:
+      var: item
+    loop: "{{ jsonVar | json_query(rack1_query) }}"
+
+  # - name: Display all ports from cluster1 as a string
+  #   ansible.builtin.debug:
+  #     msg: "{{ jsonVar['domain_definition'] | json_query('domain.server[?cluster==`cluster1`].port') | join(', ') }}"

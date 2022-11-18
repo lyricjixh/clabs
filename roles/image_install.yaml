@@ -1,0 +1,8 @@
+---
+- hosts: leaf 
+  connection: local
+  gather_facts: no
+
+  roles:
+  - ansible-role-dellos-image-upgrade
+

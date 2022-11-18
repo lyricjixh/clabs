@@ -1,0 +1,198 @@
+---
+- hosts: poc_evpn
+  connection: network_cli
+  gather_facts: False
+
+  collections:
+     - dellemc.os10
+
+  tasks:
+  - name: Cancel ZTD
+    dellos10_command:
+      commands:
+        - "ztd cancel"
+    when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+    tags:
+    - ztdoff
+
+  - name: "Provisioning Switch Base Configuration"
+    block:
+    - name: "Generating Switch Base Configuration"
+      template:
+          src: dellos10_evpn_base.j2
+          dest: "{{ build_dir }}/dellos10_evpn_base_{{hostname}}.conf.part"
+      tags:
+        - base
+        - cfggen
+
+    - name: "CFGPUSH Switch Base Configuration"
+      os10_config:
+          src: dellos10_evpn_base.j2
+          save: "yes"
+          replace: "block"
+      tags:
+        - base
+        - cfgpush
+
+  - name: "Provisioning EVPN Fabric Intf Configuration"
+    block:
+    - name: "Generating EVPN Fabric Intf Configuration"
+      template:
+          src: dellos10_evpn_fabric_intf.j2
+          dest: "{{ build_dir }}/dellos10_evpn_fabric_{{hostname}}.conf.part"
+      tags:
+        - fabric_intf
+        - cfggen
+
+    - name: "CFGPUSH EVPN Fabric Intf Configuration"
+      os10_config:
+          src: dellos10_evpn_fabric_intf.j2
+          save: "yes"
+          replace: "block"
+      tags:
+        - fabric_intf
+        - cfgpush
+
+  - name: "Provisioning Routing Policy Configuration"
+    block:
+    - name: "Generating Routing Policy Configuration"
+      template:
+          src: dellos10_rpol.j2
+          dest: "{{ build_dir }}/dellos10_rpol_{{hostname}}.conf.part"
+      tags:
+        - rpol
+        - cfggen
+
+    - name: "Generating No Routing Policy Configuration"
+      template:
+          src: dellos10_no_rpol.j2
+          dest: "{{ build_dir }}/dellos10_no_rpol_{{hostname}}.conf.part"
+      tags:
+        - rpol
+        - cfggen
+
+    - name: "First, Clearing Legacy Routing Policy configuration"
+      os10_config:
+          src: dellos10_no_rpol.j2
+      ignore_errors: yes
+      tags:
+        - rpol
+        - cfgpush
+
+    - name: "Second, CFGPUSH Routing Policy Configuration"
+      os10_config:
+          src: dellos10_rpol.j2
+          save: "yes"
+          replace: "block"
+      tags:
+        - rpol
+        - cfgpush
+
+  - name: "Provisioning EVPN BGP Configuration"
+    block:
+    - name: "Generating EVPN BGP Configuration"
+      template:
+          src: dellos10_evpn_bgp.j2
+          dest: "{{ build_dir }}/dellos10_evpn_bgp_{{hostname}}.conf.part"
+      tags:
+        - bgp
+        - cfggen
+
+    - name: "First, Disable BGP Protocol"
+      dellos10_config:
+        lines:
+          - no router bgp
+      ignore_errors: yes
+      tags:
+        - bgp
+        - cfgpush
+
+    - name: "Second, CFGPUSH EVPN BGP Configuration"
+      os10_config:
+          src: dellos10_evpn_bgp.j2
+          # save: "yes"
+          # replace: "block"
+      tags:
+        - bgp
+        - cfgpush
+
+  - name: "Provisioning EVPN Vxlan Configuration"
+    block:
+    - name: "Generating EVPN Vxlan Configuration"
+      template:
+          src: dellos10_evpn_vxlan.j2
+          dest: "{{ build_dir }}/dellos10_evpn_vxlan_{{hostname}}.conf.part"
+      tags:
+        - evpn
+        - cfggen
+
+    - name: "Generating NOEVPN Config for dellos10"
+      template:
+          src: no_evpn.j2
+          dest: "{{ build_dir }}/dellos10_no_vxlan_{{hostname}}.conf.part"
+      tags:
+        - evpn
+        - cfggen
+
+    - name: "First, Cleaning Residual EVPN Config"
+      os10_config:
+          src: no_evpn.j2
+      ignore_errors: yes
+      tags:
+        - cfgpush
+        - evpn
+
+    - name: "Second, CFGPUSH EVPN Vxlan Configuration"
+      os10_config:
+          src: dellos10_evpn_vxlan.j2
+          save: "yes"
+          # replace: "block"
+      tags:
+        - cfgpush
+        - evpn
+
+  - name: "Reload Switch for the fresh restart"
+    block:
+      - name : Reloading OS10 switch to enable IPv6 forwarding
+        dellos10_command:
+          commands:
+              # - write mem
+              - command: 'reload'
+                prompt: 'Proceed to reboot'
+                answer: 'y'
+        tags:
+          - reload
+
+      - name: "Wait for Switches Booting Up"
+        wait_for:
+          host: "{{ ansible_host }}"
+          port: 22
+          delay: 30
+          timeout: 420
+        tags: 
+          - reload
+
+      - name: "Wait 4 mins for Switch Ready(adjust as need)"
+        pause:
+          minutes: 4
+          prompt: "Pause 4 Mins for switches fully ready ..."
+        delegate_to: localhost
+        tags:
+          - reload
+
+      - name: "Collect show command outputs"
+        dellos10_command:
+          commands: "{{ item }}"
+        with_items:
+            - show version
+            - show ip bgp summary
+            - show nve vxlan-vni
+        register: show_output
+        tags:
+          - reload
+          - showlog
+
+      - debug: var=show_output
+        tags:
+          - reload
+          - showlog

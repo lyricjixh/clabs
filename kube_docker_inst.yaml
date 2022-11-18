@@ -1,0 +1,57 @@
+---
+- hosts: k8s
+  become: yes
+  gather_facts: yes
+  vars:
+    ansible_ssh_user: "lab"
+    ansible_ssh_pass: "{{ vault_lab_password }}"
+    ansible_become_pass: "{{ vault_lab_password }}"
+    local_user: "{{ lookup('env', 'USER') }}"
+
+  tasks:
+  - name: Debian | Configure Sysctl
+    sysctl:
+      name: "net.ipv4.ip_forward"
+      value: "1"
+      state: present
+
+  - name: Debian | Install Prerequisites Packages
+    package: name={{ item }} state=present force=yes
+    loop: "{{ docker_dependencies }}"
+
+  - name: Debian | Add GPG Keys
+    apt_key: 
+      url: "{{ docker_url_apt_key }}"
+
+  - name: Debian | Add Repo Source
+    apt_repository: 
+      repo: "{{ docker_repository }}"
+      update_cache: yes
+
+  - name: Debian | Install the Stable Version of Docker Packages
+    package: name={{ item }} state=present force=yes install_recommends=no
+    loop: "{{ docker_packages }}"
+  
+  - name: Enforce Docker's cgroup to systemd
+    copy:
+      src: "files/daemon.json"
+      dest: "/etc/docker/daemon.json"
+      mode: "0640"
+    notify:
+      - Restart Docker
+    tags:
+      - restart
+
+  - name: Debian | Start and Enable Docker Service
+    service:
+      name: docker
+      state: restarted
+      enabled: yes  
+    tags:
+      - restart
+
+  handlers:
+    - name: Restart Docker
+      service:
+        name: docker
+        state: restarted

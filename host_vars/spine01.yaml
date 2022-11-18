@@ -1,0 +1,50 @@
+# Spine to Leaf port in seqence
+fabric_links:
+  - 
+    name: "{{ fabric_link_01 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr('network') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr('network') }}"
+  - 
+    name: "{{ fabric_link_02 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(link_local_addr_seq[1]) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(link_local_addr_seq[1]) | ansible.netcommon.ipaddr('address') }}"
+  - 
+    name: "{{ fabric_link_03 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(link_local_addr_seq[2]) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(link_local_addr_seq[2]) | ansible.netcommon.ipaddr('address') }}"
+  - 
+    name: "{{ fabric_link_04 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(link_local_addr_seq[3]) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(link_local_addr_seq[3]) | ansible.netcommon.ipaddr('address') }}"
+  - 
+    name: "{{ fabric_link_05 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(link_local_addr_seq[4]) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(link_local_addr_seq[4]) | ansible.netcommon.ipaddr('address') }}"
+  - 
+    name: "{{ fabric_link_06 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(link_local_addr_seq[5]) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(link_local_addr_seq[5]) | ansible.netcommon.ipaddr('address') }}"
+  -
+    name: "{{ fabric_link_07 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(link_local_addr_seq[6]) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(link_local_addr_seq[6]) | ansible.netcommon.ipaddr('address') }}"
+  - 
+    name: "{{ fabric_link_08 }}"
+    state: "present"    
+    admin_state: "up"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(link_local_addr_seq[7]) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(link_local_addr_seq[7]) | ansible.netcommon.ipaddr('address') }}"

@@ -1,0 +1,76 @@
+---
+- hosts: poc_leaf
+  connection: network_cli
+  gather_facts: No
+  collections:
+     - dellemc.os10
+
+  tasks:
+    - name: Cancel ZTD
+      dellos10_command:
+        commands:
+          - "ztd cancel"
+      tags:
+      - ztdoff
+
+    - name: Provisioning Underlay
+      include_role:
+        name: poc-underlay
+      tags:
+      - cfg
+
+    - name: "Generating Routing Policy configuration"
+      template:
+          src: dellos10_rpol.j2
+          dest: "{{ build_dir }}/rpol_{{hostname}}.conf.part"
+      when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+      tags:
+        - cfggen
+        - rpol
+
+    - name: "Clearing Legacy Routing Policy configuration"
+      os10_config:
+          src: dellos10_no_rpol.j2
+      when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+      ignore_errors: yes
+      tags:
+        - cfgpush
+        - rpol
+
+    - name: "Provisioning Routing Policy configuration"
+      os10_config:
+          src: dellos10_rpol.j2
+      when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+      tags:
+        - cfgpush
+        - rpol
+
+    - name : Reloading OS10 switch to enable IPv6 forwarding
+      dellos10_command:
+        commands:
+            - write mem
+            - command: 'reload'
+              prompt: 'Proceed to reboot'
+              answer: 'y'
+
+    - name: Wait for the reboot to complete.
+      wait_for_connection:
+        connect_timeout: 20
+        sleep: 5
+        delay: 10
+        timeout: 360
+      tags: check-skip
+                  
+    - name: Wait 60 secs for Switch coming up
+      pause:
+        seconds: 60
+      delegate_to: localhost
+
+
+    - name: Checking the version
+      dellos10_facts:
+        gather_subset: hardware
+      register: post_facts
+      tags: reload
+
+    - debug: var=post_facts.ansible_facts.ansible_net_version

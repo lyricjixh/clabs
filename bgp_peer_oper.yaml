@@ -1,0 +1,54 @@
+---
+- hosts: sw1003a
+  connection: network_cli
+  gather_facts: no
+  any_errors_fatal: True
+
+  tasks:
+  - name : "Shutdown the BGPv4 Peer"
+    dellos10_config:
+      lines:
+        - "shutdown"
+      parents: ['neighbor {{ item }}']
+      before: ['router bgp {{ bgp.local_as }}']
+      match: exact
+    with_items: "{{bgp.fabric_peer_v4}}"
+    when: peerstate == "down"
+    notify:
+      - collect BGP status
+      - display BGP info
+
+  - name : "Bringup the BGPv4 Peer"
+    dellos10_config:
+      lines:
+        - "no shutdown"
+      parents: ['neighbor {{ item }}']
+      before: ['router bgp {{ bgp.local_as }}']
+      match: exact
+    with_items: "{{bgp.fabric_peer_v4}}"
+    when: peerstate == "up"
+    notify:
+        - collect BGP status
+        - display BGP info
+
+  - name: Wait 15 secs for BGP Peers coming up
+    pause:
+      seconds: 15
+    delegate_to: localhost
+    when: peerstate == "up"
+ 
+  handlers:
+    - name: collect BGP status
+      dellos10_command:
+        commands: "{{ item }}"
+      with_items:
+        - 'show running-configuration bgp'
+        - 'show ip bgp summary'
+      register: output  
+
+    - name: display BGP info
+      debug: 
+        var: "{{ item }}"
+      with_items:
+        - output.results[0].stdout_lines
+        - output.results[1].stdout_lines

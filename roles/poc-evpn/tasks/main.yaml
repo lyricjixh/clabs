@@ -1,0 +1,74 @@
+---
+-  name: "Generating EVPN VXLAN configuration for dellos10"
+   template:
+      src: dellos10_evpn.j2
+      dest: "{{ build_dir }}/EVPN10_{{hostname}}.conf.part"
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+   #   notify: save config os10
+   #   register: generate_output
+   tags:
+      - evpn
+      - cfggen
+
+-  name: "Generating NOEVPN configuration for dellos10"
+   template:
+      src: no_evpn.j2
+      dest: "{{ build_dir }}/NOEVPN10_{{hostname}}.conf.part"
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+   #   notify: save config os10
+   #   register: output
+   tags:
+      - evpn
+      - cfgpush
+      - noapply
+
+-  name: "Cleaning EVPN Residual configuration for dellos10"
+   os10_config:
+      src: no_evpn.j2
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+   #   notify: save config os10
+   #   register: output
+   tags:
+      - evpn
+      - cfgpush
+      - noapply
+
+-  name: Enable Loopback1
+   os10_config:
+      lines:
+         - description "{{ lpbk1.desc }}"
+         - ip address {{ lpbk1.addr_v4 }}/32
+         - no shutdown
+      parents: ['interface loopback1']
+      match: exact
+      save: no
+      replace: block
+   register: output
+   tags:
+      - lpbk1
+      - cfgpush
+
+-  name: Enable NVE
+   os10_config:
+      lines:
+         - source-interface loopback1
+      parents: ['nve']
+      match: exact
+      save: no
+      replace: block
+   register: output
+   tags:
+      - vne
+      - cfgpush
+
+-  name: "Provisioning EVPN VXLAN configuration for dellos10"
+   os10_config:
+      src: dellos10_evpn.j2
+   #   notify: save config os10
+      save: yes
+      replace: block
+   register: output
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+   tags:
+      - evpn
+      - cfgpush

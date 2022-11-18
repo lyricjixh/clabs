@@ -1,0 +1,39 @@
+---
+- hosts: poc_leaf
+  gather_facts: no
+  collections:
+     - dellemc.os10
+    
+  tasks:
+    # - name: Install roles from Ansible Galaxy
+    #   command: "ansible-galaxy install Dell-Networking.dellos-image-upgrade"
+    #   delegate_to: localhost
+    #   run_once: yes
+    #   tags: install
+
+    - name: Get Switch current OS version
+      dellos10_facts:
+        gather_subset: hardware
+      register: pre_facts
+
+    # - name: Enable Service under mgmt VRF
+    #   os10_config:
+    #     commands:
+    #       - command: ip {{ item }} vrf management
+    #         prompt: ']:'
+    #         answer: 'yes'
+    #   loop:
+    #     - "http"
+    #     - "scp"
+    #     - "ftp"
+    #   tags: enable_vrf
+
+    # Only uploading to switches where current version is not at required version 
+    - name: Upload image to Switch
+      include_role: 
+        name: Dell-Networking.dellos-image-upgrade
+        apply:
+          tags:
+            - install
+      when: dellos_image_upgrade.software_version != pre_facts.ansible_facts.ansible_net_version
+      tags: install

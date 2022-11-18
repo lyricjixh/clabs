@@ -1,0 +1,24 @@
+---
+  - name: CAPTURE SHOW LLDP NEIGHBORS
+    dellos10_command:
+      commands:
+        - show lldp neighbors
+    register: output
+
+#  - name: DISPLAY THE OUTPUT
+#    debug: var=output.stdout
+
+  - name: INSTALL TEXTFSM
+    import_tasks: textfsm.yaml
+
+  - name: PARSE THE OUTPUT  for {{ ansible_network_os }} show_lldp_neighbors
+    textfsm_parser:
+      src: "{{lookup('file', './templates/{{ansible_network_os}}/show_lldp_neighbors.template')}}"
+      content: "{{ output.stdout[0] }}"
+      name: lldp_facts
+    register: lldp_output
+    vars:
+      - ansible_network_os: dellos10
+
+  - name: DISPLAY THE PARSED OUTPUT
+    debug: var=lldp_output

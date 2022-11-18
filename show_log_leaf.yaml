@@ -1,0 +1,74 @@
+---
+# - hosts: poc_leaf
+#   connection: network_cli
+#   gather_facts: Yes
+
+#   tasks:
+#   - name: "Collect show command outputs"
+#     dellos10_command:
+#       commands: "{{ item }}"
+#     with_items:
+#         # - show license status
+#         # - show version
+#         - show lldp neighbors | no-more
+#         # - show ip bgp summary | no-more
+#         # - show interface status | no-more
+#         # - show ip bgp ipv6 unicast summary
+#         # - show vrrp brief
+#         - show vlt {{ vlt.domain_id }} vlt-port-detail | no-more
+#         # - show vlt 1 backup-link
+#         # - show running-configuration vlt
+#         # - show running-configuration compressed
+#         # - show nve vxlan-vni | no-more
+#     register: output
+
+#   - debug: var=output
+#   - local_action: copy content={{ output }} dest=~/LOGS/{{ inventory_hostname }}.yaml
+
+- hosts: poc_leaf
+  gather_facts: false
+
+  vars:
+    ansible_connection: ssh
+    ansible_ssh_user: "linuxadmin"
+    ansible_first_login_password: "linuxadmin"
+    ansible_password: "dell@123!"
+    ansible_become_method: sudo
+    ansible_become_pass: "dell@123!"
+
+  tasks:
+  - name: "Check if host is reachable"
+    wait_for:
+      timeout: 0
+    register: connect_rs
+    ignore_unreachable: yes
+
+  - when: connect_rs is unreachable
+    name: "Try first login and change the password"
+    become: false
+    vars:
+      ansible_connection: ssh
+      ansible_ssh_user: "lab"
+      ansible_ssh_pass: "{{vault_lab_password}}"
+    delegate_to: localhost
+    expect:
+      command: "sshpass -p linuxadmin ssh linuxadmin@{{ inventory_hostname }}"
+      timeout: 5
+      responses:
+        "(current) UNIX password:": "linuxadmin"
+        "New password:": "dell@123!"
+        "Retype new password:": "dell@123!"
+
+  - name: Update Linuxadmin user's Password
+    become: yes
+    user: 
+      name: "linuxadmin"
+      update_password: always 
+      password: "{{ vault_os10_password }}"
+
+  - name: "Collect Firmware Version"
+    command: "hshell -c 'pciephy fw versino'"
+    become: yes
+    register: fw_version
+
+  - debug: var=fw_version

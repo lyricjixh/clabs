@@ -1,0 +1,66 @@
+---
+- name: "Collect SONiC Service Tag"
+  hosts: spine
+  gather_facts: no
+  tags: sonic
+  tasks:
+#  - name: "Create Servive Tag Collection file"
+#    file:
+#      dest: /tmp/serv_tag
+#      state: touch
+#    delegate_to: localhost
+
+    - name: "Run Show Platform Syseeprom"
+      shell: "show platform syseeprom | grep {{ item }}"
+      with_items:
+        - "'Service Tag'"
+        - "'Base MAC Address'"
+      register: show_info
+
+    - name: "Extract the Value of Service Tag and MAC Addr"
+      set_fact:
+        switch_tags: "{{ show_info.results[0].stdout.split()[-1] }}"
+        mac_addrs: "{{ show_info.results[1].stdout.split()[-1] }}"
+
+    - name: "Generate the Service Tag Inventory File for Switches"
+      copy:
+        content: "{% for switch in ansible_play_batch %}
+        {{ switch }}: serv_tag={{ hostvars[switch].switch_tags }} mac_addr={{ hostvars[switch].mac_addrs }}\n
+        {% endfor %}"
+        dest: /tmp/inv_{{ region_name }}_sonic
+      delegate_to: localhost
+      run_once: true
+
+- name: "Collect DellOS10 Service Tag"
+  hosts: dellos10
+  gather_facts: no
+  tags: os10
+  tasks:
+    - name: "Run Show OS10EE Commands"
+      dellos10_command:
+        commands:
+          - command: show license status | grep "Service Tag"
+          - command: show system brief | grep MAC
+      register: show_info
+
+    - name: "Extract the Value of Service Tag and MAC Addr"
+      set_fact:
+        switch_tags: "{{ show_info.stdout[0].split()[-1] }}"
+        mac_addrs: "{{ show_info.stdout[1].split()[-1] }}"
+
+    - name: "Generate the Service Tag Inventory File for Switches"
+      copy:
+        content: "{% for switch in ansible_play_batch %}
+        {{ switch }}: serv_tag={{ hostvars[switch].switch_tags }} mac_addr={{ hostvars[switch].mac_addrs }}\n
+        {% endfor %}"
+        dest: /tmp/inv_{{ region_name }}_dellos
+      delegate_to: localhost
+      run_once: true
+
+
+#  - name: "Appending Switch entry to Collection file"
+#    lineinfile:
+#      dest: /tmp/serv_tag
+#      line: "{{ switch_tag_line }}"
+#      insertafter: EOF
+#    delegate_to: localhost

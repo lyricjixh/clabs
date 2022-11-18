@@ -1,0 +1,37 @@
+---
+- name: Get Current OS Version
+  dellos10_facts:
+    gather_subset: hardware
+  register: pre_facts
+
+- debug: var=pre_facts.ansible_facts.ansible_net_version
+
+- name : Reloading OS10 switch
+  dellos10_command:
+    commands:
+        - write mem
+        - command: 'reload'
+          prompt: 'Proceed to reboot'
+          answer: 'y'
+
+- name: Wait for the reboot to complete.
+  wait_for_connection:
+    connect_timeout: 20
+    sleep: 5
+    delay: 10
+    timeout: 360
+  tags: check-skip
+              
+- name: Wait 15 secs for Switch coming up
+  pause:
+    seconds: 15
+  delegate_to: localhost
+
+
+- name: Checking the version
+  dellos10_facts:
+    gather_subset: hardware
+  register: post_facts
+  tags: reload
+
+- debug: var=post_facts.ansible_facts.ansible_net_version

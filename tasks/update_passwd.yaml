@@ -1,0 +1,13 @@
+---
+- name: Update DellOS10 switch users password
+  dellos10_config:
+    lines: ['username {{item.user}} password {{ item.password }} role {{ item.role }}']
+  with_items: "{{ users }}"
+  when: ansible_network_os == 'dellos10'
+  no_log: true
+
+- name: Update DellOS10 switch linuxadmin password
+  dellos10_config:
+    lines: ['system-user linuxadmin password {{ vault_switch_new_password }}']
+  when: ansible_network_os == 'dellos10'
+  no_log: true

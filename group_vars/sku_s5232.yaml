@@ -1,0 +1,155 @@
+---
+esxi_port_range:
+   - 1/1/8:1-1/1/9:4
+front_panel_port_range:
+   - 1/1/1-1/1/7
+   - 1/1/8:1-1/1/9:4
+   - 1/1/10-1/1/32
+
+#breakout type "1x40G/2x100G/2x50G/4x100G/4x25G/4x10G"
+breakout:
+   -
+      type: "4x25G"
+      start: 8
+      end: 9
+
+trunk_port: 
+   desc: "trunk memeber port"
+   vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   range:
+   -
+      desc: "25G Compute Port Group1"
+      start: 8/1
+      end: 8/4
+      state: "present"
+   # port-range in same trunk
+   port_indiv:
+   -  desc: "trunk port to compute"
+      id: "9/1"
+      state: "present"
+   -  desc: "trunk port to compute"
+      id: "9/2"
+      state: "present"
+   -  desc: "trunk port to compute"
+      id: "9/3"
+      state: "present"
+   -  desc: "trunk port to compute"
+      id: "9/4"
+      state: "present"
+
+l3_uplinks:
+   -
+    name: 29
+    desc: "Fabric Uplink01_To_Spine01"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(fabric_link_seq[0]|int+1) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(fabric_link_seq[0]|int+1) | ansible.netcommon.ipaddr('address') }}"
+   -
+    name: 30
+    desc: "Fabric Uplink02_To_Spine02"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(fabric_link_seq[1]|int+1) | ansible.netcommon.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(fabric_link_seq[1]|int+1) | ansible.netcommon.ipaddr('address') }}"
+
+vlt: 
+   domain_id: "1"
+   vlti: 
+    - "31"
+    - "32"
+
+#MLAG
+mlag_bond: 
+   domain_id: "1"
+   desc: "MLAG Control link Port-Channel"
+   vlan_list: "{{ vlans.pair_vlan.id }}"
+   bond_id: "100"
+   bmem_range:
+   bmem_indiv:
+     - "31"
+     - "32"
+
+trunk_bond:
+   #  - bond_id: 101
+   #    mlag_id: 101
+   #    desc: "bond desc prefix"
+   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   #    bmem_range:
+   #    bmem_indiv:
+   #       - "1/21"
+   #  - bond_id: 102 
+   #    mlag_id: 102
+   #    desc: "bond desc prefix"
+   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   #    bmem_range:
+   #    bmem_indiv:
+   #       - "1/22"
+   #  - bond_id: 103
+   #    mlag_id: 103
+   #    desc: "bond desc prefix"
+   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   #    bmem_range:
+   #    bmem_indiv:
+   #       - "1/23"
+   #  - bond_id: 104 
+   #    mlag_id: 104
+   #    desc: "bond desc prefix"
+   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   #    bmem_range:
+   #    bmem_indiv:
+   #       - "1/24"
+
+## Sflow per SKU
+sflow_port_sku:
+-
+   id: Eth 1/1/1
+   sflow_enable : true
+   ingress_enable: true
+   state: present
+   # polling_interval: 30
+   sample_rate:
+-
+   id: Eth 1/1/2
+   sflow_enable : true
+   ingress_enable: true
+   state: present
+   # polling_interval: 30
+   sample_rate:
+-
+   id: Eth 1/1/3
+   sflow_enable : true
+   ingress_enable: true
+   state: present
+   # polling_interval: 30
+   sample_rate:
+-
+   id: Eth 1/1/4
+   sflow_enable : true
+   ingress_enable: true
+   state: present
+   # polling_interval: 30
+   sample_rate:
+
+span_sku:
+  session:
+  -
+    name: "test1"
+    desitnation: "erspan"
+    direction:  "both"           #Mirror session direction
+    dscp:       "10"             #ERSPAN destination dscp
+    dst_ip:     "192.168.20.2"   #ERSPAN Destination ip address
+    gre:        "0x88ee"         #ERSPAN destination gre-type
+    queue:                       #ERSPAN destination queue
+    source:     "Eth 1/4/1"      #Mirror session source interface
+    src_ip:     "10.0.2.1"       #ERSPAN source ip address
+    ttl:        "10"             #ERSPAN destination ttl
+    state:      "present"         #State, absent or present
+  -
+    name: "test2"
+    desitnation: "cpu"
+    direction:  "both"           #Mirror session direction
+    source:     "Eth 1/4/2"      #Mirror session source interface
+    state:      "present"         #State, absent or present
+  -
+    name: "test3"
+    desitnation: "Eth 1/16"
+    direction:  "both"           #Mirror session direction
+    source:     "Eth 1/15"      #Mirror session source interface
+    state:      "present"         #State, absent or present

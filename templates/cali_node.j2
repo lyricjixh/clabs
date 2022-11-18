@@ -1,0 +1,8 @@
+apiVersion: projectcalico.org/v3
+kind: Node
+metadata:
+  name: {{ calico.node_name }}
+spec:
+  bgp:
+    asNumber: {{ calico.local_asn }}
+    ipv4Address: {{ cali_ports | selectattr("name", "equalto", "lo")| map(attribute="addr_v4")| join() }}

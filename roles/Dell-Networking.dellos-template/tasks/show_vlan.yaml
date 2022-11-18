@@ -1,0 +1,22 @@
+---
+ - name: CAPTURE SHOW VLAN
+   dellos10_command:
+     commands:
+       - show vlan
+   register: output
+
+ - name: DISPLAY THE OUTPUT
+   debug: var=output.stdout
+
+ - name: INSTALL TEXTFSM
+   import_tasks: textfsm.yaml
+
+ - name: PARSE THE OUTPUT for {{ ansible_network_os }} show_vlan
+   textfsm_parser:
+     src: "{{lookup('file', './templates/{{ansible_network_os}}/show_vlan.template')}}"
+     content: "{{ output.stdout[0] }}"
+     name: vlan_facts
+   register: result
+   vars:
+     - ansible_network_os: dellos10
+

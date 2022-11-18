@@ -1,0 +1,136 @@
+{###########################################
+
+Purpose:
+Generating BGP Configuration
+ BGP underlay/overlay
+ Not including VRF BGP routing
+############################################}
+router bgp {{ bgp.local_as }}
+ router-id {{ lpbk0.addr_v4 }}
+ !
+ address-family ipv4 unicast
+{% if bgp.afi.ipv4 is defined and bgp.afi.ipv4 %}
+{% for redis in bgp.afi.ipv4 %}
+   redistribute {{ redis.proto }} route-map {{ redis.r_map }}
+{% endfor %}
+{% endif %}
+ !
+ address-family ipv6 unicast
+{% if bgp.afi.ipv6 is defined and bgp.afi.ipv6 %}
+{% for redis in bgp.afi.ipv6 %}
+   redistribute {{ redis.proto }} route-map {{ redis.r_map }}
+{% endfor %}
+{% endif %}
+ !
+ template fabric_peer_v4
+  send-community extended
+  remote-as {{ bgp.spine_as }}
+  !
+  address-family ipv4 unicast
+    allowas-in 1
+  !
+  address-family l2vpn evpn
+    activate
+    allowas-in 1
+  !
+ !
+ template tor_peer_v4
+  remote-as {{ bgp.local_as }}
+  send-community extended
+  !
+  address-family ipv4 unicast
+  !
+  address-family l2vpn evpn
+    activate
+    allowas-in 1
+  !
+ !
+ template sas_peer_v4
+  remote-as {{ bgp.sas_as }}
+  send-community extended
+  !
+  address-family ipv4 unicast
+  !
+  address-family l2vpn evpn
+    activate
+    allowas-in 1
+  !
+ !
+ template fabric_peer_v6
+  remote-as {{ bgp.spine_as }}
+  !
+  address-family ipv4 unicast
+    no activate
+  !
+  address-family ipv6 unicast
+    allowas-in 1
+    activate
+  !
+ !
+ template tor_peer_v6
+  remote-as {{ bgp.local_as }}
+  !
+  address-family ipv4 unicast
+    no activate
+  !
+  address-family ipv6 unicast
+    activate
+  !
+ !
+ template sas_peer_v6
+  remote-as {{ bgp.sas_as }}
+  !
+  address-family ipv4 unicast
+    no activate
+  !
+  address-family ipv6 unicast
+    activate
+  !
+ !
+{% for peer in bgp.fabric_peer_v4 %}
+ neighbor {{ peer }}
+{% if seq is odd %}
+  description "s{{loop.index}}g1"
+{% else %}
+  description "s{{loop.index}}g2"
+{% endif %}
+  inherit template fabric_peer_v4
+  no shutdown
+  !
+{% endfor %}
+{% if bgp.fabric_peer_v6 is defined and bgp.fabric_peer_v6 %}
+{% for peer in bgp.fabric_peer_v6 %}
+ neighbor {{ peer }}
+{% if seq is odd %}
+  description "s{{loop.index}}g1"
+{% else %}
+  description "s{{loop.index}}g2"
+{% endif %}
+  inherit template fabric_peer_v6
+  no shutdown
+  !
+{% endfor %}
+{% endif %}
+{% if seq is even %}
+ neighbor {{ tor_pair_netv4 | ipaddr(1) | ipaddr('address') }}
+{% else %}
+ neighbor {{ tor_pair_netv4 | ipaddr(2) | ipaddr('address') }}
+{% endif %}
+  description "tor_pair_ibgp_v4"
+  inherit template tor_peer_v4
+  no shutdown
+  !
+ !
+{% if tor_pair_netv6 is defined and tor_pair_netv6 %}
+{% if seq is even %}
+ neighbor {{ tor_pair_netv6 | ipaddr(1) | ipaddr('address') }}
+{% else %}
+ neighbor {{ tor_pair_netv6 | ipaddr(2) | ipaddr('address') }}
+{% endif %}
+  description "tor_pair_ibgp_v6"
+  inherit template tor_peer_v6
+  no shutdown
+  !
+ !
+{% endif %}
+!

@@ -1,0 +1,26 @@
+---
+- hosts: compute
+  become: yes
+  gather_facts: no
+
+  tasks:
+  - name: Specify the task
+    import_tasks: secure_os10.yaml 
+    ignore_errors: yes
+
+  - name: Upgrade the switch to new OS10 image 
+    connection: local
+    import_role: 
+       name: Dell-Networking.dellos-image-upgrade
+    ignore_errors: yes
+
+  - name : Reload the Device from standby partition
+    connection: network_cli
+    dellos10_command:
+       commands:
+           - write mem
+           - boot system standby
+           - command: 'reload'
+             prompt: 'Proceed to reboot'
+             answer: 'y'
+    when: image_status.stdout.0.find("Failed") <= -1

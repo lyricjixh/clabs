@@ -1,0 +1,95 @@
+## Edge assumption
+## Edge Uplink 2
+## Edge 2 BGP peers/uplink
+edge_link_ct: 2
+edge_links_seq:
+    - "{{ edge_link_ct*(seq-7) }}"
+    - "{{ edge_link_ct*(seq-7)+1 }}"
+edge_links:
+   -
+    port: "27"
+    desc: "Gateway uplink_To_CE01"
+    netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) }}"
+    netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) }}"
+    vrf: POD1
+   -
+    port: "28"
+    desc: "Gateway uplink_To_CE02"
+    netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) }}"
+    netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) }}"
+    vrf: POD1
+
+edge_vlans:
+    # - 
+    #     desc: "To CE01"
+    #     id: "1991"
+    #     netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) }}"
+    #     netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) }}"
+    #     port: 27
+    #     vrf: POD1
+    # - 
+    #     desc: "To CE02"
+    #     id: "1992"
+    #     netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) }}"
+    #     netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) }}"
+    #     port: 28
+    #     vrf: POD1
+
+evpn:
+    vrf:
+    - 
+        name: "POD1"
+        desc: "POD1_VRF"
+        rt: "64999:9001"
+        l3_vni: "9001"
+        l3_vni_vlan: "901"
+        type5:
+        - 
+            afi: ipv4
+            r_map: 
+            proto: connected
+        - 
+            afi: ipv4
+            r_map: 
+            proto: static
+        proto:
+            bgp:
+                gw_peer_v4:
+                    - 
+                        addr: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                        asn: "64999"
+                    - 
+                        addr: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+                        asn: "64998"
+                gw_peer_v6:
+                    - 
+                        addr: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                        asn: "64999"
+                    - 
+                        addr: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+                        asn: "64998"
+            static_v4:
+                - 
+                    dest: 0.0.0.0/0
+                    nh: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                - 
+                    dest: 0.0.0.0/0
+                    nh: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+            static_v6:
+                - 
+                    dest: 0::0/0
+                    nh: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                - 
+                    dest: 0::0/0
+                    nh: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+    - 
+        name: "POD2"
+        desc: "POD2_VRF"
+        rt: "64999:9002"
+        l3_vni: "9002"
+        l3_vni_vlan: "902"
+        type5:
+        - 
+            r_map: 
+            afi: ipv4
+            proto: "connected"

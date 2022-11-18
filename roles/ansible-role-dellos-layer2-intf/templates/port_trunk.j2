@@ -1,0 +1,31 @@
+{#####################################################
+
+Purpose:
+Configure layer2 trunk interface for dellos10 Devices.
+
+#####################################################}
+{% if trunk_port %}
+{% if trunk_port.port_range %}
+{% for range in trunk_port.port_range %}
+interface range ethernet1/1/{{ range.start }}-1/1/{{ range.end }}
+ description "{{ trunk_port.desc }}"
+ switchport mode trunk
+ switchport access vlan {{ native_vlan.id }}
+ switchport trunk allowed vlan {{ trunk_port.vlan_list|join(',') }}
+ no shutdown
+!
+{% endfor %}
+{% endif %}
+{# Generate Layer2 Port trunk as Individual CFG #}
+{% if trunk_port.port_indiv %}
+{% for indiv in trunk_port.port_indiv %}
+interface ethernet{{ indiv }}
+ description "{{ trunk_port.desc }}"
+ switchport mode trunk
+ switchport access vlan {{ native_vlan.id }}
+ switchport trunk allowed vlan {{ trunk_port.vlan_list|join(',') }}
+ no shutdown
+!
+{% endfor %}
+{% endif %}
+{% endif %}

@@ -1,0 +1,28 @@
+---
+# tasks file for dellos10
+
+-  name: "CFGGEN: Generating Underlay configuration for Dellos10"
+   template:
+      src: underlay_cfg.j2
+      dest: "{{ build_dir }}/os10_underlay_{{hostname}}.conf.part"
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+#   notify: save config os10
+#   register: generate_output
+   tags:
+     - underlay
+     - cfggen
+
+-  name: "CFGPUSH: Provisioning Underlay configuration for Dellos10"
+#   debugger: on_failed
+   os10_config:
+      src: underlay_cfg.j2
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+#   notify: save config os10
+   register: output
+   tags:
+     - underlay
+
+#-  name: Display all variables/facts for output
+#   debug:
+#    var: output
+#    verbosity: 4

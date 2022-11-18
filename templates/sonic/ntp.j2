@@ -1,0 +1,28 @@
+{###########################################
+
+Purpose:
+Generating NTP Configuration
+############################################}
+{% if ntp is defined and ntp %}
+{% if ntp.authenticate|lower == "yes" %}
+ntp authenticate
+{% endif %}
+{% if ntp.auth_key is defined and ntp.auth_key %}
+{% for value in ntp.auth_key %}
+ntp authentication-key {{ value.seq }} {{ value.type }} {{ value.text }}
+{% endfor %}
+{% endif %}
+{% for server in ntp.server %}
+{% if server.state|lower == "present" %}
+ntp server {{ server.addr }}
+{% elif server.state|lower == "absence" %}
+no ntp server {{ server.addr }}
+{% endif %}
+{% endfor %}
+{% if ntp.vrf is defined and ntp.vrf %}
+ntp source-interface Management 0
+ntp vrf mgmt
+{% endif %}
+!
+{% endif %}
+

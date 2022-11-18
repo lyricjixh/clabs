@@ -1,0 +1,49 @@
+---
+- hosts: poc_evpn
+  connection: network_cli
+  gather_facts: no
+  any_errors_fatal: True
+  collections:
+    - dellemc.os10
+
+  tasks:
+  - name: Get Current OS Version
+    dellos10_facts:
+      gather_subset: hardware
+    register: pre_facts
+    tags: version
+
+  - debug: var=pre_facts.ansible_facts.ansible_net_version
+    tags: version
+
+  - name : Reloading OS10 with ZTD
+    dellos10_command:
+      commands:
+          - command: 'reload ztd'
+            prompt: ':'
+            answer: 'yes'
+    tags: reload_ztd
+
+  - name: Wait upto 5 mins for switches ready
+    wait_for:
+      host: "{{ ansible_host }}"
+      port: 22
+      delay: 30
+      timeout: 300
+    tags: waitfor
+
+  - name: Pause 4 Mins for switches fully ready
+    pause:
+      minutes: 4
+      prompt: "Pause 4 Mins for switches fully ready ..."
+    delegate_to: localhost
+    tags: waitfor
+
+  - name: Get Current OS Version
+    dellos10_facts:
+      gather_subset: hardware
+    register: post_facts
+    tags: waitfor
+
+  - debug: var=post_facts.ansible_facts.ansible_net_version
+

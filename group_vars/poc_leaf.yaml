@@ -1,0 +1,181 @@
+---
+
+vendor: "DellEMC"
+
+
+vlan_port: 
+#   - 
+#    desc: "layer2 native vlan port"
+#    id: 401
+#    port_range: 
+#    port_indiv: 
+
+vlan_ranges:
+# Specify vlan ranges
+   - 
+    desc: "vlan desc here"
+    start: 
+    end: 
+
+bfd:
+    interval: 100
+    min_rx: 300
+    multip: 5
+    role: "active"
+    
+oob_mgmt:
+    addr_v4: "{{ ansible_host }}/{{ oob_ipv4_mask }}"
+    gw_v4: "{{ oob_ipv4_gateway }}"
+
+# Leave/spine fabric uplinks 
+uplink_ct: 2
+fabric_link_seq:
+    - "{{ 2*uplink_ct*(seq-1) }}"
+    - "{{ 2*uplink_ct*(seq-1)+2 }}"
+
+# Interface
+lpbk0:
+    desc: "Underlay Loopback"
+    addr_v4: "{{ lpbk0_netv4 | ipaddr(seq) | ipaddr('address') }}"
+    addr_v6: "{{ lpbk0_netv6 | ipaddr(seq) | ipaddr('address') }}"
+
+# BGP Parameters
+bgp:
+  local_as: "{{ 65000+rack_no }}"
+  spine_as: "65000"
+  sas_as: "64999"
+  fabric_peer_v4:
+    - "{{ fabric_ptp_netv4 | ipaddr(fabric_link_seq[0]) | ipaddr('address') }}"
+    - "{{ fabric_ptp_netv4 | ipaddr(fabric_link_seq[1]) | ipaddr('address') }}"
+  fabric_peer_v6:
+    - "{{ fabric_ptp_netv6 | ipaddr(fabric_link_seq[0]) | ipaddr('address') }}"
+    - "{{ fabric_ptp_netv6 | ipaddr(fabric_link_seq[1]) | ipaddr('address') }}"
+  afi: 
+    ipv4:
+    -
+        r_map: "LOCAL_CONNECTED_V4"
+        proto: connected
+    ipv6:
+    -
+        r_map: "LOCAL_CONNECTED_V6"
+        proto: connected
+
+# ospf Parameters
+ospf:
+  authenticate:
+    - key: "{{ vault_ospf_auth}}"
+      area: "0.0.0.0"
+  network:
+    - id: "172.17.60.0/24"
+      area: "0.0.0.0"
+    - id: "172.17.70.0/24"
+      area: "0.0.0.0"
+  aggregate:
+    - area: "0.0.0.0"
+      supernet: "172.17.0.0/16"
+  redis: 
+    - r_map: "LOCAL_CONNECTED_V4"
+      proto: connected
+    - r_map: "static_to_ospf"
+      proto: static
+
+vrrp:
+  version: 3
+  delay_reload: 3
+  group:
+    - id: 1
+      intf: "1/2"
+      type: "ipv4"
+      vrf_instance: "POD1"
+      track_intf:
+        - 1/45
+      addr_v4: 10.101.1.253/24
+      vip: 10.101.1.1/24
+      vmac: "{{ tor_pair_vmac }}"
+
+dellos_acl:
+  - type: ipv4
+    name: test01
+    description: ipv4acl
+    extended: true
+    remark:
+      - number: 5
+        description: "ipv4remark"
+    entries:
+      - number: 10
+        permit: true
+        protocol: tcp
+        source: 172.17.60.0/24
+        destination: 10.10.10.10/32
+        dest_condition: eq 22
+        state: present
+      - number: 20
+        permit: true
+        protocol: tcp
+        source: 172.17.70.0/24
+        destination: 10.10.10.10/32
+        dest_condition: eq 443
+        state: present
+    stage_ingress:
+        - name: 
+          state: absent
+    stage_egress:
+        - name: vlan 104
+          state: present
+        - name: vlan 204
+          state: absent
+    state: present
+  - type: ipv6
+    name: test01_v6
+    description: ipv6acl
+    extended: true
+    remark:
+      - number: 5
+        description: "ipv6_acl_remark"
+    entries:
+      - number: 10
+        permit: true
+        protocol: tcp
+        source: 2001:1:1:1::/64
+        destination: 2001:a:a:a::a/128
+        dest_condition: eq 22
+        state: present
+      - number: 20
+        permit: true
+        protocol: tcp
+        source: 2001:2:2:2::/64
+        destination:  2001:a:a:a::a/128
+        dest_condition: eq 443
+        state: present
+    stage_ingress:
+        - name: 
+          state: absent
+    stage_egress:
+        - name: vlan 104
+          state: absent
+        - name: vlan 204
+          state: absent
+    state: present
+
+vxlan_mtu: "9100"
+
+evpn:
+    vrf:
+    - 
+        name: "POD1"
+        desc: "POD1_VRF"
+        l3_vni: "9001"
+        l3_vni_vlan: "901"
+        type5:
+        - 
+            afi: ipv4
+            r_map: 
+            proto: connected
+        # - 
+        #     afi: ipv4
+        #     r_map: 
+        #     proto: static
+        # - 
+        #     afi: ipv4
+        #     r_map: 
+        #     proto: bgp

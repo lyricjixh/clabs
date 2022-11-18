@@ -1,0 +1,16 @@
+header {
+  target:: arista VTY-ACL
+}
+
+term vty-access {
+  comment:: "allow_only_VTY_hosts"
+  source-address:: VTY_HOSTS
+  action:: accept
+}
+
+term default-deny {
+  comment:: "Deny_all_others"
+  action:: deny
+  logging:: true
+}
+

@@ -1,0 +1,57 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{###########################################
+
+Purpose:
+Generating Static Vxlan Configuration
+############################################}
+{% include 'dellos10_underlay.j2' %}
+!
+interface loopback1
+ description "{{ lpbk1.desc }}"
+ no shutdown
+ ip address {{ lpbk1.addr_v4 }}/32
+{% if lpbk1.addr_v6 is defined and lpbk1.addr_v6 %}
+ ipv6 address {{ lpbk1.addr_v6 }}/128
+{% endif %}
+ exit
+!
+nve
+ source-interface loopback1
+ exit
+!
+ip virtual-router mac-address {{ tor_pair_vmac }}
+!
+{% for vni in vxlans %}
+virtual-network {{ vni.id }}
+  description "{{ vni.desc }}"
+  vxlan-vni {{ vni.id }}
+{% for rvtep in vni.rvtep %}
+    remote-vtep {{ rvtep }}
+{% endfor %}
+!
+{% endfor %}
+{% for vni in vxlans %}
+interface virtual-network{{ vni.id }}
+  description "{{ vni.desc }}"
+  no shutdown
+  mtu 9216
+  ip address {{ vni.netv4 | ipaddr(-(seq+1)) }}
+  ip virtual-router address {{ vni.netv4 | ipaddr('1') | ipaddr('address') }}
+{% if vni.netv6 is defined and vni.netv6 %}
+  ipv6 address {{ vni.netv6 | ipaddr(-(seq+1)) }}
+  ipv6 virtual-router address {{ vni.netv6 | ipaddr('1') | ipaddr('address') }}
+{% endif %}
+!
+{% endfor %}
+{% for app_vlan in vlans.app_vlans %}
+interface vlan{{ app_vlan.id }}
+  description "{{ app_vlan.desc }}"
+  no ip address
+  no ipv6 address
+  no vrrp-group 1
+  no vrrp-ipv6-group 1
+  virtual-network {{ app_vlan.vni }}
+  no shutdown
+!
+{% endfor %}
+

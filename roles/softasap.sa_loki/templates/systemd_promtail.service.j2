@@ -1,0 +1,21 @@
+# CI/CD managed
+# Do NOT modify this file by hand!
+
+[Unit]
+Description=Promtail log collector
+After=network.target
+Requires=network.target
+
+[Service]
+#EnvironmentFile={{ loki_config_dir }}/promtail_configuration
+
+ExecStart={{ loki_dir }}/promtail -config.file {{loki_config_dir}}/promtail_config.yml $OPTIONS
+User={{loki_user|default('loki')}}
+Group={{loki_group|default('loki')}}
+
+Restart=always
+RestartSec=5
+TimeoutSec=5
+
+[Install]
+WantedBy=multi-user.target

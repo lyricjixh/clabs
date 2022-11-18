@@ -1,0 +1,31 @@
+---
+# tasks file for dellos10
+
+ - name: "Generating ACL configuration for dellos10"
+   template:
+      src: dellos10_acl.j2
+      dest: "{{ build_dir }}/acl_{{hostname}}.conf.part"
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
+#   notify: save config os10
+   register: generate_output
+   tags:
+    - sysserv
+    - cfggen
+
+ - name: "Debug printing the output"
+   debug: 
+     var: generate_output
+   tags:
+    - sysserv
+    - cfggen
+
+ - name: "Provisioning ACL configuration for dellos10"
+   os10_config:
+      src: dellos10_acl.j2
+   when: (ansible_network_os is defined and ansible_network_os == "dellos10")
+#   notify: save config os10
+   register: output
+   tags:
+    - sysserv
+
+

@@ -1,0 +1,17 @@
+#jinja2: trim_blocks: True, lstrip_blocks: True
+{#######################################
+
+#Purpose:
+Create NTP configuration for SONiC devices
+
+#######################################}
+{% if ntp_servers is defined and ntp_servers %}
+{% set ntp_dict_value = {} %}
+  {% for ntp_server in ntp_servers %}
+    {% set x=ntp_dict_value.__setitem__(ntp_server, {}) %}
+  {% endfor %}
+
+{% set ntp_json = {} %}
+{% set x=ntp_json.__setitem__('NTP_SERVER', ntp_dict_value) %}
+{{ ntp_json|to_nice_json }}
+{% endif %}

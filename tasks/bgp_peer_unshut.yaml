@@ -1,0 +1,19 @@
+---
+    - name: Unshut bgpv4 leaf/spine neighbor
+      dellos10_config:
+        lines:
+          - "no shutdown"
+        parents: ['neighbor {{ item }}']
+        before: ['router bgp {{ bgp.local_as }}']
+        match: exact
+        replace: block
+      loop: "{{ bgp.fabric_peer_v4 }}"
+    - name: Unshut bgpv6 leaf/spine neighbor
+      dellos10_config:
+        lines:
+          - "no shutdown"
+        parents: ['neighbor {{ item }}']
+        before: ['router bgp {{ bgp.local_as }}']
+        match: exact
+        replace: block
+      loop: "{{ bgp.fabric_peer_v6 }}"

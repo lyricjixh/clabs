@@ -1,0 +1,6 @@
+# Location:
+rack_no: 3
+
+vxlan_rvtep:
+    - 10.10.0.1
+    - 10.10.0.2

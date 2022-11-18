@@ -1,0 +1,118 @@
+{% if vxlans is defined and vxlans %}
+evpn
+{% for vni in vxlans %}
+{% if vni.state == "present" %}
+ evi {{ vni.id }}
+  vni {{ vni.id }}
+  rd auto
+  route-targe {{ vni.id }}:{{ vni.id }} both
+ !
+{% endif %}
+{% endfor %}
+!
+{% for vni in vxlans %}
+{% if vni.state == "present" %}
+virtual-network {{ vni.id }}
+  description "{{ vni.desc }}"
+  vxlan-vni {{ vni.id }}
+  exit
+!
+interface virtual-network{{ vni.id }}
+  description "{{ vni.desc }}"
+  no shutdown
+  mtu {{ vxlan_mtu }}
+  ip vrf forwarding {{ vni.vrf }}
+{% if vni.netv4 is defined and vni.netv4 %}
+  ip address {{ vni.netv4 | ipaddr(-(seq+1)) }}
+  ip virtual-router address {{ vni.netv4 | ipaddr('1') | ipaddr('address') }}
+{% endif %}
+{% if vni.netv6 is defined and vni.netv6 %}
+  ipv6 address {{ vni.netv6 | ipaddr(-(seq+1)) }}
+  ipv6 virtual-router address {{ vni.netv6 | ipaddr('1') | ipaddr('address') }}
+{% endif %}
+  exit
+!
+interface vlan{{ vni.vlan }}
+  description "{{ vni.desc }}"
+  virtual-network {{ vni.id }}
+  mtu {{ vxlan_mtu }}
+  no shutdown
+  exit
+!
+{% endif %}
+{% endfor %}
+{% if breakout_10g is defined and breakout_10g %}
+interface range ethernet1/1/{{breakout_10g.start}}:1-1/1/{{breakout_10g.end}}:4
+ no shutdown
+ switchport mode trunk
+ switchport access Vlan {{ vlans.native_vlan.id }}
+ switchport trunk allowed vlan {{ vxlans | json_query('[?state==`present`].vlan') | join(',') }}
+ mtu 9216
+!
+{% endif %}
+{% if breakout_25g is defined and breakout_25g %}
+interface range ethernet1/1/{{breakout_25g.start}}:1-1/1/{{breakout_25g.end}}:4
+ no shutdown
+ switchport mode trunk
+ switchport access Vlan {{ vlans.native_vlan.id }}
+ switchport trunk allowed vlan {{ vxlans | json_query('[?state==`present`].vlan') | join(',') }}
+ mtu 9216
+!
+{% endif %}
+{% if breakout_40g is defined and breakout_40g %}
+interface range ethernet1/1/{{breakout_40g.start}}:1-1/1/{{breakout_40g.end}}:1
+ no shutdown
+ switchport mode trunk
+ switchport access Vlan {{ vlans.native_vlan.id }}
+ switchport trunk allowed vlan {{ vxlans | json_query('[?state==`present`].vlan') | join(',') }}
+ mtu 9216
+!
+{% endif %}
+{% if trunk_port.port_indiv is defined and trunk_port.port_indiv %}
+{% for tport in trunk_port.port_indiv %}
+interface ethernet1/1/{{tport}}
+ no shutdown
+ switchport mode trunk
+ switchport access vlan 1
+ switchport trunk allowed vlan {{ vxlans | json_query('[?state==`present`].vlan') | join(',') }}
+ mtu 9216
+ flowcontrol receive off
+!
+{% endfor %}
+{% endif %}
+!
+{% if trunk_port.range is defined and trunk_port.range %}
+{% for prange in trunk_port.range %}
+interface range ethernet1/1/{{prange.start}}-1/1/{{prange.end}}
+ description "prange.desc"
+ no shutdown
+ switchport mode trunk
+ switchport access vlan 1
+ switchport trunk allowed vlan {{ vxlans | json_query('[?state==`present`].vlan') | join(',') }}
+ mtu 9216
+ flowcontrol receive off
+!
+{% endfor %}
+{% endif %}
+!
+{#### 
+Removal of Absent instance
+####}
+{% for vni in vxlans %}
+{% if vni.state == "absence" %}
+no interface vlan{{ vni.vlan }}
+!
+no interface virtual-network{{ vni.id }}
+!
+no virtual-network {{ vni.id }}
+!
+{% endif %}
+{% endfor %}
+evpn
+{% for vni in vxlans %}
+{% if vni.state == "absence" %}
+  no evi {{ vni.id }}
+!
+{% endif %}
+{% endfor %}
+{% endif %}

@@ -1,0 +1,13 @@
+{###########################################
+
+Purpose:
+Generating TACAS Plus Configuration
+############################################}
+{% if aaa_tac.vrf is defined and aaa_tac.vrf %}
+{% for server in aaa_tac.server %}
+tacacs-server host {{ server.addr }} vrf mgmt timeout {{ aaa_tac.timeout }} key {{ server.key }}
+{% endfor %}
+{% else %}
+tacacs-server host {{ server.addr }} timeout {{ aaa_tac.timeout }} key {{ server.key }}
+{% endif %}
+

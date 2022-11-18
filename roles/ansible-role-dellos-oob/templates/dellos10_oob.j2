@@ -1,0 +1,82 @@
+#jinja2: trim_blocks: True,lstrip_blocks: True
+{#############################################
+
+Purpose:
+Generate OOB Configuration for dellos10 Devices
+
+###############################################}
+!
+hostname {{ hostname }}
+ip domain-name {{ domain.name }}
+!
+{% for user in users %}
+username {{user.name}} password {{ user.passwd }} role {{ user.role }}
+{% endfor %}
+!
+snmp-server vrf management
+{% for view in snmp.view %}
+snmp-server view {{ view.name }} {{ view.oid }} included
+{% endfor %}
+{% for group in snmp.group %}
+{% for level in group.sec_level %}
+snmp-server group {{ group.name }} {{ group.version }} {{ level.name }} {{ level.view_type }} {{ level.view_name }}
+{% endfor %}
+{% endfor %}
+{% for user in snmp.user %}
+snmp-server user {{ user.name }} {{ user.group }} {{ user.version }} auth {{ user.auth }} {{ user.passwd }} priv {{ user.encry }} {{ user.passwd }}
+{% endfor %}
+{% for host in snmp.host %}
+snmp-server host {{ host.addr }} traps version {{ host.version }} {{ host.sec_level }} {{ host.user }}
+{% endfor %}
+!
+logging console severity log-warning
+logging log-file severity log-info
+logging source-interface {{ logging.src_intf }}
+{% for server in logging.server %}
+{% if server.vrf  %}
+logging server {{ server.addr }} severity {{ server.level }} vrf {{ server.vrf }}
+{% endif   %}
+logging server {{ server.addr }} severity {{ server.level }}
+{% endfor %}
+!
+hardware l3 ipv6-extended-prefix 1024
+!
+{% if breakout_25g %}
+{% set b_start = breakout_25g.start | int %}
+{% set b_end = breakout_25g.end | int +1 %}
+{% for i in range(b_start, b_end, 1) %}
+port-group 1/1/{{ i }}
+ profile restricted
+{% set p_num = ( i-1 ) * 2 + 1 %}
+ port 1/1/{{ p_num }} mode Eth 25g-4x
+!
+{% endfor %}
+{% endif %}
+!
+{% if breakout_10g %}
+{% set b_start = breakout_10g.start | int %}
+{% set b_end = breakout_10g.end | int +1 %}
+{% for i in range(b_start, b_end, 1) %}
+port-group 1/1/{{ i }}
+ profile restricted
+{% set p_num = ( i-1 ) * 2 + 1 %}
+ port 1/1/{{ p_num }} mode Eth 10g-4x
+!
+{% endfor %}
+{% endif %}
+!
+interface mgmt 1/1/1
+ no ip address dhcp
+ no ipv6 address autoconfig
+!
+ip vrf management
+ interface management
+exit
+interface mgmt 1/1/1
+ no shutdown
+ no ip address dhcp
+ ip address {{ oob_mgmt.addr_v4 }}
+ no ipv6 address
+!
+management route 0.0.0.0/0 {{ oob_mgmt.gw_v4 }}
+!
