@@ -185,14 +185,14 @@
 # # Enable License and retart switchd
 # - name: Copy the License file onto local
 #   copy: 
-#     src: sonic_trial.lic
-#     dest: /home/sonic/sonic_trial.lic
-#     owner: "sonic"
-#     group: "sonic"
+#     src: ceos_trial.lic
+#     dest: /home/ceos/ceos_trial.lic
+#     owner: "ceos"
+#     group: "ceos"
 #     mode: '0644'
 
 # - name: Apply the License
-#   shell: cl-license -i /home/sonic/sonic_trial.lic
+#   shell: cl-license -i /home/ceos/ceos_trial.lic
 
 # # Reboot switches and check coming back after 2 mins
 # - name: Finally Reboot to make a fresh start

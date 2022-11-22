@@ -1,0 +1,9 @@
+{###########################################
+
+Purpose:
+Generating Hostanme/Domain Configuration
+############################################}
+{% for server in domain.server %}
+ip name-server {{ server }} vrf mgmt
+{% endfor %}
+!

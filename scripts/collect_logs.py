@@ -7,7 +7,7 @@ import pdb
 import sys
 
 def showCommands(host):
-	prompt_dict = { 'dellos10': '\S+\d+[\S]-x#', 'sonic': '\$' }
+	prompt_dict = { 'dellos10': '\S+\d+[\S]-x#', 'ceos': '\$' }
 	host_ssh_ip = var_dict['_meta']['hostvars'][host]['ansible_host'] 
 	host_ssh_pass = var_dict['_meta']['hostvars'][host]['ansible_ssh_pass']
 	host_nos = var_dict['_meta']['hostvars'][host]['ansible_network_os']
@@ -30,7 +30,7 @@ def showCommands(host):
 	for cmd in cmd_list:
 		session.sendline(cmd)
 		session.expect(prompt)
-	if host_nos == 'sonic':
+	if host_nos == 'ceos':
 		session.sendline('vtysh')
 		session.expect(prompt_dict['dellos10'])
 		session.sendline('show ip bgp summary')

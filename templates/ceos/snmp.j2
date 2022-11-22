@@ -1,0 +1,42 @@
+{###########################################
+
+Purpose:
+Generating SNMP Configuration
+############################################}
+{% if snmp is defined and snmp %}
+{% if snmp.location is defined and snmp.location %}
+snmp-server location "{{ snmp.location }}"
+{% endif %}
+{% if snmp.contact is defined and snmp.contact %}
+snmp-server contact "{{ snmp.contact }}"
+{% endif %}
+{% if snmp.version|lower == "2c" %}
+{% for group in snmp.group %}
+{% if group.version|lower == "2c" %}
+snmp-server group {{ group.name }} v2c
+{% endif %}
+{% endfor %}
+snmp-server community public
+{% for comm in snmp.community %}
+snmp-server community {{ comm.name }} group {{ comm.group }}
+{% endfor %}
+{% for host in snmp.host %}
+{% if host.version|lower == "2c" %}
+snmp-server host {{ host.addr }} community {{ host.community }}
+{% endif %}
+{% endfor %}
+{% elif snmp.version|lower == "3" %}
+snmp-server group labgroupv3 v3 noauth read read_view
+snmp-server user labadmin group labgroupv3 auth sha auth-password {{ vault_snmp_labadmin_auth }}
+snmp-server view read_view 1.3.6.1.2 included
+{% endif %}
+{% if snmp.vrf is defined and snmp.vrf %}
+{% if snmp.proto_port is defined and snmp.proto_port %}
+snmp-server agentaddress {{ ansible_host }} port {{ snmp.proto_port }} interface mgmt
+{% else %}
+snmp-server agentaddress {{ ansible_host }} interface mgmt
+{% endif %}
+{% endif %}
+!
+{% endif %}
+

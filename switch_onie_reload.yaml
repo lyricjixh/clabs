@@ -4,7 +4,7 @@
   gather_facts: no
   any_errors_fatal: True
   collections:
-    - dellemc.enterprise_sonic
+    - dellemc.enterprise_ceos
     - dellemc.os10
 
   tasks:
@@ -57,7 +57,7 @@
     when: (ansible_network_os is defined and ansible_network_os == "dellos10") and ((dellos_cfg_generate | default('False')) | bool)
 
   - name: "Gather facts"
-    sonic_facts:
+    ceos_facts:
       gather_subset: min
       gather_network_resources: 
         - interfaces
@@ -66,10 +66,10 @@
         # - vlans
         - bgp
     register: result
-    when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+    when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_ceos.ceos")
 
   - name: "debug facts"
     debug: 
       msg: "{{ result.ansible_facts.ansible_network_resources }}"
-    when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+    when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_ceos.ceos")
     

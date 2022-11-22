@@ -1,0 +1,74 @@
+{###########################################
+
+Purpose:
+Generating Multitanency VRF Intance Configuration
+############################################}
+
+{% for vrfi in evpn.vrf %}
+ip vrf Vrf_{{ vrfi.name }}
+!
+interface Vlan {{ vrfi.l3_vni_vlan }}
+  description "VRF {{ vrfi.name }} Vlan"
+  ip vrf forwarding Vrf_{{ vrfi.name }}
+exit
+{% endfor %}
+!
+{% for vrfi in evpn.vrf %}
+{% if vrfi.proto.static_v4 is defined and vrfi.proto.static_v4 %}
+{% for route in vrfi.proto.static_v4 %}
+ip route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+!
+{% if vrfi.proto.static_v6 is defined and vrfi.proto.static_v6 %}
+{% for route in vrfi.proto.static_v6 %}
+ipv6 route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+{% endfor %}
+{% endif %}
+!
+router bgp {{ bgp.local_as }} vrf Vrf_{{ vrfi.name }}
+  address-family ipv4 unicast
+{% if vrfi.type5 is defined and vrfi.type5 %}
+{% for redist in vrfi.type5 %}
+{% if redist.r_map is defined and redist.r_map %}
+    redistribute {{ redist.proto }} route-map {{ redist.r_map }}
+{% else %}
+    redistribute {{ redist.proto }}
+{% endif %}
+{% endfor %}
+{% endif %}
+  !
+  address-family l2vpn evpn
+    advertise ipv4 unicast
+  !
+{% if vrfi.proto.bgp.gw_peer_v4 is defined and vrfi.proto.bgp.gw_peer_v4 %}
+{% for gwpeer in vrfi.proto.bgp.gw_peer_v4 %}
+  neighbor {{ gwpeer.addr }}
+    remote-as {{ gwpeer.asn }}
+    no shutdown
+    !
+    address-family ipv4 unicast
+      activate
+    !
+  !
+{% endfor %}
+{% endif %}
+{% if vrfi.proto.bgp.gw_peer_v6 is defined and vrfi.proto.bgp.gw_peer_v6 %}
+{% for gwpeer in vrfi.proto.bgp.gw_peer_v6 %}
+  neighbor {{ gwpeer.addr }}
+    remote-as {{ gwpeer.asn }}
+    no shutdown
+    !
+    address-family ipv4 unicast
+      no activate
+    !
+    address-family ipv6 unicast
+      allowas-in 2
+      activate
+    !
+  !
+{% endfor %}
+{% endif %}
+  !
+!
+{% endfor %}

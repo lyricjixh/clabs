@@ -1,5 +1,5 @@
 ---
-# handlers file for sonic-oper
+# handlers file for ceos-oper
 - name: Restart network FRR deamon
   systemd:
     name: bgp

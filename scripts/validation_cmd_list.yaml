@@ -19,7 +19,7 @@ dellos10:
     - show port-channel summary
     - show version
     - show boot detail
-sonic:
+ceos:
     - show version
     - show lldp table
     - show ip interface

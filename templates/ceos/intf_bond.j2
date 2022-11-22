@@ -1,0 +1,37 @@
+{###########################################
+
+Purpose:
+Generating MLAG Configuration
+############################################}
+{% if trunk_bond is defined and trunk_bond %}
+{% for bond in trunk_bond %}
+interface PortChannel {{ bond.bond_id }}
+ description "{{ bond.desc }} {{ bond.bond_id }}"
+ mtu 9216
+ switchport trunk allowed vlan {{ bond.vlan_list|join(",") }}
+ no shutdown
+{% if mlag_bond.domain_id is defined and mlag_bond.domain_id %}
+ mclag {{ mlag_bond.domain_id }}
+{% endif %}
+exit
+{% if trunk_bond.bmem_range is defined and trunk_bond.bmem_range %}
+{% set member = trunk_bond.bmem_range[i-1] %}
+interface range Eth {{ member }}
+ description "{{ bond.desc }} {{ bond.bond_id }} member"
+ mtu 9216
+ channel-group {{ bond.bond_id }}
+ no shutdown
+exit
+{% endif %}
+{% if bond.bmem_indiv is defined and bond.bmem_indiv %}
+{% for member in bond.bmem_indiv %}
+interface Eth{{ member }}
+ description "{{ bond.desc }} {{ bond.bond_id }} member"
+ mtu 9216
+ channel-group {{ bond.bond_id }}
+ no shutdown
+exit
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endif %}

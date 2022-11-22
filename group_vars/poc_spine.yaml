@@ -2,14 +2,14 @@
 # ansible_connection: ssh
 # ansible_ssh_user: admin
 # ansible_ssh_user: admin
-# ansible_password: "{{ vault_sonic_password }}" 
+# ansible_password: "{{ vault_ceos_password }}" 
 # ansible_become: yes
 # ansible_become_method: sudo
-# ansible_become_pass: "{{ vault_sonic_password }}"
+# ansible_become_pass: "{{ vault_ceos_password }}"
 
 
 
-# SONiC Log Collection
+# ceos Log Collection
 collect_logs:
     - show version
     - show lldp table | no-more

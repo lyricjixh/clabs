@@ -1,14 +1,15 @@
 ---
-ansible_network_os: dellemc.enterprise_sonic.sonic
+ansible_network_os: arista.eos.eos
 ansible_httpapi_use_ssl: true
 ansible_httpapi_validate_certs: false
 ansible_connection: network_cli
 
 ansible_ssh_user: admin
-ansible_ssh_pass: "{{vault_sonic_password}}"
+ansible_ssh_pass: "{{vault_ceos_password}}"
 ansible_become: yes
 ansible_become_method: sudo
-ansible_become_pass: "{{ vault_sonic_password }}"
+ansible_become_pass: "{{ vault_ceos_password }}"
+ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 features:
     debian: 
@@ -266,7 +267,7 @@ policy:
                         type: "ipv6 next-hop global"
                         object: "2001:2001::1"
 
-sonic_acl:
+ceos_acl:
   - name: copp_v4
     type: ipv4
     state: present

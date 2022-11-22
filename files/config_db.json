@@ -14,7 +14,7 @@
         "localhost": {
             "hwsku": "DellEMC-S5232f-C32", 
             "default_config_profile": "l3", 
-            "hostname": "sonic", 
+            "hostname": "ceos", 
             "platform": "x86_64-dellemc_s5232f_c3538-r0", 
             "type": "LeafRouter"
         }

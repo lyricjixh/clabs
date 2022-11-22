@@ -4,6 +4,6 @@
 ## Copy all messages to the remote syslog servers indicated below
 {% if logging.server is defined and logging.server -%}
 {% for server in logging.server %}
-*.* @[{{ server.addr }}]:514;SONiCForwardingFormat
+*.* @[{{ server.addr }}]:514;ceosForwardingFormat
 {% endfor %}
 {% endif -%}

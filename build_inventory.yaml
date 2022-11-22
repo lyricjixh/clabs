@@ -1,8 +1,8 @@
 ---
-- name: "Collect SONiC Service Tag"
+- name: "Collect ceos Service Tag"
   hosts: spine
   gather_facts: no
-  tags: sonic
+  tags: ceos
   tasks:
 #  - name: "Create Servive Tag Collection file"
 #    file:
@@ -27,7 +27,7 @@
         content: "{% for switch in ansible_play_batch %}
         {{ switch }}: serv_tag={{ hostvars[switch].switch_tags }} mac_addr={{ hostvars[switch].mac_addrs }}\n
         {% endfor %}"
-        dest: /tmp/inv_{{ region_name }}_sonic
+        dest: /tmp/inv_{{ region_name }}_ceos
       delegate_to: localhost
       run_once: true
 

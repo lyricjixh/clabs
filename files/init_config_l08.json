@@ -664,7 +664,7 @@
             "mac": "3c:2c:30:21:f1:82",
             "platform": "x86_64-dellemc_s5232f_c3538-r0",
             "type": "LeafRouter",
-            "hostname": "enter_sonic",
+            "hostname": "enter_ceos",
             "default_config_profile": "l3",
             "frr_mgmt_framework_config": "true"
         }

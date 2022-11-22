@@ -3,41 +3,41 @@
   connection: httpapi
   gather_facts: no
   collections:
-     - dellemc.enterprise_sonic
+     - dellemc.enterprise_ceos
   tasks:
   - name: Create Interfaces
-    sonic_interfaces:
-      config: "{{sonic_interfaces}}"
-    when: sonic_interfaces is defined and sonic_interfaces
+    ceos_interfaces:
+      config: "{{ceos_interfaces}}"
+    when: ceos_interfaces is defined and ceos_interfaces
 
   - name: Create L3 Interfaces
-    sonic_l3_interfaces:
-      config: "{{sonic_l3_interfaces}}"
-    when: sonic_l3_interfaces is defined and sonic_l3_interfaces
+    ceos_l3_interfaces:
+      config: "{{ceos_l3_interfaces}}"
+    when: ceos_l3_interfaces is defined and ceos_l3_interfaces
 
   - name: "Push configs for clos-fabric usecase"
     vars:
       ansible_connection: network_cli
-    sonic_config:
+    ceos_config:
       src: clos_fabric_cfg.j2
     register: result
 
   - name: Create BGP configuration
-    sonic_bgp:
-      config: "{{sonic_bgp}}"
-    when: sonic_bgp is defined and sonic_bgp
+    ceos_bgp:
+      config: "{{ceos_bgp}}"
+    when: ceos_bgp is defined and ceos_bgp
 
   - name: Create BGP AF configuration
-    sonic_bgp_af:
-      config: "{{sonic_bgp_af}}"
-    when: sonic_bgp_af is defined and sonic_bgp_af
+    ceos_bgp_af:
+      config: "{{ceos_bgp_af}}"
+    when: ceos_bgp_af is defined and ceos_bgp_af
 
   - name: Create BGP Neighbors configuration
-    sonic_bgp_neighbors:
-      config: "{{sonic_bgp_neighbors}}"
-    when: sonic_bgp_neighbors is defined and sonic_bgp_neighbors
+    ceos_bgp_neighbors:
+      config: "{{ceos_bgp_neighbors}}"
+    when: ceos_bgp_neighbors is defined and ceos_bgp_neighbors
 
   - name: Create BGP Neighbors AF configuration
-    sonic_bgp_neighbors_af:
-      config: "{{sonic_bgp_neighbors_af}}"
-    when: sonic_bgp_neighbors_af is defined and sonic_bgp_neighbors_af
+    ceos_bgp_neighbors_af:
+      config: "{{ceos_bgp_neighbors_af}}"
+    when: ceos_bgp_neighbors_af is defined and ceos_bgp_neighbors_af

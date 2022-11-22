@@ -38,7 +38,7 @@ interface Vlan {{ vlans.pair_vlan.id }}
 {% endif %}
 {% endif %}
 !
-{% include 'rpol_sonic.j2' %}
+{% include 'rpol_ceos.j2' %}
 !
 interface Vlan {{ vlans.vxrail_vlan.id }}
   description {{ vlans.vxrail_vlan.desc }}

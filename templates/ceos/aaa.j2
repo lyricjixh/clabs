@@ -1,0 +1,14 @@
+{###########################################
+
+Purpose:
+Generating AAA Configuration
+############################################}
+{% if aaa.authentication is defined and aaa.authentication %}
+aaa authentication login default {{ aaa.authentication }}
+{% endif %}
+{% if aaa.authorization is defined and aaa.authorization %}
+aaa authorization login default {{ aaa.authorization }}
+{% endif %}
+{% if aaa.accounting is defined and aaa.accounting %}
+aaa accounting login default {{ aaa.accounting }}
+{% endif %}

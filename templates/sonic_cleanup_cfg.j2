@@ -2,7 +2,7 @@
 {##############################################
 
 Purpose:
-Generating SONiC Cleanup Configuration
+Generating ceos Cleanup Configuration
 ###############################################}
 no interface vxlan vtep100
 !
@@ -32,7 +32,7 @@ no ip vrf Vrf_{{ vrfi.name }}
 !
 no router bgp
 !
-{% include 'no_rpol_sonic.j2' %}
+{% include 'no_rpol_ceos.j2' %}
 {% if edge_vlans is defined and edge_vlans %}
 {% for vlan in edge_vlans %}
 interface Eth 1/{{ vlan.port }}

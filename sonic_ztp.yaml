@@ -1,8 +1,8 @@
 ---
-- hosts: sonic
+- hosts: ceos
   gather_facts: true
   collections:
-     - dellemc.enterprise_sonic
+     - dellemc.enterprise_ceos
 
   tasks:
   - name: Set ONIE Mode to Uninstall
@@ -31,7 +31,7 @@
     tags: reset
 
   # - name: Get Current OS Version
-  #   sonic_facts:
+  #   ceos_facts:
   #     gather_subset: hardware
   #   register: post_facts
   #   tags: version

@@ -246,7 +246,7 @@
       tags:
         - isc_dhcp
 
-    - name: Refresh SONIC JSON Files
+    - name: Refresh ceos JSON Files
       copy:
           src: ztp/{{ item }}
           dest: /var/www/html/{{ item }}

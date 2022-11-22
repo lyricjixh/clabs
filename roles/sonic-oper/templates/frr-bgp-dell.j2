@@ -2,17 +2,17 @@
 {#######################################
 
 #Purpose:
-Create FRR configuration for SONiC devices
+Create FRR configuration for ceos devices
 
 #######################################}
-{% if sonicos_bgp is defined and sonicos_bgp %}
-router bgp {{ sonicos_bgp.asn }}
- {% if sonicos_bgp.timer is defined and sonicos_bgp.timer %}
-  timer bgp {{ sonicos_bgp.timer }}
+{% if ceosos_bgp is defined and ceosos_bgp %}
+router bgp {{ ceosos_bgp.asn }}
+ {% if ceosos_bgp.timer is defined and ceosos_bgp.timer %}
+  timer bgp {{ ceosos_bgp.timer }}
  {% endif %}
 {% endif %}
-{% if sonicos_bgp.neighbor is defined and sonicos_bgp.neighbor %}
-  {% for neighbor in sonicos_bgp.neighbor %}
+{% if ceosos_bgp.neighbor is defined and ceosos_bgp.neighbor %}
+  {% for neighbor in ceosos_bgp.neighbor %}
     {% if neighbor.address is defined and neighbor.address %}
       {% if neighbor.remote_asn is defined and neighbor.remote_asn %}
         {% if neighbor.state is defined and neighbor.state == "present" %}
@@ -40,8 +40,8 @@ router bgp {{ sonicos_bgp.asn }}
     {% endif %}
   {% endfor %}  
 {% endif %}   
-{% if sonicos_bgp.redistribute is defined and sonicos_bgp.redistribute %}
-  {% for route in sonicos_bgp.redistribute %}
+{% if ceosos_bgp.redistribute is defined and ceosos_bgp.redistribute %}
+  {% for route in ceosos_bgp.redistribute %}
     {% if route.route_type is defined and route.route_type %}
       {% if route.address_type is defined and route.address_type %}
         {% if route.address_type == "ipv4" %}
@@ -59,9 +59,9 @@ router bgp {{ sonicos_bgp.asn }}
       {% endif %}
     {% endif %}
   {% endfor %}
-  {% if sonicos_bgp.ipv4_network is defined and sonicos_bgp.ipv4_network %}
+  {% if ceosos_bgp.ipv4_network is defined and ceosos_bgp.ipv4_network %}
 address-family ipv4 unicast
-    {% for network in sonicos_bgp.ipv4_network %}
+    {% for network in ceosos_bgp.ipv4_network %}
       {% if network.state is defined and network.state %}
         {% if network.state == "present" %}
 network {{ network.address }}
@@ -73,9 +73,9 @@ network {{ network.address }}
       {% endif %}
     {% endfor %}
   {% endif %}
-  {% if sonicos_bgp.ipv6_network is defined and sonicos_bgp.ipv4_network %}
+  {% if ceosos_bgp.ipv6_network is defined and ceosos_bgp.ipv4_network %}
 address-family ipv6 unicast
-    {% for network in sonicos_bgp.ipv4_network %}
+    {% for network in ceosos_bgp.ipv4_network %}
       {% if network.state is defined and network.state %}
         {% if network.state == "present" %}
 network {{ network.address }}

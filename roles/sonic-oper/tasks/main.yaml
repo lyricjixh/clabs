@@ -1,23 +1,23 @@
 ---
-# tasks file for dellemc.enterprise_sonic interface
+# tasks file for dellemc.enterprise_ceos interface
 
 - name: "Creat build directory on target host"
   file:
     path: "{{build_dir}}"
     state: directory
     mode: a+rx
-  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_ceos.ceos")
   tags:
     - cfggen
     - intf
     - bgp
 
-- name: "Generating interface configuration for SONiC"
+- name: "Generating interface configuration for ceos"
   template:
-    src: sonic-interface.j2
+    src: ceos-interface.j2
     dest: "{{build_dir}}/interface_{{hostname}}.sh"
     mode: 0755
-  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_ceos.ceos")
   # delegate_to: localhost
   # connection: local
   register: generate_output
@@ -32,17 +32,17 @@
     - cfggen
     - intf
 
-- name: "Provisioning interface configuration for SONiC"
+- name: "Provisioning interface configuration for ceos"
   # sudo: true
   shell: "{{build_dir}}/interface_{{hostname}}.sh"
   # remote_src: yes
-  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_sonic.sonic")
+  when: (ansible_network_os is defined and ansible_network_os == "dellemc.enterprise_ceos.ceos")
   register: output
   tags:
     - intf
 
-# # sonicos-ntp configuration task
-# - name: "Provision sonic NTP config task"
+# # ceosos-ntp configuration task
+# - name: "Provision ceos NTP config task"
 #   include_tasks: service-ntp.yaml
 #   tags:
 #     - ntp
@@ -59,7 +59,7 @@
   # tags:
   #   - bgp
 
-- name: "Generating FRR configuration for Sonic"
+- name: "Generating FRR configuration for ceos"
   template:
       src: frr-bgp-customerized.j2
       dest: "{{ build_dir }}/frr_candidate.conf"
@@ -67,10 +67,10 @@
     - cfggen
     - bgp
 
-- name: "Provisioning FRR configuration for Sonic"
+- name: "Provisioning FRR configuration for ceos"
   template:
       src: frr-bgp-customerized.j2
-      dest: "/etc/sonic/frr/frr.conf"
+      dest: "/etc/ceos/frr/frr.conf"
   notify:
     - Restart network FRR deamon
   tags:

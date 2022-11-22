@@ -1,0 +1,15 @@
+{###########################################
+
+Purpose:
+Generating Syslog Configuration
+############################################}
+{% if log is defined and log %}
+{% for server in log.server %}
+{% if log.vrf is defined and log.vrf %}
+logging server {{ server.addr }} remote-port {{ server.port }} source-interface Management 0 vrf mgmt
+{% else %}
+logging server {{ server.addr }} remote-port {{ server.port }} source-interface {{ log.src_intf }}
+{% endif %}
+{% endfor %}
+!
+{% endif %}

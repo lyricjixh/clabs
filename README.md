@@ -1,4 +1,4 @@
-Dell OS10/SONiC Layer3 Cluster Automation
+Dell OS10/ceos Layer3 Cluster Automation
 ===============================================
 
 Ansible ENV:
@@ -63,7 +63,7 @@ ansible-playbook -i inventory/<inventory file> <playbook>  <options, -t [tags:cf
 Example:
 ### Clear up the underlay configuratio on Leaf
 * ansible-playbook -i inventory/lab.yaml cleanup_underlay.yaml -t nounderlay
-### Build Spine switch (Intf, BGP) with SONiC
+### Build Spine switch (Intf, BGP) with ceos
 * ansible-playbook -i inventory/lab.yaml build_spine.yaml
 ### Build Leaf switch (Intf, BGP) with OS10EE
 * ansible-playbook -i inventory/lab.yaml build_leaf.yaml
@@ -79,7 +79,7 @@ ansible-vault encrypt_string 'foobar(password)' --name 'vault_os10_pass'
 Vault Key Map:
 
 |Function	|Username	|vault_key
-|Spine Switch (SONiC)	|admin	|vault_sonic_password
+|Spine Switch (ceos)	|admin	|vault_ceos_password
 |Leaf Switch (OS10)	|admin	|vault_os10_password
 |ESXi Host	|root	|vault_esxi_password
 |VMs	|lab	|vault_lab_password

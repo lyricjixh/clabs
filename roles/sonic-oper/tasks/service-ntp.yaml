@@ -1,6 +1,6 @@
-# tasks file for sonicos-ntp
+# tasks file for ceosos-ntp
  
-  - name: "Generating ntp configuration for sonic"
+  - name: "Generating ntp configuration for ceos"
     template:
       src: service-ntp.j2
       dest: "{{build_dir}}/ntp_{{inventory_hostname}}.json"

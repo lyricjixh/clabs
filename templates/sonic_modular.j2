@@ -1,44 +1,44 @@
 {###########################################
 
 Purpose:
-SONiC Modular Template
+ceos Modular Template
 ############################################}
-{% include 'sonic/hostname.j2' %}
+{% include 'ceos/hostname.j2' %}
 !
 {% if features.oob|lower == "yes" %}
-{% include 'sonic/intf_oob.j2' %}
+{% include 'ceos/intf_oob.j2' %}
 {% endif %}
 !
 {% if features.netserv.domain|lower == "yes" %}
-{% include 'sonic/domain.j2' %}
+{% include 'ceos/domain.j2' %}
 {% endif %}
 !
 {% if features.netserv.user|lower == "yes" %}
-{% include 'sonic/user.j2' %}
+{% include 'ceos/user.j2' %}
 {% endif %}
 !
 {% if features.netserv.ntp|lower == "yes" %}
-{% include 'sonic/ntp.j2' %}
+{% include 'ceos/ntp.j2' %}
 {% endif %}
 !
 {% if features.netserv.syslog|lower == "yes" %}
-{% include 'sonic/syslog.j2' %}
+{% include 'ceos/syslog.j2' %}
 {% endif %}
 !
 {% if features.netserv.snmp|lower == "yes" %}
-{% include 'sonic/snmp.j2' %}
+{% include 'ceos/snmp.j2' %}
 {% endif %}
 !
 {% if features.netserv.tacacs|lower == "yes" %}
-{% include 'sonic/tacacs.j2' %}
+{% include 'ceos/tacacs.j2' %}
 {% endif %}
 !
 {% if features.netserv.radius|lower == "yes" %}
-{% include 'sonic/radius.j2' %}
+{% include 'ceos/radius.j2' %}
 {% endif %}
 !
 {% if features.netserv.aaa|lower == "yes" %}
-{% include 'sonic/aaa.j2' %}
+{% include 'ceos/aaa.j2' %}
 {% endif %}
 !
 {% if features.interface.standard_name|lower == "yes" %}
@@ -46,89 +46,89 @@ interface-naming standard
 {% endif %}
 !
 {% if features.interface.layer3|lower == "yes" %}
-{% include 'sonic/intf_lpbk.j2' %}
-{% include 'sonic/intf_northbound.j2' %}
+{% include 'ceos/intf_lpbk.j2' %}
+{% include 'ceos/intf_northbound.j2' %}
 {% endif %}
 !
 {% if features.interface.vlan|lower == "yes" %}
-{% include 'sonic/intf_vlan.j2' %}
+{% include 'ceos/intf_vlan.j2' %}
 {% endif %}
 !
 {% if features.interface.stp|lower == "yes" %}
-{% include 'sonic/stp.j2' %}
+{% include 'ceos/stp.j2' %}
 {% endif %}
 !
-{% include 'sonic/intf_southbound.j2' %}
+{% include 'ceos/intf_southbound.j2' %}
 !
 {% if features.interface.mlag|lower == "yes" %}
-{% include 'sonic/mlag.j2' %}
+{% include 'ceos/mlag.j2' %}
 {% endif %}
 !
 {% if features.interface.bond|lower == "yes" %}
-{% include 'sonic/intf_bond.j2' %}
+{% include 'ceos/intf_bond.j2' %}
 {% endif %}
 !
 {% if features.interface.l2port|lower == "yes" %}
-{% include 'sonic/intf_l2.j2' %}
+{% include 'ceos/intf_l2.j2' %}
 {% endif %}
 !
 {% if features.interface.ufd|lower == "yes" %}
-{% include 'sonic/ufd.j2' %}
+{% include 'ceos/ufd.j2' %}
 {% endif %}
 !
 {% if features.interface.vrrp|lower == "yes" %}
-{% include 'sonic/vrrp.j2' %}
+{% include 'ceos/vrrp.j2' %}
 {% endif %}
 !
 {% if features.routing.policy|lower == "yes" %}
-{% include 'sonic/route_pol.j2' %}
+{% include 'ceos/route_pol.j2' %}
 {% endif %}
 !
 {% if features.routing.bgp|lower == "yes" %}
-{% include 'sonic/bgp_underlay.j2' %}
+{% include 'ceos/bgp_underlay.j2' %}
 {% endif %}
 !
 {% if features.routing.ospf|lower == "yes" %}
-{% include 'sonic/ospf.j2' %}
+{% include 'ceos/ospf.j2' %}
 {% endif %}
 !
 {% if features.overlay.evpn|lower == "yes" %}
-{% include 'sonic/evpn_vrf.j2' %}
-{% include 'sonic/vxlan.j2' %} 
-{% include 'sonic/evpn_edge.j2' %} 
+{% include 'ceos/evpn_vrf.j2' %}
+{% include 'ceos/vxlan.j2' %} 
+{% include 'ceos/evpn_edge.j2' %} 
 {% endif %}
 !
 {% if features.overlay.uni_bgp|lower == "yes" %}
-{% include 'sonic/bgp_overlay_unified.j2' %}
+{% include 'ceos/bgp_overlay_unified.j2' %}
 {% elif features.overlay.ibgp|lower == "yes" %}
-{% include 'sonic/bgp_overlay_ibgp.j2' %}
+{% include 'ceos/bgp_overlay_ibgp.j2' %}
 {% endif %}
 !
 {% if features.overlay.static_vxlan|lower == "yes" %}
-{% include 'sonic/static_vxlan.j2' %}
+{% include 'ceos/static_vxlan.j2' %}
 {% endif %}
 !
 {% if features.security.acl|lower == "yes" %}
-{% include 'sonic/acl.j2' %}
+{% include 'ceos/acl.j2' %}
 {% endif %}
 !
 {% if features.security.copp|lower == "yes" %}
-{% include 'sonic/copp.j2' %}
+{% include 'ceos/copp.j2' %}
 {% endif %}
 !
 {% if features.security.intf|lower == "yes" %}
-{% include 'sonic/intf_acl.j2' %}
+{% include 'ceos/intf_acl.j2' %}
 {% endif %}
 !
 {% if features.netserv.sflow|lower == "yes" %}
-{% include 'sonic/sflow.j2' %}
+{% include 'ceos/sflow.j2' %}
 {% endif %}
 !
 {% if features.netserv.span|lower == "yes" %}
-{% include 'sonic/span.j2' %}
+{% include 'ceos/span.j2' %}
 {% endif %}
 !
 {% if features.netserv.telemetry|lower == "yes" %}
-{% include 'sonic/telemetry.j2' %}
+{% include 'ceos/telemetry.j2' %}
 {% endif %}
 !

@@ -1,7 +1,7 @@
 ---
 
 dellos_cfg_generate: True
-build_dir: ~/cfggen/
+build_dir: ~/devops/cfggen/
 
 ansible_python_interpreter: /usr/bin/python3
 
@@ -12,7 +12,7 @@ hostname: "{{ inventory_hostname }}"
 sysuser_passwd: "{{ vault_os10_password }}"
 
 pause_time: 1200   # Min 1200 sec is needed  for boot into ONIE from dellos10
-#pause_time: 700   # Min 700 sec is needed  for boot into ONIE from sonic
+#pause_time: 700   # Min 700 sec is needed  for boot into ONIE from ceos
 ssh_esc : '\x03\n'
 ssh_close: "exit\n"
 
@@ -24,16 +24,16 @@ nos_install_exp:
   'Installing OS10 on primary partition(.*)': "{{ssh_esc}}"
   'OS10 installation on primary partition is complete(.*)': "{{ssh_esc}}"
 
-sonic_nos_install_exp:  
+ceos_nos_install_exp:  
   'ONIE:/root #': "{{cmds}}"
-  'Initializing SONiC(.*)': "{{ssh_esc}}"
-  'Installing SONiC to(.*)': "{{ssh_esc}}"
-  'Installed SONiC base image SONiC-OS(.*)': "{{ssh_esc}}"
+  'Initializing ceos(.*)': "{{ssh_esc}}"
+  'Installing ceos to(.*)': "{{ssh_esc}}"
+  'Installed ceos base image ceos-OS(.*)': "{{ssh_esc}}"
 
-sonic_nos_upgrade_exp:
+ceos_nos_upgrade_exp:
   'New image will be installed(.*)': "y \n"
-  'Installing image SONiC-OS(.*)': "{{ssh_esc}}"
-  'Installed SONiC base image SONiC-OS(.*)': "{{ssh_esc}}"
+  'Installing image ceos-OS(.*)': "{{ssh_esc}}"
+  'Installed ceos base image ceos-OS(.*)': "{{ssh_esc}}"
 
 exp: {}
 onie_cmd: |
@@ -51,29 +51,21 @@ default_exp:
   "Permission denied.*": "{{ssh_esc}}"
 
 #image: "http://10.11.8.184///tftpboot/NGOS/FMB-ar-rel_10.5.0-release/AmazonInstallers/latest-build-468/PKGS_OS10-Enterprise-10.5.0.2.468stretch-installer-x86_64.bin"
-#image: "http://10.11.8.184//tftpboot/users/kannank/sonic-broadcom-cloud-base_2.1_RC7.bin"
-#image: "http://10.11.8.184//tftpboot/SONIC/engops_sonicbuild/30/sonic-broadcom.bin"
+#image: "http://10.11.8.184//tftpboot/users/kannank/ceos-broadcom-cloud-base_2.1_RC7.bin"
+#image: "http://10.11.8.184//tftpboot/ceos/engops_ceosbuild/30/ceos-broadcom.bin"
 nos_install: |
   onie-nos-install {{ image|default('') }}
 
 
 # Vault Key Repo
 # ansible-vault encrypt_string <encrypted_value> --name '<var_name>'
-vault_sonic_password: !vault |
+vault_ceos_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
-          63653135333336623732333163613039363861356538356335306633646636643161323137393330
-          3835393530353539353332663264663731646462623961320a313663383264636662303932343331
-          34353735633735376133346536353337376565323064663066343764623232656665353631306631
-          3537366364346537350a303836633964333935303731343961663863383361396537363561623861
-          3133
-
-vault_os10_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          39616434346134653737396539333738343963313530326661386338616134646232633236656361
-          3861383937376464383264643338666564666532363162300a383936653265656162623365663566
-          63313133393734636336343666333631353831363439376139626162633235343839396438393266
-          6534313139366464330a613334376133336436386233383835343633376234653131306664313839
-          6362
+          66363939663031303965633664336138643133396335303330343162613931353761343366313262
+          3266373033383162386566353939363965656131316561610a363165643330636364323261303762
+          36393465366666653934393131643035313661626465313231316161633737623633336131663638
+          6264383331643566610a653866633037643131663264303830303566643466323936343166626235
+          3563
 
 vault_linux_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256

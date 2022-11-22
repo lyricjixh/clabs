@@ -1,20 +1,20 @@
 ---
-# tasks file to add/update sonicos-interface
+# tasks file to add/update ceosos-interface
  
-- name: "Generating interface configuration for sonic"
+- name: "Generating interface configuration for ceos"
   template:
-    src: sonic-interface.j2
+    src: ceos-interface.j2
     dest: "{{build_dir}}/interface_{{hostname}}.sh"
-  when: (ansible_network_os is defined and ansible_network_os == "sonic")
+  when: (ansible_network_os is defined and ansible_network_os == "ceos")
   register: generate_output
   tags:
     - cfggen
     - intf
 
-- name: "Provisioning interface configuration for sonic"
+- name: "Provisioning interface configuration for ceos"
   # sudo: true
   script: "{{build_dir}}/interface_{{hostname}}.sh"
-  when: (ansible_network_os is defined and ansible_network_os == "sonic")
+  when: (ansible_network_os is defined and ansible_network_os == "ceos")
   register: output
   tags:
     - intf
