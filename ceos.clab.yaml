@@ -1,16 +1,127 @@
-name: ceos-lab01
+name: pod1
 
+mgmt:
+  network: br-clos02
+  ipv4_subnet: 172.100.100.0/24
+  
 topology:
   kinds:
-      ceos:
-        image: ceos:4.29.0.2F
+    ceos:
+      image: ceos:4.29.0.2F
+    frr_router:
+      image: frrouting/frr:latest
+    compute:
+      image: ubuntu:latest
   nodes:
-    ceos1:
+    cleaf01:
       kind: ceos
-    ceos2: 
+      mgmt_ipv4: 172.100.100.2
+    cleaf02: 
       kind: ceos
+      mgmt_ipv4: 172.100.100.3
+      env:
+        BOOT_DEALY: 10
+    cleaf03: 
+      kind: ceos
+      mgmt_ipv4: 172.100.100.4
+      env:
+        BOOT_DEALY: 20
+    cleaf04: 
+      kind: ceos
+      mgmt_ipv4: 172.100.100.5
       env:
         BOOT_DEALY: 30
+    bleaf01: 
+      kind: ceos
+      mgmt_ipv4: 172.100.100.6
+      env:
+        BOOT_DEALY: 40
+    bleaf02: 
+      kind: ceos
+      mgmt_ipv4: 172.100.100.7
+      env:
+        BOOT_DEALY: 50
+    spine01:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.101
+      env:
+        BOOT_DEALY: 60
+    spine02:
+      kind: ceos
+      mgmt_ipv4: 172.100.100.102
+      env:
+        BOOT_DEALY: 70
+    dc-gw01:
+      kind: frr_router
+      mgmt_ipv4: 172.100.100.251
+      binds:
+        - files/gw01/daemons:/etc/frr/daemons
+        - files/gw01/frr.conf:/etc/frr/frr.conf
+    dc-gw02:
+      kind: frr_router
+      mgmt_ipv4: 172.100.100.252
+      binds:
+        - files/gw02/daemons:/etc/frr/daemons
+        - files/gw01/frr.conf:/etc/frr/frr.conf
+    r1-vm01:
+      kind: compute
+      mgmt_ipv4: 172.100.100.191
+      wait-for:
+        - cleaf01
+        - cleaf02
+    r1-vm02:
+      kind: compute
+      mgmt_ipv4: 172.100.100.192
+        - cleaf01
+        - cleaf02
+    r2-vm03:
+      kind: compute
+      mgmt_ipv4: 172.100.100.193
+      wait-for:
+        - cleaf03
+        - cleaf04
+    r2-vm04:
+      kind: compute
+      mgmt_ipv4: 172.100.100.194
+        - cleaf03
+        - cleaf04
 
   links:
-    - endpoints: ["ceos1:eth1", "ceos2:eth1"]
+    # POD leaf pair in rack interlink
+    - endpoints: ["cleaf01:eth27", "cleaf02:eth27"]
+    - endpoints: ["cleaf01:eth28", "cleaf02:eth28"]
+    - endpoints: ["cleaf03:eth27", "cleaf04:eth27"]
+    - endpoints: ["cleaf03:eth28", "cleaf04:eth28"]
+    - endpoints: ["bleaf01:eth27", "bleaf02:eth27"]
+    - endpoints: ["bleaf01:eth28", "bleaf02:eth28"]
+
+    # POD leaf to spine links
+    - endpoints: ["cleaf01:e31", "spine01:e1"]
+    - endpoints: ["cleaf01:e32", "spine02:e1"]
+    - endpoints: ["cleaf02:e31", "spine01:e2"]
+    - endpoints: ["cleaf02:e32", "spine02:e2"]
+    - endpoints: ["cleaf03:e31", "spine01:e3"]
+    - endpoints: ["cleaf03:e32", "spine02:e3"]
+    - endpoints: ["cleaf04:e31", "spine01:e4"]
+    - endpoints: ["cleaf04:e32", "spine02:e4"]
+    - endpoints: ["bleaf01:e31", "spine01:e5"]
+    - endpoints: ["bleaf01:e32", "spine02:e5"]
+    - endpoints: ["bleaf02:e31", "spine01:e6"]
+    - endpoints: ["bleaf02:e32", "spine02:e6"]
+
+    # POD leaf pair to computes links
+    - endpoints: ["cleaf01:e1", "r1-vm01:e1"]
+    - endpoints: ["cleaf01:e2", "r1-vm02:e1"]
+    - endpoints: ["cleaf02:e1", "r1-vm01:e2"]
+    - endpoints: ["cleaf02:e2", "r1-vm02:e2"]
+    - endpoints: ["cleaf03:e1", "r2-vm03:e1"]
+    - endpoints: ["cleaf03:e2", "r2-vm04:e1"]
+    - endpoints: ["cleaf04:e1", "r2-vm03:e2"]
+    - endpoints: ["cleaf04:e2", "r2-vm04:e2"]
+
+    # POD bleaf pair to dc gateway links
+    - endpoints: ["bleaf01:e1", "dc-gw01:e1"]
+    - endpoints: ["bleaf01:e2", "dc-gw02:e1"]
+    - endpoints: ["bleaf02:e1", "dc-gw01:e2"]
+    - endpoints: ["bleaf02:e2", "dc-gw02:e2"]
+
