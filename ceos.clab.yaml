@@ -8,10 +8,6 @@ topology:
   kinds:
     ceos:
       image: ceos:4.29.0.2F
-    frr_router:
-      image: frrouting/frr:latest
-    compute:
-      image: ubuntu:latest
   nodes:
     cleaf01:
       kind: ceos
@@ -52,37 +48,45 @@ topology:
       env:
         BOOT_DEALY: 70
     dc-gw01:
-      kind: frr_router
+      kind: linux
       mgmt_ipv4: 172.100.100.251
+      image: frrouting/frr:latest
       binds:
         - files/gw01/daemons:/etc/frr/daemons
         - files/gw01/frr.conf:/etc/frr/frr.conf
     dc-gw02:
-      kind: frr_router
+      kind: linux
+      image: frrouting/frr:latest
       mgmt_ipv4: 172.100.100.252
       binds:
         - files/gw02/daemons:/etc/frr/daemons
         - files/gw01/frr.conf:/etc/frr/frr.conf
     r1-vm01:
-      kind: compute
+      kind: linux
+      image: ubuntu:latest
       mgmt_ipv4: 172.100.100.191
       wait-for:
         - cleaf01
         - cleaf02
     r1-vm02:
-      kind: compute
+      kind: linux
+      image: ubuntu:latest
       mgmt_ipv4: 172.100.100.192
+      wait-for:
         - cleaf01
         - cleaf02
     r2-vm03:
-      kind: compute
+      kind: linux
+      image: ubuntu:latest
       mgmt_ipv4: 172.100.100.193
       wait-for:
         - cleaf03
         - cleaf04
     r2-vm04:
-      kind: compute
+      kind: linux
+      image: ubuntu:latest
       mgmt_ipv4: 172.100.100.194
+      wait-for:
         - cleaf03
         - cleaf04
 
