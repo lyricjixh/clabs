@@ -47,20 +47,44 @@ network:
           dhcp6: false
 {% endfor %}
 {% endif %}
-{% if trunk_port.vlans is defined and trunk_port.vlans %}
+{% if compute.vid is defined and compute.vid %}
     vlans:
-{% for vlan in trunk_port.vlans %}
-        vlan.{{ vlan.id }}:
-            id: {{ vlan.id }}
+{% if compute.vid == 101 %}
+        vlan.{{ compute.vid }}:
+            id: {{ compute.vid }}
             link: eth1
-            addresses: [{{ vlan.addr_v4 }}]
+            addresses: [{{ v101_addr_v4 }}]
             routes:
-{% for route in vlan.routes_v4 %}
+{% for route in v101_routes_v4 %}
             - to: {{ route.dst }}
-              via: {{ vlan.gw_v4 }}
+              via: {{ v101_gw_v4 }}
               metric: 100
 {% endfor %}
             mtu: 9000
+{% elif compute.vid == 201 %}
+        vlan.{{ compute.vid }}:
+            id: {{ compute.vid }}
+            link: eth1
+            addresses: [{{ v201_addr_v4 }}]
+            routes:
+{% for route in v201_routes_v4 %}
+            - to: {{ route.dst }}
+              via: {{ v201_gw_v4 }}
+              metric: 100
 {% endfor %}
+            mtu: 9000
+{% elif compute.vid == 301 %}
+        vlan.{{ compute.vid }}:
+            id: {{ compute.vid }}
+            link: eth1
+            addresses: [{{ v301_addr_v4 }}]
+            routes:
+{% for route in v301_routes_v4 %}
+            - to: {{ route.dst }}
+              via: {{ v301_gw_v4 }}
+              metric: 100
+{% endfor %}
+            mtu: 9000
+{% endif %}
 {% endif %}
 {% endif %}

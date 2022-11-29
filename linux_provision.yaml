@@ -121,7 +121,7 @@
 #         state: restarted
 
 
-- hosts: ubuntu
+- hosts: compute
   become: yes
   gather_facts: no
   vars:
@@ -137,6 +137,19 @@
   #   delegate_to: localhost
   #   ignore_errors: yes
   #   run_once: yes
+
+  # - name: Change user password
+  #   vars:
+  #     ansible_ssh_user: "root"
+  #     ansible_ssh_pass: "{{ vault_lab_password }}"
+  #   user: 
+  #     name: "{{ ansible_ssh_user }}"
+  #     # password: "$1$A2BdvCtP$z0Es8C57XrmnK.ETqUtob/"  #openssl passwd -1
+  #     password: "{{ ansible_ssh_pass | password_hash('sha512')}}"  #sha approach
+  #     state: present
+  #   tags: 
+  #   - passwd
+  #   - user
 
   - name: Make a ".ssh" Directory for the lab user
     file: path=/home/lab/.ssh state=directory mode=0755
@@ -198,17 +211,6 @@
       validate: visudo -cf %s
     tags:
       - users
-
-  # - name: Add lab user and add it to sudo
-  #   user: 
-  #     name: "lab"
-  #     password: "$1$A2BdvCtP$z0Es8C57XrmnK.ETqUtob/"  #openssl passwd -1
-  #     comment: "Dell Lab User"
-  #     groups: sudo
-  #     shell: /bin/bash
-  #     state: present
-  #     create_home: yes
-  #     append: yes
 
   - name: Add the users under Unbuntu
     user:

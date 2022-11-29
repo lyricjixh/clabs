@@ -1,27 +1,2 @@
-eth1_desc: "vlan101"
-v101_addr_v4: "{{ v101_netv4 | ansible.utils.ipaddr(seq-100) }}"
-v101_addr_v6: "{{ v101_netv6 | ansible.utils.ipaddr(seq-100) }}"
-v101_gw_v4: "{{ v101_netv4 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}"
-v101_gw_v6: "{{ v101_netv6 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}"
-v101_routes_v4:
-   -
-      dst: "{{ compute_lpbk0_netv4 }}"
-   -
-      dst: "{{ v201_netv4 }}"
-   -
-      dst: "{{ v301_netv4 }}"
-   -
-      dst: "{{ v104_netv4 }}"
-   -
-      dst: "{{ v204_netv4 }}"
-v101_routes_v6:
-   -
-      dst: "{{ compute_lpbk0_netv6 }}"
-   -
-      dst: "{{ v201_netv6 }}"
-   -
-      dst: "{{ v301_netv6 }}"
-   -
-      dst: "{{ v104_netv6 }}"
-   -
-      dst: "{{ v204_netv6 }}"
+compute:
+   vid: 101

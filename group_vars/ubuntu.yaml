@@ -12,6 +12,7 @@ ubuntu_packages:
   - build-essential
   - python3-pip
   - net-tools
+  - netplan.io
 #   - network-manager
 
 ubuntu_users:
@@ -23,53 +24,6 @@ ubuntu_users:
     groups: "devops"
     password: "{{ vault_xji_password }}"
     state: "present"
-
-# Linux Layer2 Bond
-# bond not supported on container Ubuntu 
-# trunk_bond:
-#   id: 0
-#   desc: "Linux Layer2 Bond Intf"
-#   vlans:
-#     - id: 101
-#       addr_v4: "{{ v101_addr_v4 }}"
-#       addr_v6: "{{ v101_addr_v6 }}"
-#       routes_v4: "{{ v101_routes_v4 }}"
-#       gw_v4: "{{ v101_gw_v4 }}"
-#       routes_v6: "{{ v101_routes_v6 }}"
-#       gw_v6: "{{ v101_gw_v6 }}"
-#     - id: 201
-#       addr_v4: "{{ v201_addr_v4 }}"
-#       addr_v6: "{{ v201_addr_v6 }}"
-#       routes_v4: "{{ v201_routes_v4 }}"
-#       gw_v4: "{{ v201_gw_v4 }}"
-#       routes_v6: "{{ v201_routes_v6 }}"
-#       gw_v6: "{{ v201_gw_v6 }}"
-#   bmem_indiv:
-#     - "eth1"
-#     - "eth2"
-
-# Linux Layer2 Bond
-# bond not supported on container Ubuntu 
-trunk_port:
-  desc: "Linux Layer2 Intf"
-  vlans:
-    - id: 101
-      addr_v4: "{{ v101_addr_v4 }}"
-      addr_v6: "{{ v101_addr_v6 }}"
-      routes_v4: "{{ v101_routes_v4 }}"
-      gw_v4: "{{ v101_gw_v4 }}"
-      routes_v6: "{{ v101_routes_v6 }}"
-      gw_v6: "{{ v101_gw_v6 }}"
-    - id: 201
-      addr_v4: "{{ v201_addr_v4 }}"
-      addr_v6: "{{ v201_addr_v6 }}"
-      routes_v4: "{{ v201_routes_v4 }}"
-      gw_v4: "{{ v201_gw_v4 }}"
-      routes_v6: "{{ v201_routes_v6 }}"
-      gw_v6: "{{ v201_gw_v6 }}"
-  bmem_indiv:
-    - "eth1"
-    - "eth2"  
 
 ports:
    "lo":

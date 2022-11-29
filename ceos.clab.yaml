@@ -63,28 +63,28 @@ topology:
         - files/gw01/frr.conf:/etc/frr/frr.conf
     r1-vm01:
       kind: linux
-      image: ubuntu:latest
+      image: ubuntu_clab:latest
       mgmt_ipv4: 172.100.100.191
       wait-for:
         - cleaf01
         - cleaf02
     r1-vm02:
       kind: linux
-      image: ubuntu:latest
+      image: ubuntu_clab:latest
       mgmt_ipv4: 172.100.100.192
       wait-for:
         - cleaf01
         - cleaf02
     r2-vm03:
       kind: linux
-      image: ubuntu:latest
+      image: ubuntu_clab:latest
       mgmt_ipv4: 172.100.100.193
       wait-for:
         - cleaf03
         - cleaf04
     r2-vm04:
       kind: linux
-      image: ubuntu:latest
+      image: ubuntu_clab:latest
       mgmt_ipv4: 172.100.100.194
       wait-for:
         - cleaf03
