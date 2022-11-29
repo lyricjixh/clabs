@@ -41,13 +41,13 @@ l3_uplinks:
    -
     name: 29
     desc: "Fabric Uplink01_To_Spine01"
-    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(fabric_link_seq[0]|int+1) | ansible.netcommon.ipaddr('address') }}"
-    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(fabric_link_seq[0]|int+1) | ansible.netcommon.ipaddr('address') }}"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[0]|int+1) | ansible.utils.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[0]|int+1) | ansible.utils.ipaddr('address') }}"
    -
     name: 30
     desc: "Fabric Uplink02_To_Spine02"
-    addr_v4: "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(fabric_link_seq[1]|int+1) | ansible.netcommon.ipaddr('address') }}"
-    addr_v6: "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(fabric_link_seq[1]|int+1) | ansible.netcommon.ipaddr('address') }}"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[1]|int+1) | ansible.utils.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[1]|int+1) | ansible.utils.ipaddr('address') }}"
 
 vlt: 
    domain_id: "1"

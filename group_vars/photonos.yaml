@@ -42,17 +42,17 @@ ports:
 
    "eth1":
       desc: "{{ eth1_desc }}"
-      addr_v4: "{{ eth1_addr_v4 }}"
-      addr_v6: "{{ eth1_addr_v6 }}"
-      routes_v4: "{{ eth1_routes_v4 }}"
-      gw_v4: "{{ eth1_gw_v4 }}"
-      routes_v6: "{{ eth1_routes_v6 }}"
-      gw_v6: "{{ eth1_gw_v6 }}"
+      addr_v4: "{{ v101_addr_v4 }}"
+      addr_v6: "{{ v101_addr_v6 }}"
+      routes_v4: "{{ v101_routes_v4 }}"
+      gw_v4: "{{ v101_gw_v4 }}"
+      routes_v6: "{{ v101_routes_v6 }}"
+      gw_v6: "{{ v101_gw_v6 }}"
 
    "lo":
       desc: "Loopback"
-      addr_v4: "{{ compute_lpbk0_netv4 | ansible.netcommon.ipaddr(seq-100) | ansible.netcommon.ipaddr('address') }}/32"
-      addr_v6: "{{ compute_lpbk0_netv6 | ansible.netcommon.ipaddr(seq-100) | ansible.netcommon.ipaddr('address') }}/128"
+      addr_v4: "{{ compute_lpbk0_netv4 | ansible.utils.ipaddr(seq-100) | ansible.utils.ipaddr('address') }}/32"
+      addr_v6: "{{ compute_lpbk0_netv6 | ansible.utils.ipaddr(seq-100) | ansible.utils.ipaddr('address') }}/128"
 
 connectivity_test_destinations:
   - { ip: 10.100.2.12, port: 22 }

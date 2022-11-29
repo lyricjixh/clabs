@@ -1,24 +1,24 @@
 eth1_desc: "vlan304"
-eth1_addr_v4: "{{ v304_netv4 | ansible.netcommon.ipaddr(seq-100) }}"
-eth1_addr_v6: "{{ v304_netv6 | ansible.netcommon.ipaddr(seq-100) }}"
-eth1_gw_v4: "{{ v304_netv4 | ansible.netcommon.ipaddr(1) | ansible.netcommon.ipaddr('address') }}"
-eth1_gw_v6: "{{ v304_netv6 | ansible.netcommon.ipaddr(1) | ansible.netcommon.ipaddr('address') }}"
-eth1_routes_v4:
+v304_addr_v4: "{{ v304_netv4 | ansible.utils.ipaddr(seq-100) }}"
+v304_addr_v6: "{{ v304_netv6 | ansible.utils.ipaddr(seq-100) }}"
+v304_gw_v4: "{{ v304_netv4 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}"
+v304_gw_v6: "{{ v304_netv6 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}"
+v304_routes_v4:
    -
       dst: "{{ compute_lpbk0_netv4 }}"
    -
-      dst: "{{ v101_netv4 }}"
+      dst: "{{ v304_netv4 }}"
    -
       dst: "{{ v201_netv4 }}"
    -
       dst: "{{ v104_netv4 }}"
    -
       dst: "{{ v204_netv4 }}"
-eth1_routes_v6:
+v304_routes_v6:
    -
       dst: "{{ compute_lpbk0_netv6 }}"
    -
-      dst: "{{ v101_netv6 }}"
+      dst: "{{ v304_netv6 }}"
    -
       dst: "{{ v201_netv6 }}"
    -

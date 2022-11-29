@@ -1,0 +1,66 @@
+network:
+    version: 2
+    renderer: networkd
+{% if trunk_bond is defined and trunk_bond %}
+{% if trunk_bond.bmem_indiv is defined and trunk_bond.bmem_indiv %}
+    ethernets:
+{% for indiv in trunk_bond.bmem_indiv %}
+        {{ indiv }}:
+          mtu: 9000
+{% endfor %}
+{% endif %}
+    bonds:
+        bond{{trunk_bond.id}}:
+            mtu: 9000
+            dhcp4: false
+            dhcp6: false
+            interfaces: [{{trunk_bond.bmem_indiv|join(', ')}}]
+            parameters:
+                mode: 802.3ad
+                lacp-rate: fast
+                transmit-hash-policy: layer3+4
+                mii-monitor-interval: 100
+{% if trunk_bond.vlans is defined and trunk_bond.vlans %}
+    vlans:
+{% for vlan in trunk_bond.vlans %}
+        bond0.{{ vlan.id }}:
+            id: {{ vlan.id }}
+            link: bond{{trunk_bond.id}}
+            addresses: [{{ vlan.addr_v4 }}]
+            routes:
+{% for route in vlan.routes_v4 %}
+            - to: {{ route.dst }}
+              via: {{ vlan.gw_v4 }}
+              metric: 100
+{% endfor %}
+            mtu: 9000
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if trunk_port is defined and trunk_port %}
+{% if trunk_port.bmem_indiv is defined and trunk_port.bmem_indiv %}
+    ethernets:
+{% for indiv in trunk_port.bmem_indiv %}
+        {{ indiv }}:
+          mtu: 9000
+          dhcp4: false
+          dhcp6: false
+{% endfor %}
+{% endif %}
+{% if trunk_port.vlans is defined and trunk_port.vlans %}
+    vlans:
+{% for vlan in trunk_port.vlans %}
+        vlan.{{ vlan.id }}:
+            id: {{ vlan.id }}
+            link: eth1
+            addresses: [{{ vlan.addr_v4 }}]
+            routes:
+{% for route in vlan.routes_v4 %}
+            - to: {{ route.dst }}
+              via: {{ vlan.gw_v4 }}
+              metric: 100
+{% endfor %}
+            mtu: 9000
+{% endfor %}
+{% endif %}
+{% endif %}

@@ -2,13 +2,8 @@
 ansible_ssh_user: lab
 ansible_ssh_pass: "{{vault_lab_password}}"
 ansible_sudo_pass: "{{vault_lab_password}}"
-ansible_linux_os: photonos
-vendor: "VMWare ESXi"
 
 ansible_python_interpreter: /usr/bin/python3
-
-photon_yum_repo: https://vmware.bintray.com/photon_pre_release_1.0_x86_64
-photon_yum_repo_enabled: yes
 
 ubuntu_packages:
   - lldpd
@@ -20,11 +15,64 @@ ubuntu_packages:
 #   - network-manager
 
 ubuntu_users:
-  - name: "jayb"
+  - name: "ansible"
     groups: "devops"
-    password: "{{ vault_jayb_password }}"
+    password: "{{ vault_ansible_password }}"
     state: "present"
   - name: "xji"
     groups: "devops"
     password: "{{ vault_xji_password }}"
     state: "present"
+
+# Linux Layer2 Bond
+# bond not supported on container Ubuntu 
+# trunk_bond:
+#   id: 0
+#   desc: "Linux Layer2 Bond Intf"
+#   vlans:
+#     - id: 101
+#       addr_v4: "{{ v101_addr_v4 }}"
+#       addr_v6: "{{ v101_addr_v6 }}"
+#       routes_v4: "{{ v101_routes_v4 }}"
+#       gw_v4: "{{ v101_gw_v4 }}"
+#       routes_v6: "{{ v101_routes_v6 }}"
+#       gw_v6: "{{ v101_gw_v6 }}"
+#     - id: 201
+#       addr_v4: "{{ v201_addr_v4 }}"
+#       addr_v6: "{{ v201_addr_v6 }}"
+#       routes_v4: "{{ v201_routes_v4 }}"
+#       gw_v4: "{{ v201_gw_v4 }}"
+#       routes_v6: "{{ v201_routes_v6 }}"
+#       gw_v6: "{{ v201_gw_v6 }}"
+#   bmem_indiv:
+#     - "eth1"
+#     - "eth2"
+
+# Linux Layer2 Bond
+# bond not supported on container Ubuntu 
+trunk_port:
+  desc: "Linux Layer2 Intf"
+  vlans:
+    - id: 101
+      addr_v4: "{{ v101_addr_v4 }}"
+      addr_v6: "{{ v101_addr_v6 }}"
+      routes_v4: "{{ v101_routes_v4 }}"
+      gw_v4: "{{ v101_gw_v4 }}"
+      routes_v6: "{{ v101_routes_v6 }}"
+      gw_v6: "{{ v101_gw_v6 }}"
+    - id: 201
+      addr_v4: "{{ v201_addr_v4 }}"
+      addr_v6: "{{ v201_addr_v6 }}"
+      routes_v4: "{{ v201_routes_v4 }}"
+      gw_v4: "{{ v201_gw_v4 }}"
+      routes_v6: "{{ v201_routes_v6 }}"
+      gw_v6: "{{ v201_gw_v6 }}"
+  bmem_indiv:
+    - "eth1"
+    - "eth2"  
+
+ports:
+   "lo":
+      desc: "Loopback"
+      addr_v4: "{{ compute_lpbk0_netv4 | ansible.utils.ipaddr(seq-100) | ansible.utils.ipaddr('address') }}/32"
+      addr_v6: "{{ compute_lpbk0_netv6 | ansible.utils.ipaddr(seq-100) | ansible.utils.ipaddr('address') }}/128"

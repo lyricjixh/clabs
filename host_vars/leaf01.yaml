@@ -3,8 +3,8 @@ bgp:
   spine_as: "65000"
   sas_as: "64999"
   fabric_peer_v4:
-    - "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr('network') }}"
-    - "{{ fabric_ptp_netv4 | ansible.netcommon.ipaddr(fabric_link_seq[1]) | ansible.netcommon.ipaddr('address') }}"
+    - "{{ fabric_ptp_netv4 | ansible.utils.ipaddr('network') }}"
+    - "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[1]) | ansible.utils.ipaddr('address') }}"
   fabric_peer_v6:
-    - "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr('network') }}"
-    - "{{ fabric_ptp_netv6 | ansible.netcommon.ipaddr(fabric_link_seq[1]) | ansible.netcommon.ipaddr('address') }}"
+    - "{{ fabric_ptp_netv6 | ansible.utils.ipaddr('network') }}"
+    - "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[1]) | ansible.utils.ipaddr('address') }}"

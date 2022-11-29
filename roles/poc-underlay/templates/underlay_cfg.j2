@@ -35,23 +35,23 @@ interface vlan{{ vlan.id }}
  description {{ vlan.desc }}
  no shutdown
  mtu 9216
- ip address {{ vlan.netv4 | ansible.netcommon.ipaddr(-(seq+1)) }}
+ ip address {{ vlan.netv4 | ansible.utils.ipaddr(-(seq+1)) }}
 {% if vlan.netv6 is defined and vlan.netv6 %} 
- ipv6 address {{ vlan.netv6 | ansible.netcommon.ipaddr(-(seq+1)) }}
+ ipv6 address {{ vlan.netv6 | ansible.utils.ipaddr(-(seq+1)) }}
 {% endif %} 
  !
  vrrp-group 1
 {% if seq is odd %} 
   priority 110
 {% endif %} 
-  virtual-address {{ vlan.netv4 | ansible.netcommon.ipaddr('1') | ansible.netcommon.ipaddr('address') }}
+  virtual-address {{ vlan.netv4 | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
  !
 {% if vlan.netv6 is defined and vlan.netv6 %} 
  vrrp-ipv6-group 1
 {% if seq is odd %} 
   priority 110
 {% endif %} 
-  virtual-address {{ vlan.netv6 | ansible.netcommon.ipaddr('1') | ansible.netcommon.ipaddr('address') }}
+  virtual-address {{ vlan.netv6 | ansible.utils.ipaddr('1') | ansible.utils.ipaddr('address') }}
  !
 {% endif %} 
 !
@@ -61,15 +61,15 @@ interface vlan{{ vlans.pair_vlan.id }}
  no shutdown
  mtu 9216
 {% if seq is odd %} 
- ip address {{ vlans.pair_vlan.netv4 | ansible.netcommon.ipaddr(1) }}
+ ip address {{ vlans.pair_vlan.netv4 | ansible.utils.ipaddr(1) }}
 {% else %} 
- ip address {{ vlans.pair_vlan.netv4 | ansible.netcommon.ipaddr(2) }}
+ ip address {{ vlans.pair_vlan.netv4 | ansible.utils.ipaddr(2) }}
 {% endif %}
 {% if vlans.pair_vlan.netv6 is defined and vlans.pair_vlan.netv6 %}
 {% if seq is odd %} 
- ipv6 address {{ vlans.pair_vlan.netv6 | ansible.netcommon.ipaddr(1) }}
+ ipv6 address {{ vlans.pair_vlan.netv6 | ansible.utils.ipaddr(1) }}
 {% else %} 
- ipv6 address {{ vlans.pair_vlan.netv6 | ansible.netcommon.ipaddr(2) }}
+ ipv6 address {{ vlans.pair_vlan.netv6 | ansible.utils.ipaddr(2) }}
 {% endif %}
 {% endif %}
 !
@@ -241,9 +241,9 @@ router bgp {{ bgp.local_as }}
 {% endfor %}
 {% endif %}
 {% if seq is even %}
- neighbor {{ tor_pair_netv4 | ansible.netcommon.ipaddr(1) | ansible.netcommon.ipaddr('address') }}
+ neighbor {{ tor_pair_netv4 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}
 {% else %}
- neighbor {{ tor_pair_netv4 | ansible.netcommon.ipaddr(2) | ansible.netcommon.ipaddr('address') }}
+ neighbor {{ tor_pair_netv4 | ansible.utils.ipaddr(2) | ansible.utils.ipaddr('address') }}
 {% endif %}
   description "tor_pair_ibgp_v4"
   inherit template tor_peer_v4
@@ -252,9 +252,9 @@ router bgp {{ bgp.local_as }}
  !
 {% if tor_pair_netv6 is defined and tor_pair_netv6 %}
 {% if seq is even %}
- neighbor {{ tor_pair_netv6 | ansible.netcommon.ipaddr(1) | ansible.netcommon.ipaddr('address') }}
+ neighbor {{ tor_pair_netv6 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}
 {% else %}
- neighbor {{ tor_pair_netv6 | ansible.netcommon.ipaddr(2) | ansible.netcommon.ipaddr('address') }}
+ neighbor {{ tor_pair_netv6 | ansible.utils.ipaddr(2) | ansible.utils.ipaddr('address') }}
 {% endif %}
   description "tor_pair_ibgp_v6"
   inherit template tor_peer_v6
@@ -265,9 +265,9 @@ router bgp {{ bgp.local_as }}
 !
 vlt-domain {{ vlt.domain_id }}
 {% if seq is even %}
- backup destination {{ tor_pair_netv4 | ansible.netcommon.ipaddr(1) | ansible.netcommon.ipaddr('address') }}
+ backup destination {{ tor_pair_netv4 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}
 {% else %}
- backup destination {{ tor_pair_netv4 | ansible.netcommon.ipaddr(2) | ansible.netcommon.ipaddr('address') }}
+ backup destination {{ tor_pair_netv4 | ansible.utils.ipaddr(2) | ansible.utils.ipaddr('address') }}
 {% endif %}
 {% for port in vlt.vlti %} 
  discovery-interface ethernet1/1/{{ port }}
