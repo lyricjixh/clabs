@@ -1,21 +1,21 @@
 ---
-- hosts: poc_rack01
-  gather_facts: false
-  connection: local
+- hosts: poc_cleaf
+  gather_facts: true
+  # connection: local
+  collections:
+      - arista.eos
 
   tasks:
   - name: Configure device hostname from lines
-    vars:
-      ansible_command_timeout: 10
-      ansible_connect_timeout: 10
-    eos_config:
-        src: ceos/hostname.j2
-    # ignore_errors: yes
+    arista.eos.eos_hostname:
+      config:
+        hostname: "{{ hostname }}.{{ domain.name }}"
+      state: replaced
+    # eos_config:
+    #     src: ceos/hostname.j2
     tags:
-      - hostname
+    - hostname
 
-
-  # tasks:
   # - name: Enable OOB Mgmt VRF, 1st time
   #   ceos_config:
   #     lines:
