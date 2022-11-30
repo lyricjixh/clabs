@@ -1,25 +1,26 @@
 ---
 - hosts: ceos
-  gather_facts: no
   collections:
      - arista.eos
     
   tasks:
-  - name: Install roles from Ansible Galaxy
-    command: "ansible-galaxy collection install arista.eos"
-    delegate_to: localhost
-    run_once: yes
-    tags: install
+  # - name: Install roles from Ansible Galaxy
+  #   command: "ansible-galaxy collection install arista.eos"
+  #   delegate_to: localhost
+  #   run_once: yes
+  #   tags: install
 
   - name: Get Switch current OS version
+    # gather_facts: true
     eos_facts:
-      gather_subset: hardware
+      gather_subset: 
+      - hardware
     register: pre_facts
     tags: facts
 
   - name: Display EoS Version
     debug:
-      var: pre_facts[ansible_net_version]
+      msg: "The version is {{ pre_facts.ansible_facts.ansible_net_version }}"
     tags: facts
 
   # - name: Enable Service under mgmt VRF

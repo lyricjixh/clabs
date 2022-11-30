@@ -153,13 +153,20 @@ helper_ip: 10.60.97.254
 
 users:
 # no including ansible user
-    - name: "lab" 
-      passwd: "{{ vault_lab_password }}"
-      role: "sysadmin"
+  - name: "lab" 
+    passwd: "{{ vault_lab_password }}"
+    role: "sysadmin"
+    priv: 10
 
-    - name: "netadmin" 
-      passwd: "{{ vault_lab_password }}"
-      role: "operator"
+  - name: "ansible"
+    passwd: "{{ vault_ansible_password }}"
+    role: "sysadmin"
+    priv: 15
+
+  - name: "netops" 
+    passwd: "{{ vault_netops_password }}"
+    role: "operator"
+    priv: 15
 
 oob_ipv4_mask: 24
 oob_netv4: 172.100.100.0/24

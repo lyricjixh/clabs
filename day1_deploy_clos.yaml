@@ -5,6 +5,20 @@
   - arista.eos
 
   tasks:
+  - name: Generate the templated config
+    template:
+      src: ceos/user.j2
+      dest: "{{ build_dir }}/{{hostname}}.conf.part"
+    tags:
+    - cfggen
+
+  - name: Display the generated config
+    debug: var=item
+    with_file:
+    - "/home/xji/devops/cfggen/{{hostname}}.conf.part"
+    tags:
+    - cfggen
+
   - name: Enable IP Routing
     eos_config:
      lines: 
@@ -13,18 +27,54 @@
     tags:
       - ip
 
-  - name: Enable Domain Server
+  - name: Enable Domain/DNS Server
     eos_config:
-        src: ceos/domain.j2
+      src: ceos/domain.j2
+      # diff_against: validate_config
+      # intended_config: "/home/xji/devops/cfggen/{{hostname}}.conf.part"
     tags:
       - domain
 
-#     - name: Enable Local Users
-#       ceos_config:
-#           src: ceos/user.j2
-#       when: (features.netserv.user is defined and features.netserv.user|lower == "yes")
-#       tags:
-#         - user
+  - name: Enable Banner Motd
+    eos_banner:
+      banner: motd
+      text: |
+        ********* Arista PoC Demo Lab ***********
+        The Assets belongs to Arista Network Inc.
+        *****************************************
+      state: present
+    tags:
+      - banner
+
+  - name: Enable Banner Login
+    eos_banner:
+      banner: login
+      text: |
+        *************************
+        Welcome to Arista PoC Lab
+        please use it properly!
+        *************************
+      state: present
+    tags:
+      - banner
+
+  - name: Setup the local user accounts
+    block:
+    - name: Enable all local users
+      eos_config:
+        src: ceos/user.j2
+
+    - name: Add SSHKEY for Ansible user
+      arista.eos.eos_user:
+        name: ansible
+        sshkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        state: present
+
+    # - name: remove all users except admin
+    #   arista.eos.eos_user:
+    #     purge: yes
+    tags:
+      - users
 
 #     - name: Enable NTP
 #       ceos_config:
