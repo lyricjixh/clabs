@@ -12,7 +12,7 @@ ip vrf management
  interface management
 exit
 interface mgmt 1/1/1
- ip address 172.17.60.23/24
+ ip address 172.100.100.23/24
 exit
-management route 0.0.0.0/0 172.17.60.254
+management route 0.0.0.0/0 172.100.100.1
 exit

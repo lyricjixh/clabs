@@ -1,50 +1,60 @@
 name: pod1
 
 mgmt:
-  network: br-clos02
+  network: pod1-oob
   ipv4_subnet: 172.100.100.0/24
   
 topology:
   kinds:
     ceos:
       image: ceos:4.29.0.2F
+      env:
+        CLAB_MGMT_VRF: MGMT
   nodes:
     cleaf01:
       kind: ceos
       mgmt_ipv4: 172.100.100.2
+      # startup-config: ztp/cleaf01.conf.init
     cleaf02: 
       kind: ceos
       mgmt_ipv4: 172.100.100.3
+      # startup-config: ztp/cleaf02.conf.init
       env:
         BOOT_DEALY: 10
-    cleaf03: 
+    cleaf03:
       kind: ceos
       mgmt_ipv4: 172.100.100.4
+      # startup-config: ztp/cleaf03.conf.init
       env:
         BOOT_DEALY: 20
     cleaf04: 
       kind: ceos
       mgmt_ipv4: 172.100.100.5
+      # startup-config: ztp/cleaf04.conf.init
       env:
         BOOT_DEALY: 30
     bleaf01: 
       kind: ceos
       mgmt_ipv4: 172.100.100.6
+      # startup-config: ztp/bleaf01.conf.init
       env:
         BOOT_DEALY: 40
     bleaf02: 
       kind: ceos
       mgmt_ipv4: 172.100.100.7
+      # startup-config: ztp/bleaf02.conf.init
       env:
         BOOT_DEALY: 50
     spine01:
       kind: ceos
       mgmt_ipv4: 172.100.100.101
+      # startup-config: ztp/spine01.conf.init
       env:
         BOOT_DEALY: 60
     spine02:
       kind: ceos
       mgmt_ipv4: 172.100.100.102
+      # startup-config: ztp/spine02.conf.init
       env:
         BOOT_DEALY: 70
     dc-gw01:
@@ -60,7 +70,7 @@ topology:
       mgmt_ipv4: 172.100.100.252
       binds:
         - files/gw02/daemons:/etc/frr/daemons
-        - files/gw01/frr.conf:/etc/frr/frr.conf
+        - files/gw02/frr.conf:/etc/frr/frr.conf
     r1-vm01:
       kind: linux
       image: ubuntu_clab:latest

@@ -7,7 +7,7 @@ site-id: "Lab01"
 
 #Services
 domain:
-    name: "poc.dell.com"
+    name: "poc.arista.com"
     vrf: "management"
     server:
         - "8.8.8.8"
@@ -39,9 +39,9 @@ log:
     src_intf: "mgmt1/1/1" 
     vrf: "management"
     server:
-        - addr: "172.17.60.81"
+        - addr: "172.100.100.81"
           port: "514"
-        - addr: "172.17.60.249"
+        - addr: "172.100.100.249"
           port: "514"
 aaa:
     authentication: "local group tacacs+"
@@ -60,7 +60,7 @@ aaa_tac:
 snmp:
     version: "2c"
     vrf: "management"
-    contact: "labadmin@poc.dell.com"
+    contact: "labadmin@poc.arista.com"
     proto_port: "1161" ## leave blank for default 161
     location: "Santa Clara Lab"
     view:
@@ -99,7 +99,7 @@ snmp:
           auth: "sha"
           encry: "aes"
     host:
-        - addr: "172.17.60.249"
+        - addr: "172.100.100.249"
           version: "2c"
           community: "community_01"
         - addr: "99.99.99.99"
@@ -130,7 +130,7 @@ sflow:
   vrf: "mgmt"
   agent_id: "loopback0"
   collector:
-    - collector_ip: "172.17.60.249"
+    - collector_ip: "172.100.100.249"
       udp_port: 6343
       state: present
   polling_interval: 30
@@ -161,13 +161,9 @@ users:
       passwd: "{{ vault_lab_password }}"
       role: "operator"
 
-    - name: "jayb" 
-      passwd: "{{ vault_jayb_password }}"
-      role: "sysadmin"
-
 oob_ipv4_mask: 24
-oob_netv4: 172.17.60.0/24
-oob_netv4_gw: 172.17.60.254
+oob_netv4: 172.100.100.0/24
+oob_netv4_gw: 172.100.100.1
 
 lpbk0_netv4: "10.0.0.0/24"
 lpbk0_netv6: "2001::/64"

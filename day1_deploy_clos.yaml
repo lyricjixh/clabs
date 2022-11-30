@@ -1,48 +1,23 @@
 ---
-- hosts: poc_cleaf
-  gather_facts: true
-  # connection: local
+- hosts: ceos
+  gather_facts: false
   collections:
-      - arista.eos
+  - arista.eos
 
   tasks:
-  - name: Configure device hostname from lines
-    arista.eos.eos_hostname:
-      config:
-        hostname: "{{ hostname }}.{{ domain.name }}"
-      state: replaced
-    # eos_config:
-    #     src: ceos/hostname.j2
+  - name: Enable IP Routing
+    eos_config:
+     lines: 
+     - ip routing
+     - ip routing vrf MGMT
     tags:
-    - hostname
+      - ip
 
-  # - name: Enable OOB Mgmt VRF, 1st time
-  #   ceos_config:
-  #     lines:
-  #       - ip vrf mgmt
-  #   ignore_errors: yes
-  #   register: output
-  #   tags:
-  #     - oob
-
-#   tasks:
-#   - name: ceos Basic Provisioning
-#     block:
-#     - name: Enable Hostanme 1st time
-#       vars:
-#         ansible_command_timeout: 10
-#         ansible_connect_timeout: 10
-#       ceos_config:
-#           src: ceos/hostname.j2
-#       ignore_errors: yes
-#       tags:
-#         - hostname
-
-#     - name: Enable Domain Server
-#       ceos_config:
-#           src: ceos/domain.j2
-#       tags:
-#         - domain
+  - name: Enable Domain Server
+    eos_config:
+        src: ceos/domain.j2
+    tags:
+      - domain
 
 #     - name: Enable Local Users
 #       ceos_config:

@@ -66,7 +66,7 @@ ospf:
     - key: "{{ vault_ospf_auth}}"
       area: "0.0.0.0"
   network:
-    - id: "172.17.60.0/24"
+    - id: "172.100.100.0/24"
       area: "0.0.0.0"
     - id: "172.17.70.0/24"
       area: "0.0.0.0"
@@ -105,7 +105,7 @@ dellos_acl:
       - number: 10
         permit: true
         protocol: tcp
-        source: 172.17.60.0/24
+        source: 172.100.100.0/24
         destination: 10.10.10.10/32
         dest_condition: eq 22
         state: present

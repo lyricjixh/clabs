@@ -9,9 +9,9 @@ ansible_become_pass: "{{ vault_os10_password }}"
 
 dellos_image_upgrade:
     operation_type: install
-    software_image_url: "http://172.17.60.81/PKGS_OS10-Enterprise-10.5.2.8.380stretch-installer-x86_64.bin"
+    software_image_url: "http://172.100.100.81/PKGS_OS10-Enterprise-10.5.2.8.380stretch-installer-x86_64.bin"
     software_version: 10.5.2.8
-    # software_image_url: "http://172.17.60.81/PKGS_OS10-Enterprise-10.5.2.7.374stretch-installer-x86_64.bin"
+    # software_image_url: "http://172.100.100.81/PKGS_OS10-Enterprise-10.5.2.7.374stretch-installer-x86_64.bin"
     # software_version: 10.5.2.7
     number_of_retries: 50
 

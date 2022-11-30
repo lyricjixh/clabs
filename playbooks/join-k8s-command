@@ -1,1 +1,1 @@
-kubeadm join 172.17.60.121:6443 --token g4eprj.86x8d8btl8eajkrm --discovery-token-ca-cert-hash sha256:9b040e1354aee9af2a9be510905561ae82e261af53fd4d4f5637a6a95d7657cb 
+kubeadm join 172.100.100.121:6443 --token g4eprj.86x8d8btl8eajkrm --discovery-token-ca-cert-hash sha256:9b040e1354aee9af2a9be510905561ae82e261af53fd4d4f5637a6a95d7657cb 

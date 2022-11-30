@@ -22,7 +22,7 @@ ip vrf {{ vrfi.name }}
 !
 {% endfor %}
 snmp-server contact "Dell POC Lab @ Santa Clara"
-snmp-server engineID remote 172.17.60.249 udp-port 161 0x61646d696e
+snmp-server engineID remote 172.100.100.249 udp-port 161 0x61646d696e
 snmp-server group labgroup 2c notify notify_view
 snmp-server group labgroupv3 3 noauth read read_view
 snmp-server user labadmin labgroupv3 3 auth sha admin321
@@ -31,5 +31,5 @@ snmp-server view notify_view 1.3.6.1.2.1.2.2 included
 snmp-server view labview .1 excluded
 !
 logging source-interface mgmt1/1/1
-logging server 172.17.60.249 tcp 1514 severity log-notice
+logging server 172.100.100.249 tcp 1514 severity log-notice
 !
