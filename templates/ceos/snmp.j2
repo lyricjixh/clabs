@@ -4,39 +4,66 @@ Purpose:
 Generating SNMP Configuration
 ############################################}
 {% if snmp is defined and snmp %}
-{% if snmp.location is defined and snmp.location %}
-snmp-server location "{{ snmp.location }}"
-{% endif %}
 {% if snmp.contact is defined and snmp.contact %}
 snmp-server contact "{{ snmp.contact }}"
 {% endif %}
-{% if snmp.version|lower == "2c" %}
-{% for group in snmp.group %}
-{% if group.version|lower == "2c" %}
-snmp-server group {{ group.name }} v2c
-{% endif %}
+!
+{% if snmp.view is defined and snmp.view %}
+{% for view in snmp.view %}
+snmp-server view {{ view.name }} {{ view.oid }} {{ view.action }}
 {% endfor %}
-snmp-server community public
-{% for comm in snmp.community %}
-snmp-server community {{ comm.name }} group {{ comm.group }}
-{% endfor %}
-{% for host in snmp.host %}
-{% if host.version|lower == "2c" %}
-snmp-server host {{ host.addr }} community {{ host.community }}
-{% endif %}
-{% endfor %}
-{% elif snmp.version|lower == "3" %}
-snmp-server group labgroupv3 v3 noauth read read_view
-snmp-server user labadmin group labgroupv3 auth sha auth-password {{ vault_snmp_labadmin_auth }}
-snmp-server view read_view 1.3.6.1.2 included
-{% endif %}
-{% if snmp.vrf is defined and snmp.vrf %}
-{% if snmp.proto_port is defined and snmp.proto_port %}
-snmp-server agentaddress {{ ansible_host }} port {{ snmp.proto_port }} interface mgmt
-{% else %}
-snmp-server agentaddress {{ ansible_host }} interface mgmt
-{% endif %}
 {% endif %}
 !
+{% for group in snmp.group %}
+{% if group.version|lower == "2c" %}
+snmp-server group {{ group.name }} v{{ group.version }} {{ group.views|join(' ')}}
+{% elif group.version|lower == "3" %}
+snmp-server group {{ group.name }} v{{ group.version }} {{ group.auth}} {{ group.views|join(' ')}}
 {% endif %}
-
+{% endfor %}
+!
+{% if snmp.community is defined and snmp.community %}
+{% for comm in snmp.community %}
+snmp-server community {{ comm.name }} {{ comm.priv }} {{ comm.acl }}
+{% endfor %}
+{% endif %}
+!
+{% if snmp.user is defined and snmp.user %}
+{% for user in snmp.user %}
+{% if user.version|lower == "3" %}
+snmp-server user {{ user.name }} {{ user.group }} v3 auth {{ user.auth }} {{ user.password }} priv {{ user.encry }} {{ user.password }} 
+{% else %}
+snmp-server user {{ user.name }} {{ user.group }} v2c
+{% endif %}
+{% endfor %}
+{% endif %}
+!
+{% for host in snmp.host %}
+{% if host.version|lower == "2c" %}
+{% if host.vrf %}
+snmp-server host {{ host.addr }} vrf {{ host.vrf }} version 2c {{ host.community }}
+{% else %}
+snmp-server host {{ host.addr }} version 2c {{ host.community }}
+{% endif %}
+{% elif host.version|lower == "3" %}
+{% if host.vrf %}
+snmp-server host {{ host.addr }} vrf {{ host.vrf }} version 3 {{ host.auth }} {{ host.user }}
+{% else %}
+snmp-server host {{ host.addr }} version 3 {{ host.auth }} {{ host.user }}
+{% endif %}
+{% endif %}
+{% endfor %}
+!
+{% if snmp.traps is defined and snmp.traps %}
+{% for trap in snmp.traps %}
+{% if trap.type %}
+snmp-server enable traps {{ trap.category }} {{ trap.type|join(' ') }}
+{% else %}
+snmp-server enable traps {{ trap.category }}
+{% endif %}
+{% endfor %}
+{% endif %}
+!
+snmp-server vrf MGMT local-interface management0
+!
+{% endif %}

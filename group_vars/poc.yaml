@@ -8,22 +8,23 @@ site-id: "Lab01"
 #Services
 domain:
     name: "poc.arista.com"
-    vrf: "management"
+    vrf: "MGMT"
     server:
         - "8.8.8.8"
         - "8.8.4.4"
 
 ntp:
     src_intf: "mgmt1/1/1" 
-    vrf: "management"
+    vrf: "MGMT"
     authenticate: "yes"
     auth_key:
-      - seq: "1"
+      - seq: 2
+        type: "sha1"
+        text: "{{ vault_ntp_auth_key1 }}"
+      - seq: 23
         type: "md5"
-        text: "lab1234"
-      - seq: "2"
-        type: "md5"
-        text: "dell1234"
+        text: "{{ vault_ntp_auth_key2 }}"
+    trusted_key: 23
     server:
         - addr: "10.10.60.81"
           prefer: "yes"
@@ -36,13 +37,17 @@ ntp:
           state: "present"
 
 log:
-    src_intf: "mgmt1/1/1" 
-    vrf: "management"
+    src_intf: "management0" 
+    vrf: "MGMT"
     server:
         - addr: "172.100.100.81"
           port: "514"
+          protocol: "tcp"
         - addr: "172.100.100.249"
           port: "514"
+          protocol: "tcp"
+    trap: "critical"
+    sync: "yes"
 aaa:
     authentication: "local group tacacs+"
     authorization: 
@@ -50,7 +55,7 @@ aaa:
 
 aaa_tac:
     timeout: "60" 
-    vrf: "management"
+    vrf: "MGMT"
     server:
         - addr: "1.1.1.1"
           key: "{{ vault_tac_key }}"
@@ -58,61 +63,74 @@ aaa_tac:
           key: "{{ vault_tac_key }}"
 
 snmp:
-    version: "2c"
-    vrf: "management"
+    vrf: "MGMT"
     contact: "labadmin@poc.arista.com"
-    proto_port: "1161" ## leave blank for default 161
-    location: "Santa Clara Lab"
+    proto_port: "1161"    ## leave blank for default 161
+    location: "Container PoC Lab"
     view:
-        - name: "globalView"
-          oid: "1.3.6.1"
+      - name: "globalView"
+        oid: "1.3.6.1"
+        action: "include"
+      - name: "view_01"
+        oid: "1.3.6.1.2"
+        action: "include"
+      - name: "view_02"
+        oid: "1.3.6.1.2"
+        action: "include"
     group:
-        - name: "admin01"
-          version: "2c"
-          view: 
-            - name: "view01"
-              view_type: "read"
-              view_name: "globalView"
-            - name: "view02"
-              view_type: "write"
-              view_name: "globalView"
-        - name: "admin02"
-          version: "3"
-          sec_level:
-            - name: "auth"
-              view_type: "read"
-              view_name: "globalView"
-            - name: "priv"
-              view_type: "read"
-              view_name: "globalView"
+      - name: "admin01"
+        version: "2c"
+        views:
+        - "read globalview"
+        - "write view_01"
+        - "notify view_02"
+      - name: "admin02"
+        version: "3"
+        auth: "auth"    ##[auth|noauth|priv]
+        views:
+        - "read globalview"
+        - "write view_01"
+        - "notify view_02"
     user:
-        - name: "netops"
-          group: "admin01"
-          version: "3"
-          passwd: "{{ vault_snmp_labadmin_auth }}"
-          auth: "sha"
-          encry: "aes"
-        - name: "nimsoft"
-          version: "3"
-          group: "admin01"
-          passwd: "{{ vault_snmp_labadmin_auth }}"
-          auth: "sha"
-          encry: "aes"
+      - name: "netops"
+        group: "admin01"
+        version: "3"
+        password: "{{ vault_snmp_labadmin_auth }}"
+        auth: "sha"
+        encry: "aes"
+      - name: "tac"
+        version: "3"
+        group: "admin02"
+        password: "{{ vault_snmp_labadmin_auth }}"
+        auth: "md5"
+        encry: "aes"
+    traps:
+      - category: "bgp"
+        type:
+        - established
+        - backward-transition
+      - category: "capacity"
+        type:
+        - arista-hardware-utilization-alert
+      - category: "external-alarm"
+        type:
     host:
         - addr: "172.100.100.249"
           version: "2c"
           community: "community_01"
+          vrf: "MGMT"
         - addr: "99.99.99.99"
           version: "3"
-          user: "nimsoft"
-          sec_level: "auth"
+          user: "netops"
+          auth: "auth"
+          vrf: "MGMT"
     community:
-        - name: "community_01"
+        - name: "community_ro"
           string: "{{ vault_snmp_comm_ro }}"
           priv: "ro"
           acl: "SNMP-HOSTS"
           group: "admin01"
-        - name: "community_02"
+        - name: "community_rw"
           string: "{{ vault_snmp_comm_rw }}"
           priv: "rw"
           acl: "SNMP-HOSTS"

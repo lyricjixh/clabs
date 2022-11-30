@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/user.j2
+      src: ceos/snmp.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
@@ -38,10 +38,7 @@
   - name: Enable Banner Motd
     eos_banner:
       banner: motd
-      text: |
-        ********* Arista PoC Demo Lab ***********
-        The Assets belongs to Arista Network Inc.
-        *****************************************
+      text: "{{ lookup('file', 'files/banner_motd') }}"
       state: present
     tags:
       - banner
@@ -49,11 +46,7 @@
   - name: Enable Banner Login
     eos_banner:
       banner: login
-      text: |
-        *************************
-        Welcome to Arista PoC Lab
-        please use it properly!
-        *************************
+      text: "{{ lookup('file', 'files/banner_login') }}"
       state: present
     tags:
       - banner
@@ -76,39 +69,39 @@
     tags:
       - users
 
-#     - name: Enable NTP
-#       ceos_config:
-#           src: ceos/ntp.j2
-#       when: (features.netserv.ntp is defined and features.netserv.ntp|lower == "yes")
-#       tags:
-#         - ntp
+  - name: Enable NTP
+    eos_config:
+        src: ceos/ntp.j2
+    # when: (features.netserv.ntp is defined and features.netserv.ntp|lower == "yes")
+    tags:
+      - ntp
 
-#     - name: Enable Syslog
-#       ceos_config:
-#           src: ceos/syslog.j2
-#       when: (features.netserv.syslog is defined and features.netserv.syslog|lower == "yes")
-#       tags:
-#         - syslog
+  - name: Enable Syslog
+    eos_config:
+        src: ceos/syslog.j2
+    # when: (features.netserv.syslog is defined and features.netserv.syslog|lower == "yes")
+    tags:
+    - syslog
 
-#     - name: Enable SNMP
-#       ceos_config:
-#           src: ceos/snmp.j2
-#       when: (features.netserv.snmp is defined and features.netserv.snmp|lower == "yes")
-#       tags:
-#         - snmp
+  - name: Enable SNMP
+    eos_config:
+        src: ceos/snmp.j2
+    when: (features.netserv.snmp is defined and features.netserv.snmp|lower == "yes")
+    tags:
+    - snmp
 
 #     - name: Enable Group & AAA
 #       block:
 #       - name: Enable Tacacs
-#         ceos_config:
+#         eos_config:
 #             src: ceos/tacacs.j2
 #         when: (features.netserv.tacacs is defined and features.netserv.tacacs|lower == "yes")
 #       - name: Enable Radius
-#         ceos_config:
+#         eos_config:
 #             src: ceos/radius.j2
 #         when: (features.netserv.radius is defined and features.netserv.radius|lower == "yes")
 #       - name: Enable AAA
-#         ceos_config:
+#         eos_config:
 #             src: ceos/aaa.j2
 #         when: (features.netserv.aaa is defined and features.netserv.aaa|lower == "yes")
 #       tags:
@@ -123,7 +116,7 @@
 
 #   tasks:
 #   - name: Enable Standard Interface Naming
-#     ceos_config:
+#     eos_config:
 #       lines:
 #         - "interface-naming standard"
 #     ignore_errors: yes
@@ -139,10 +132,10 @@
 #   - name: Enable Northbound Layer3 Interface
 #     block:
 #     - name: Enable loopback Interface
-#       ceos_config:
+#       eos_config:
 #           src: ceos/intf_lpbk.j2
 #     - name: Enable Leaf/Spine PTP Interface
-#       ceos_config:
+#       eos_config:
 #           src: ceos/intf_northbound.j2
 #     tags:
 #       - northbound
@@ -151,10 +144,10 @@
 #   - name: Enable Vlan Interface and STP
 #     block:
 #     - name: Enable Vlan
-#       ceos_config:
+#       eos_config:
 #           src: ceos/intf_vlan.j2
 #     - name: Enable Spanning Tree
-#       ceos_config:
+#       eos_config:
 #           src: ceos/stp.j2
 #       when: (features.interface.stp is defined and features.interface.stp|lower == "yes")
 #     tags:
@@ -168,7 +161,7 @@
 #     #   ansible_connect_timeout: 60
 #     block:
 #     - name: Breakout Port
-#       ceos_config:
+#       eos_config:
 #           src: ceos/breakout.j2
 #       tags:
 #         - southbound
@@ -181,19 +174,19 @@
 #       when: ( features.interface.breakout is defined and features.interface.breakout|lower == "yes")
 
 #     - name: Enable Breakout Port Trunking
-#       ceos_config:
+#       eos_config:
 #           src: ceos/intf_southbound.j2
 #       tags:
 #         - southbound
 
 #     - name: Enable Layer2 Port
-#       ceos_config:
+#       eos_config:
 #           src: ceos/intf_l2.j2
 #       when: (features.interface.l2port is defined and features.interface.l2port|lower == "yes")
 #       tags:
 #         - l2port
 #     - name: Enable MLAG Domain
-#       ceos_config:
+#       eos_config:
 #           src: ceos/mlag.j2
 #           # replace: block
 #       ignore_errors: yes
@@ -201,7 +194,7 @@
 #       tags:
 #         - mlag
 #     - name: Enable Bond and Trunking
-#       ceos_config:
+#       eos_config:
 #           src: ceos/intf_bond.j2
 #       when: (features.interface.bond is defined and features.interface.bond|lower == "yes")
 #       ignore_errors: yes
@@ -212,7 +205,7 @@
 #       - interface
 
 #   - name: Enable Uplink Failure Detection (UFD) if defined
-#     ceos_config:
+#     eos_config:
 #         src: ceos/ufd.j2
 #     when: (features.interface.ufd is defined and features.interface.ufd|lower == "yes")
 #     tags:
@@ -222,13 +215,13 @@
 #   - name: Enable BGP Underlay
 #     block:
 #     - name: Enable Routing Policy
-#       ceos_config:
+#       eos_config:
 #           src: ceos/route_pol.j2
 #       tags:
 #         - rpol
 
 #     - name: Enable Underlay BGP 1st time
-#       ceos_config:
+#       eos_config:
 #           src: ceos/bgp_underlay.j2
 #           replace: block
 #       ignore_errors: yes
@@ -236,7 +229,7 @@
 #         - bgp_under
 
 #     - name: Enable Underlay BGP 2nd time
-#       ceos_config:
+#       eos_config:
 #           src: ceos/bgp_underlay.j2
 #           replace: block
 #       tags:
@@ -251,33 +244,33 @@
 #       # ansible_connect_timeout: 120
 #     block:
 #     - name: Enable VRF Instance
-#       ceos_config:
+#       eos_config:
 #           src: ceos/evpn_vrf.j2
 #       ignore_errors: yes
 #       tags:
 #         - vrf
 #     - name: Enable Vxlan Tunneling
-#       ceos_config:
+#       eos_config:
 #           src: ceos/vxlan.j2
 #       ignore_errors: yes
 #       tags:
 #         - vxlan
 #     - name: Enable Unified BGP Overlay if by design
-#       ceos_config:
+#       eos_config:
 #           src: ceos/bgp_overlay_unified.j2
 #       tags:
 #         - bgp_over
 #       when: (features.overlay.uni_bgp is defined and features.overlay.uni_bgp|lower == "yes")
 
 #     - name: Enable iBGP Overlay if by design
-#       ceos_config:
+#       eos_config:
 #           src: ceos/bgp_overlay_ibgp.j2
 #       tags:
 #         - bgp_over
 #       when: (features.overlay.ibgp is defined and features.overlay.ibgp|lower == "yes")
 
 #     - name: Enable EVPN Edge for Border Leaves
-#       ceos_config:
+#       eos_config:
 #           src: ceos/evpn_edge.j2
 #       ignore_errors: yes
 #       tags:
@@ -292,14 +285,14 @@
 #       # ansible_connect_timeout: 120
 #     block:
 #     - name: Enable Access List
-#       ceos_config:
+#       eos_config:
 #           src: ceos/acl.j2
 #       when: (features.security.acl is defined and features.security.acl|lower == "yes")
 #       tags:
 #         - acl
 
 #     - name: Enable CoPP
-#       ceos_config:
+#       eos_config:
 #         src: ceos/copp.j2
 #         # lines:
 #         #   # - no ip access-group acl_test_v4 in
@@ -315,7 +308,7 @@
 #         - copp
 
 #     - name: Enable Interface ACL
-#       ceos_config:
+#       eos_config:
 #         src: ceos/intf_acl.j2
 #         # ### replace: block doesn't work!
 #         replace: line
@@ -337,14 +330,14 @@
 #         # ansible_timeout: 120
 #         # ansible_command_timeout: 60
 #         # ansible_connect_timeout: 60
-#       ceos_config:
+#       eos_config:
 #           src: ceos/sflow.j2
 #       when: (features.netserv.sflow is defined and features.netserv.sflow|lower == "yes")
 #       tags:
 #         - sflow
 
 #     - name: Enable SPAN
-#       ceos_config:
+#       eos_config:
 #         src: ceos/span.j2
 #         replace: line
 #       when: (features.netserv.span is defined and features.netserv.span|lower == "yes")
@@ -352,7 +345,7 @@
 #         - span
 
 #     - name: Enable Telemetry
-#       ceos_config:
+#       eos_config:
 #         src: ceos/telemetry.j2
 #         # ### replace: block doesn't work!
 #         replace: line
