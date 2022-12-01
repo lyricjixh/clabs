@@ -4,7 +4,7 @@ Purpose:
 Generating Northbound Configuration
 including L3 PTP link between Leaf/spine
 ############################################}
-{% for intf in l3_uplinks %}
+{% for intf in fabric_links %}
 interface Eth 1/{{ intf.name }}
  description "{{ intf.desc }}"
  ip address {{ intf.addr_v4 }}/{{ fabric_ptp_netmaskv4 }}

@@ -1,7 +1,7 @@
 Ansible Ad-Hoc
 
 ansible sw1003a -m debug -a "var=hostvars"
-ansible all -m debug -a "var=hostvars[hostname].l3_uplinks" -l sw1003a
+ansible all -m debug -a "var=hostvars[hostname].fabric_links" -l sw1003a
 
 Asnible Gather_Facts
 # ansible all -m setup --tree /tmp/facts

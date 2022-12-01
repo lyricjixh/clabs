@@ -11,6 +11,14 @@ ansible_become_method: sudo
 ansible_become_pass: "{{ vault_ceos_password }}"
 ansible_ssh_common_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
+# Loopback Interface, leaf/spine Globally
+lpbk0:
+    desc: "Underlay Loopback"
+    addr_v4: "{{ lpbk0_netv4 | ansible.utils.ipaddr(seq) | ansible.utils.ipaddr('address') }}"
+    addr_v6: "{{ lpbk0_netv6 | ansible.utils.ipaddr(seq) | ansible.utils.ipaddr('address') }}"
+
+phy_mtu: 9214
+
 features:
     debian: 
         hostname: "no"

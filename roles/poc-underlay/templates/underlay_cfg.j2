@@ -87,7 +87,7 @@ interface ethernet1/1/{{ port }}
  flowcontrol receive on
 !
 {% endfor %}
-{% for intf in l3_uplinks %}
+{% for intf in fabric_links %}
 interface ethernet1/1/{{ intf.name }}
  description "{{ intf.desc }}"
  no switchport

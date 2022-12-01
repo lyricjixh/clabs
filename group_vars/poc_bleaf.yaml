@@ -56,32 +56,32 @@ evpn:
             bgp:
                 gw_peer_v4:
                     - 
-                        addr: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                        addr: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
                         asn: "64999"
                     - 
-                        addr: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+                        addr: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
                         asn: "64998"
                 gw_peer_v6:
                     - 
-                        addr: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                        addr: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
                         asn: "64999"
                     - 
-                        addr: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+                        addr: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
                         asn: "64998"
             static_v4:
                 - 
                     dest: 0.0.0.0/0
-                    nh: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                    nh: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
                 - 
                     dest: 0.0.0.0/0
-                    nh: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+                    nh: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
             static_v6:
                 - 
                     dest: 0::0/0
-                    nh: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) | ipaddr(-2) | ipaddr('address') }}"
+                    nh: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
                 - 
                     dest: 0::0/0
-                    nh: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ipaddr(-2) | ipaddr('address') }}"
+                    nh: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
     - 
         name: "POD2"
         desc: "POD2_VRF"

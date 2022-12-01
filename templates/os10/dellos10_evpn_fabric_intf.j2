@@ -56,7 +56,7 @@ interface vlan{{ vlans.vxrail_vlan.id }}
  ipv6 mld snooping querier
 !
 {# Fabric PTP ports #}
-{% for intf in l3_uplinks %}
+{% for intf in fabric_links %}
 interface ethernet1/1/{{ intf.name }}
  description "{{ intf.desc }}"
  no switchport

@@ -1,3 +1,5 @@
+### port profile for specific SKU in leaf function
+### port profile of Spine defined in poc_spine.yaml 
 ---
 esxi_port_range:
    - 1/1/1-1/1/2
@@ -42,17 +44,17 @@ trunk_port:
       id: "4"
       state: "present"
 
-l3_uplinks:
-   -
-    name: 53
-    desc: "Fabric Uplink01_To_Spine01"
-    addr_v4: "{{ fabric_ptp_netv4 | ipaddr(fabric_link_seq[0]|int+1) | ipaddr('address') }}"
-    addr_v6: "{{ fabric_ptp_netv6 | ipaddr(fabric_link_seq[0]|int+1) | ipaddr('address') }}"
-   -
-    name: 54
-    desc: "Fabric Uplink02_To_Spine02"
-    addr_v4: "{{ fabric_ptp_netv4 | ipaddr(fabric_link_seq[1]|int+1) | ipaddr('address') }}"
-    addr_v6: "{{ fabric_ptp_netv6 | ipaddr(fabric_link_seq[1]|int+1) | ipaddr('address') }}"
+## define the port mapping on platform
+ports:
+   fabric:
+   - 31
+   - 32
+   mlag_ctl:
+   - 27
+   - 28
+   compute:
+   - 1
+   - 2
 
 vlt: 
    domain_id: "1"

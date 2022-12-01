@@ -1,3 +1,5 @@
+### port profile for specific SKU in leaf function
+### port profile of Spine defined in poc_spine.yaml 
 ---
 esxi_port_range:
    - 1/1/8:1-1/1/9:4
@@ -8,10 +10,10 @@ front_panel_port_range:
 
 #breakout type "1x40G/2x100G/2x50G/4x100G/4x25G/4x10G"
 breakout:
-   -
-      type: "4x25G"
-      start: 8
-      end: 9
+   # -
+   #    type: "4x25G"
+   #    start: 8
+   #    end: 9
 
 trunk_port: 
    desc: "trunk memeber port"
@@ -37,23 +39,16 @@ trunk_port:
       id: "9/4"
       state: "present"
 
-l3_uplinks:
-   -
-    name: 29
-    desc: "Fabric Uplink01_To_Spine01"
-    addr_v4: "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[0]|int+1) | ansible.utils.ipaddr('address') }}"
-    addr_v6: "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[0]|int+1) | ansible.utils.ipaddr('address') }}"
-   -
-    name: 30
-    desc: "Fabric Uplink02_To_Spine02"
-    addr_v4: "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[1]|int+1) | ansible.utils.ipaddr('address') }}"
-    addr_v6: "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[1]|int+1) | ansible.utils.ipaddr('address') }}"
-
-vlt: 
-   domain_id: "1"
-   vlti: 
-    - "31"
-    - "32"
+ports:
+   fabric:
+   - 31
+   - 32
+   mlag_ctl:
+   - 27
+   - 28
+   compute:
+   - 1
+   - 2
 
 #MLAG
 mlag_bond: 
@@ -63,8 +58,8 @@ mlag_bond:
    bond_id: "100"
    bmem_range:
    bmem_indiv:
-     - "31"
-     - "32"
+     - "27"
+     - "28"
 
 trunk_bond:
    #  - bond_id: 101

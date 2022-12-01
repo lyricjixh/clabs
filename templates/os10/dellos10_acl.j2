@@ -4,7 +4,7 @@
 Purpose:
 Configure ACL commands for dellos10 devices
 
-dellos_acl:
+cluster_acl:
    - name: ssh-only
      type: ipv4
      description: acl
@@ -34,8 +34,8 @@ dellos_acl:
           state: present
      state: present
 #####################################}
-{% if dellos_acl is defined and dellos_acl %}
-  {% for val in dellos_acl %}
+{% if cluster_acl is defined and cluster_acl %}
+  {% for val in cluster_acl %}
     {% if val.name is defined and val.name %}
       {% if val.state is defined and val.state == "absent" %}
         {% if val.type is defined and val.type == "ipv4" %}

@@ -11,7 +11,7 @@ link state track {{ ufd.grp_name }}
  threshold down {{ ufd.threshold_down }}
  threshold up {{ ufd.threshold_up }}
 !
-{% for intf in l3_uplinks %}
+{% for intf in fabric_links %}
 interface Eth 1/{{ intf.name }}
  link state track {{ ufd.grp_name }} upstream
 !

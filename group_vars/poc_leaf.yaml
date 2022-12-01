@@ -1,7 +1,11 @@
 ---
 
-vendor: "DellEMC"
+vendor: "Arista"
 
+#Vxlan
+lpbk1:
+    desc: "Overlay vTEP Endpoint"
+    addr_v4: "{{ lpbk1_netv4 | ansible.utils.ipaddr(rack_no) | ansible.utils.ipaddr('address') }}"
 
 vlan_port: 
 #   - 
@@ -33,11 +37,19 @@ fabric_link_seq:
     - "{{ 2*uplink_ct*(seq-1) }}"
     - "{{ 2*uplink_ct*(seq-1)+2 }}"
 
-# Interface
-lpbk0:
-    desc: "Underlay Loopback"
-    addr_v4: "{{ lpbk0_netv4 | ipaddr(seq) | ipaddr('address') }}"
-    addr_v6: "{{ lpbk0_netv6 | ipaddr(seq) | ipaddr('address') }}"
+fabric_links:
+   -
+    # 1st fabirc port
+    name: "{{ ports.fabric[0]}}"
+    desc: "Fabric Uplink01_To_Spine01"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[0]|int+1) | ansible.utils.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[0]|int+1) | ansible.utils.ipaddr('address') }}"
+   -
+    # 2nd fabirc port
+    name: "{{ ports.fabric[1]}}"
+    desc: "Fabric Uplink02_To_Spine02"
+    addr_v4: "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[1]|int+1) | ansible.utils.ipaddr('address') }}"
+    addr_v6: "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[1]|int+1) | ansible.utils.ipaddr('address') }}"
 
 # BGP Parameters
 bgp:
@@ -45,11 +57,11 @@ bgp:
   spine_as: "65000"
   sas_as: "64999"
   fabric_peer_v4:
-    - "{{ fabric_ptp_netv4 | ipaddr(fabric_link_seq[0]) | ipaddr('address') }}"
-    - "{{ fabric_ptp_netv4 | ipaddr(fabric_link_seq[1]) | ipaddr('address') }}"
+    - "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[0]) | ansible.utils.ipaddr('address') }}"
+    - "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[1]) | ansible.utils.ipaddr('address') }}"
   fabric_peer_v6:
-    - "{{ fabric_ptp_netv6 | ipaddr(fabric_link_seq[0]) | ipaddr('address') }}"
-    - "{{ fabric_ptp_netv6 | ipaddr(fabric_link_seq[1]) | ipaddr('address') }}"
+    - "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[0]) | ansible.utils.ipaddr('address') }}"
+    - "{{ fabric_ptp_netv6 | ansible.utils.ipaddr(fabric_link_seq[1]) | ansible.utils.ipaddr('address') }}"
   afi: 
     ipv4:
     -
@@ -93,7 +105,7 @@ vrrp:
       vip: 10.101.1.1/24
       vmac: "{{ tor_pair_vmac }}"
 
-dellos_acl:
+cluster_acl:
   - type: ipv4
     name: test01
     description: ipv4acl
@@ -179,3 +191,19 @@ evpn:
         #     afi: ipv4
         #     r_map: 
         #     proto: bgp
+
+#EVPN iBGP Overlay
+evpn_ibgp:
+  local_asn: "64999"
+  rrs_v4:
+    peer_group: evpn_rrs_v4
+    addr:
+      - "{{ hostvars['leaf07'].lpbk0.addr_v4 }}"
+      - "{{ hostvars['leaf08'].lpbk0.addr_v4 }}"
+  rrc_v4:
+    peer_group: evpn_rrc_v4
+    addr:
+      - "{{ hostvars['leaf05']['lpbk0']['addr_v4'] }}"
+      - "{{ hostvars['leaf06']['lpbk0']['addr_v4'] }}"
+  peer_v4:
+    peer_group: evpn_rrp_v4

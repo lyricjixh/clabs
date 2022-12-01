@@ -328,24 +328,3 @@ rack02_asn: "65002"
 rack03_asn: "65003"
 rack04_asn: "65004"
 calico_asn: "{{ 65110+rack_no }}"
-
-#Vxlan
-lpbk1:
-    desc: "Overlay vTEP Endpoint"
-    addr_v4: "{{ lpbk1_netv4 | ipaddr(rack_no) | ipaddr('address') }}"
-
-#EVPN iBGP Overlay
-evpn_ibgp:
-  local_asn: "64999"
-  rrs_v4:
-    peer_group: evpn_rrs_v4
-    addr:
-      - "{{ hostvars['leaf07'].lpbk0.addr_v4 }}"
-      - "{{ hostvars['leaf08'].lpbk0.addr_v4 }}"
-  rrc_v4:
-    peer_group: evpn_rrc_v4
-    addr:
-      - "{{ hostvars['leaf05']['lpbk0']['addr_v4'] }}"
-      - "{{ hostvars['leaf06']['lpbk0']['addr_v4'] }}"
-  peer_v4:
-    peer_group: evpn_rrp_v4

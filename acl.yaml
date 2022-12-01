@@ -5,7 +5,7 @@
     - dellemc.os10
 
   vars:
-    dellos_acl:
+    cluster_acl:
       # This ACL is applied against the VTY
       - name: SWITCH-VTY-ACCESS
         type: ipv4
