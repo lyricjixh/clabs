@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/snmp.j2
+      src: ceos/aaa.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
@@ -90,56 +90,34 @@
     tags:
     - snmp
 
-#     - name: Enable Group & AAA
-#       block:
-#       - name: Enable Tacacs
-#         eos_config:
-#             src: ceos/tacacs.j2
-#         when: (features.netserv.tacacs is defined and features.netserv.tacacs|lower == "yes")
-#       - name: Enable Radius
-#         eos_config:
-#             src: ceos/radius.j2
-#         when: (features.netserv.radius is defined and features.netserv.radius|lower == "yes")
-#       - name: Enable AAA
-#         eos_config:
-#             src: ceos/aaa.j2
-#         when: (features.netserv.aaa is defined and features.netserv.aaa|lower == "yes")
-#       tags:
-#         - aaa
-#     tags:
-#       - netserv
+  - name: Enable Group & AAA
+    block:
+    - name: Enable Tacacs
+      eos_config:
+          src: ceos/tacacs.j2
+      # when: (features.netserv.tacacs is defined and features.netserv.tacacs|lower == "yes")
+    - name: Enable Radius
+      eos_config:
+          src: ceos/radius.j2
+      # when: (features.netserv.radius is defined and features.netserv.radius|lower == "yes")
+    - name: Enable AAA
+      eos_config:
+          src: ceos/aaa.j2
+      # when: (features.netserv.aaa is defined and features.netserv.aaa|lower == "yes")
+    tags:
+      - aaa
 
-# - hosts: ceos
-#   gather_facts: false
-#   collections:
-#      - dellemc.enterprise_ceos
-
-#   tasks:
-#   - name: Enable Standard Interface Naming
-#     eos_config:
-#       lines:
-#         - "interface-naming standard"
-#     ignore_errors: yes
-#   tags:
-#     - intf_naming
-
-# - hosts: ceos
-#   gather_facts: false
-#   collections:
-#      - dellemc.enterprise_ceos
-
-#   tasks:
-#   - name: Enable Northbound Layer3 Interface
-#     block:
-#     - name: Enable loopback Interface
-#       eos_config:
-#           src: ceos/intf_lpbk.j2
-#     - name: Enable Leaf/Spine PTP Interface
-#       eos_config:
-#           src: ceos/intf_northbound.j2
-#     tags:
-#       - northbound
-#       - interface
+  - name: Enable Layer3 Interface Loopback&Uplinks
+    block:
+    - name: Enable loopback Interface
+      eos_config:
+          src: ceos/intf_lpbk.j2
+    - name: Enable Leaf/Spine PTP Interface
+      eos_config:
+          src: ceos/intf_northbound.j2
+    tags:
+      - northbound
+      - interface
 
 #   - name: Enable Vlan Interface and STP
 #     block:

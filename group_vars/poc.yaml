@@ -49,18 +49,64 @@ log:
     trap: "critical"
     sync: "yes"
 aaa:
-    authentication: "local group tacacs+"
+    authentication:
+      login: 
+      - local
+      - group tac_group1
+      - group radius_group1
+      enable:
+      # - local
+      # - group tac_group1
+      # - group radius_group1
     authorization: 
+      commands:         ##for shell commands
+      - local
+      config-commands:  ##for config commands
+      exec:             ##for starting shell
+      - local
+      - group tac_group1
+      - group radius_group1
     accounting:
+      commands:         ##for shell commands
+      # - group tac_group1
+      exec:             ##for starting shell
+      # - group tac_group1
+      system:           ##for starting shell
+      # - group tac_group1
 
 aaa_tac:
-    timeout: "60" 
+    timeout: "15" 
     vrf: "MGMT"
-    server:
-        - addr: "1.1.1.1"
-          key: "{{ vault_tac_key }}"
-        - addr: "1.1.1.2"
-          key: "{{ vault_tac_key }}"
+    group:
+      - name: "tac_group1"
+        server:
+            - addr: "1.1.1.1"
+              key: "{{ vault_tac_key }}"
+            - addr: "1.1.1.2"
+              key: "{{ vault_tac_key }}"
+      - name: "tac_group2"
+        server:
+            - addr: "2.1.1.1"
+              key: "{{ vault_tac_key }}"
+            - addr: "2.1.1.2"
+              key: "{{ vault_tac_key }}"
+
+aaa_radius:
+    timeout: "15" 
+    vrf: "MGMT"
+    group:
+      - name: "radius_group1"
+        server:
+            - addr: "1.1.1.1"
+              key: "{{ vault_radius_key }}"
+            - addr: "1.1.1.2"
+              key: "{{ vault_radius_key }}"
+      - name: "radius_group2"
+        server:
+            - addr: "2.1.1.1"
+              key: "{{ vault_radius_key }}"
+            - addr: "2.1.1.2"
+              key: "{{ vault_radius_key }}"
 
 snmp:
     vrf: "MGMT"
@@ -183,7 +229,7 @@ users:
 
   - name: "netops" 
     passwd: "{{ vault_netops_password }}"
-    role: "operator"
+    role: "network-admin"
     priv: 15
 
 oob_ipv4_mask: 24
