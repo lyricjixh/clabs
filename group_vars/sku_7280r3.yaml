@@ -69,20 +69,20 @@ mlag_bond:
      - "28"
 
 trunk_bond:
-    - bond_id: 101
-      mlag_id: 101
-      desc: "bond desc prefix"
-      vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
-      bmem_range:
-      bmem_indiv:
-         - "1"
-    - bond_id: 102 
-      mlag_id: 102
-      desc: "bond desc prefix"
-      vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
-      bmem_range:
-      bmem_indiv:
-         - "2"
+   #  - bond_id: 101
+   #    mlag_id: 101
+   #    desc: "compute bond"
+   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   #    bmem_range:
+   #    bmem_indiv:
+   #       - "1"
+   #  - bond_id: 102 
+   #    mlag_id: 102
+   #    desc: "compute bond"
+   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   #    bmem_range:
+   #    bmem_indiv:
+   #       - "2"
 
 ## Sflow per SKU
 sflow_port_sku:
