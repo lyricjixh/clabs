@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/intf_ptp.j2
+      src: ceos/mlag.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
@@ -134,18 +134,18 @@
   - arista.eos
 
   tasks:
-  - name: Enable Vlan Interface and STP
-    block:
-    - name: Enable Vlan
-      eos_config:
-          src: ceos/intf_vlan.j2
-    - name: Enable Spanning Tree
-      eos_config:
-          src: ceos/stp.j2
-      when: (features.interface.stp is defined and features.interface.stp|lower == "yes")
-    tags:
-      - vlan
-      - interface
+  # - name: Enable Vlan Interface and STP
+  #   block:
+  #   - name: Enable Vlan
+  #     eos_config:
+  #         src: ceos/intf_vlan.j2
+  #   - name: Enable Spanning Tree
+  #     eos_config:
+  #         src: ceos/stp.j2
+  #     # when: (features.interface.stp is defined and features.interface.stp|lower == "yes")
+  #   tags:
+  #     - vlan
+  #     - interface
 
   - name: Enable Southbound L2/MLAG/Trunk Interface
     # vars:
@@ -153,31 +153,41 @@
     #   ansible_command_timeout: 60
     #   ansible_connect_timeout: 60
     block:
-    - name: Breakout Port
-      eos_config:
-          src: ceos/breakout.j2
-      tags:
-        - southbound
+    # - name: Breakout Port
+    #   eos_config:
+    #       src: ceos/breakout.j2
+    #   tags:
+    #     - southbound
 
-    - name: "Wait 45 secs for Breakout Finishing"
-      pause:
-        seconds: 45
-      delegate_to: localhost
-      tags: southbound
-      when: ( features.interface.breakout is defined and features.interface.breakout|lower == "yes")
+    # - name: "Wait 45 secs for Breakout Finishing"
+    #   pause:
+    #     seconds: 45
+    #   delegate_to: localhost
+    #   tags: southbound
+    #   when: ( features.interface.breakout is defined and features.interface.breakout|lower == "yes")
 
-    - name: Enable Breakout Port Trunking
-      eos_config:
-          src: ceos/intf_southbound.j2
-      tags:
-        - southbound
+    # - name: Enable Breakout Port Trunking
+    #   eos_config:
+    #       src: ceos/intf_southbound.j2
+    #   tags:
+    #     - southbound
 
     - name: Enable Layer2 Port
       eos_config:
           src: ceos/intf_l2.j2
-      when: (features.interface.l2port is defined and features.interface.l2port|lower == "yes")
+      # when: (features.interface.l2port is defined and features.interface.l2port|lower == "yes")
       tags:
         - l2port
+
+    # - name: Delete Layer2 Port
+    #   eos_l2_interfaces:
+    #       config:
+    #       - name: Ethernet1
+    #       - name: Ethernet2
+    #       state: deleted
+    #   tags:
+    #     - delete
+
     - name: Enable MLAG Domain
       eos_config:
           src: ceos/mlag.j2

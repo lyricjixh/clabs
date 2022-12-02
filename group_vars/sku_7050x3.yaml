@@ -19,24 +19,18 @@ trunk_port:
    desc: "trunk memeber port"
    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
    range:
-   -
-      desc: "25G Compute Port Group1"
-      start: 8/1
-      end: 8/4
-      state: "present"
+   # -
+   #    desc: "25G Compute Port Group1"
+   #    start: 1
+   #    end: 2
+   #    state: "present"
    # port-range in same trunk
    port_indiv:
    -  desc: "trunk port to compute"
-      id: "9/1"
+      id: "1"
       state: "present"
    -  desc: "trunk port to compute"
-      id: "9/2"
-      state: "present"
-   -  desc: "trunk port to compute"
-      id: "9/3"
-      state: "present"
-   -  desc: "trunk port to compute"
-      id: "9/4"
+      id: "2"
       state: "present"
 
 ports:
@@ -54,7 +48,8 @@ ports:
 mlag_bond: 
    domain_id: "1"
    desc: "MLAG Control link Port-Channel"
-   vlan_list: "{{ vlans.pair_vlan.id }}"
+   vlan: "{{ vlans.pair_vlan.id }}"
+   group: "mlagpeer"
    bond_id: "100"
    bmem_range:
    bmem_indiv:
@@ -62,34 +57,20 @@ mlag_bond:
      - "28"
 
 trunk_bond:
-   #  - bond_id: 101
-   #    mlag_id: 101
-   #    desc: "bond desc prefix"
-   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
-   #    bmem_range:
-   #    bmem_indiv:
-   #       - "1/21"
-   #  - bond_id: 102 
-   #    mlag_id: 102
-   #    desc: "bond desc prefix"
-   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
-   #    bmem_range:
-   #    bmem_indiv:
-   #       - "1/22"
-   #  - bond_id: 103
-   #    mlag_id: 103
-   #    desc: "bond desc prefix"
-   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
-   #    bmem_range:
-   #    bmem_indiv:
-   #       - "1/23"
-   #  - bond_id: 104 
-   #    mlag_id: 104
-   #    desc: "bond desc prefix"
-   #    vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
-   #    bmem_range:
-   #    bmem_indiv:
-   #       - "1/24"
+    - bond_id: 101
+      mlag_id: 101
+      desc: "bond desc prefix"
+      vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+      bmem_range:
+      bmem_indiv:
+         - "1"
+    - bond_id: 102 
+      mlag_id: 102
+      desc: "bond desc prefix"
+      vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+      bmem_range:
+      bmem_indiv:
+         - "2"
 
 ## Sflow per SKU
 sflow_port_sku:

@@ -21,6 +21,49 @@ vlan_ranges:
     start: 
     end: 
 
+## for underlay vlan input
+vlans:
+    app_vlans:
+        - 
+            desc: "vMgmt_Mgmt"
+            id: "101"
+            netv4: "{{ v101_netv4 }}"
+            netv6: "{{ v101_netv6 }}"
+
+        - 
+            desc: "vSAN_Mgmt"
+            id: "201"
+            netv4: "{{ v201_netv4 }}"
+            netv6: "{{ v201_netv6 }}"
+        - 
+            desc: "vTEP_Mgmt"
+            id: "301"
+            netv4: "{{ v301_netv4 }}"
+            netv6: "{{ v301_netv6 }}"
+    pair_vlan:
+        desc: "ToR_Pair_iBGP"
+        id: "1001"
+        netv4: "{{ tor_pair_netv4 }}"
+        netv6: "{{ tor_pair_netv6 }}"
+    vxrail_vlan:
+        desc: "VxRail_Mgmt"
+        id: "3939"
+    cali_vlans:
+        - 
+            desc: "Calio uplink01"
+            id: 141
+            netv4: "{{ v141_netv4 }}"
+            netv6: "{{ v141_netv6 }}"
+
+        - 
+            desc: "Calio uplink02"
+            id: 142
+            netv4: "{{ v142_netv4 }}"
+            netv6: "{{ v142_netv6 }}"
+    native_vlan:
+        desc: "Native Vlan if not default 1"
+        id: "1"
+
 bfd:
     interval: 100
     min_rx: 300
@@ -98,7 +141,7 @@ vrrp:
     - id: 1
       intf: "1/2"
       type: "ipv4"
-      vrf_instance: "POD1"
+      vrf_instance: "RED"
       track_intf:
         - 1/45
       addr_v4: 10.101.1.253/24
@@ -174,8 +217,8 @@ vxlan_mtu: "9100"
 evpn:
     vrf:
     - 
-        name: "POD1"
-        desc: "POD1_VRF"
+        name: "RED"
+        desc: "RED_VRF"
         l3_vni: "9001"
         l3_vni_vlan: "901"
         type5:

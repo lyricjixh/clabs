@@ -11,13 +11,13 @@ edge_links:
     desc: "Gateway uplink_To_CE01"
     netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) }}"
     netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) }}"
-    vrf: POD1
+    vrf: RED
    -
     port: "28"
     desc: "Gateway uplink_To_CE02"
     netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) }}"
     netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) }}"
-    vrf: POD1
+    vrf: RED
 
 edge_vlans:
     # - 
@@ -26,20 +26,20 @@ edge_vlans:
     #     netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[0]) }}"
     #     netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[0]) }}"
     #     port: 27
-    #     vrf: POD1
+    #     vrf: RED
     # - 
     #     desc: "To CE02"
     #     id: "1992"
     #     netv4: "{{ edge_netv4|ipsubnet(edge_netmaskv4, edge_links_seq[1]) }}"
     #     netv6: "{{ edge_netv6|ipsubnet(edge_netmaskv6, edge_links_seq[1]) }}"
     #     port: 28
-    #     vrf: POD1
+    #     vrf: RED
 
 evpn:
     vrf:
     - 
-        name: "POD1"
-        desc: "POD1_VRF"
+        name: "RED"
+        desc: "RED_VRF"
         rt: "64999:9001"
         l3_vni: "9001"
         l3_vni_vlan: "901"
