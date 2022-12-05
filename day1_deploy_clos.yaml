@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/intf_bond.j2
+      src: ceos/route_pol.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
@@ -205,8 +205,7 @@
         - bond
     tags:
       - southbound
-      - interface
-
+    
 #   - name: Enable Uplink Failure Detection (UFD) if defined
 #     eos_config:
 #         src: ceos/ufd.j2
@@ -215,13 +214,13 @@
 #       - ufd
 #       - interface
 
-#   - name: Enable BGP Underlay
-#     block:
-#     - name: Enable Routing Policy
-#       eos_config:
-#           src: ceos/route_pol.j2
-#       tags:
-#         - rpol
+  - name: Enable BGP Underlay
+    block:
+    - name: Enable Routing Policy
+      eos_config:
+          src: ceos/route_pol.j2
+      tags:
+        - rpol
 
 #     - name: Enable Underlay BGP 1st time
 #       eos_config:

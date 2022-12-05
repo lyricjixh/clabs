@@ -72,18 +72,23 @@ features:
 policy:
     comm_list:
         -
-            name: "pe_edge"
+            name: "COMM_PE_EDGE"
             permit:
                 - "{{ rack_tor_asn }}:10101"
                 - "{{ rack_tor_asn }}:10201"
                 - "{{ rack_tor_asn }}:10301"
             deny:
         -
-            name: "EVPN_PE"
+            name: "COMM_EVPN_PE"
             permit:
-                - "65000:9000"
+                - "{{ spine_asn }}:9000"
                 - "65100:9001"
                 - "65100:9002"
+            deny:
+        -
+            name: "COMM_LOCAL_ROUTE"
+            permit:
+                - "{{ spine_asn }}:{{ spine_asn }}"
             deny:
     as_path:
         -
@@ -100,7 +105,7 @@ policy:
                 - "^$"
     prefix_list:
         -
-            name: "V4_CONNECTED"
+            name: "PFX_PFX_V4_CONNECTED"
             afi: "ipv4"
             step: 10
             prefix:
@@ -144,7 +149,7 @@ policy:
                     action: "permit"
                     range: "{{ v304_netv4 }} le 32"
         -
-            name: "V6_CONNECTED"
+            name: "PFX_V6_CONNECTED"
             afi: "ipv6"
             step: 10
             prefix:
@@ -222,11 +227,13 @@ policy:
             match:
                 -
                     type: "ip address prefix-list"
-                    object: "V4_CONNECTED"
+                    object: "PFX_PFX_V4_CONNECTED"
                     action:
+                        type: "community community-list"
+                        object: "COMM_LOCAL_ROUTE"
                 -
                     type: "community"
-                    object: "EVPN_PE"
+                    object: "COMM_EVPN_PE"
                     action:
         -
             name: "LOCAL_CONNECTED_V6"
@@ -234,8 +241,10 @@ policy:
             match:
                 -
                     type: "ipv6 address prefix-list"
-                    object: "V6_CONNECTED"
+                    object: "PFX_V6_CONNECTED"
                     action:
+                        type: "community community-list"
+                        object: "COMM_LOCAL_ROUTE"
         -
             name: "drain_ingress_tfk"
             step: 10
@@ -245,7 +254,7 @@ policy:
                     object: 
                     action:
                         type: "as-path prepend"
-                        object: "{{ rack_tor_asn }},{{ rack_tor_asn }},{{ rack_tor_asn }} "
+                        object: "{{ rack_tor_asn }} repeat 3"
         -
             name: "drain_egress_tfk"
             step: 10
@@ -272,7 +281,7 @@ policy:
                     type: 
                     object:
                     action:
-                        type: "ipv6 next-hop global"
+                        type: "ipv6 next-hop"
                         object: "2001:2001::1"
 
 ceos_acl:
