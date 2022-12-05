@@ -122,6 +122,15 @@ fabric_links:
 
 bgp:
   local_as: "{{ spine_asn }}"
+  remote_as:
+  - "{{ rack01_asn }}"
+  - "{{ rack01_asn }}"
+  - "{{ rack02_asn }}"
+  - "{{ rack02_asn }}"
+  - "{{ rack03_asn }}"
+  - "{{ rack03_asn }}"
+  - "{{ rack04_asn }}"
+  - "{{ rack04_asn }}"
   sas_as: "64999"
   fabric_peer_v4:
     - "{{ fabric_ptp_netv4 | ansible.utils.ipaddr(fabric_link_seq[0]|int+1) | ansible.utils.ipaddr('address') }}"

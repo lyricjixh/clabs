@@ -35,7 +35,7 @@ router bgp {{ bgp.local_as }}
   remote-as external
   capability extended-nexthop
   bfd
-  remote-as {{ bgp.spine_as }}
+  remote-as {{ bgp.remote_as }}
   !
   address-family ipv4 unicast
    activate
@@ -75,7 +75,7 @@ router bgp {{ bgp.local_as }}
   remote-as external
   capability extended-nexthop
   bfd
-  remote-as {{ bgp.spine_as }}
+  remote-as {{ bgp.remote_as }}
   !
   address-family ipv4 unicast
    no activate

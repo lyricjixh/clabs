@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/route_pol.j2
+      src: ceos/bgp_underlay_spine.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
@@ -128,7 +128,7 @@
     tags:
     - ptp
 
-- hosts: poc_leaf
+- hosts: poc_leaf,poc_spine
   gather_facts: false
   collections:
   - arista.eos
@@ -156,6 +156,7 @@
     # - name: Breakout Port
     #   eos_config:
     #       src: ceos/breakout.j2
+    #   when: "'cleaf' in inventory_hostname"
     #   tags:
     #     - southbound
 
@@ -163,12 +164,14 @@
     #   pause:
     #     seconds: 45
     #   delegate_to: localhost
+    #   when: "'cleaf' in inventory_hostname"
     #   tags: southbound
     #   when: ( features.interface.breakout is defined and features.interface.breakout|lower == "yes")
 
     # - name: Enable Breakout Port Trunking
     #   eos_config:
     #       src: ceos/intf_southbound.j2
+    #   when: "'cleaf' in inventory_hostname"
     #   tags:
     #     - southbound
 
@@ -222,22 +225,19 @@
       tags:
         - rpol
 
-#     - name: Enable Underlay BGP 1st time
-#       eos_config:
-#           src: ceos/bgp_underlay.j2
-#           replace: block
-#       ignore_errors: yes
-#       tags:
-#         - bgp_under
+    - name: Enable Underlay BGP on Leaf
+      eos_config:
+          src: ceos/bgp_underlay_leaf.j2
+      when: "'leaf' in inventory_hostname"
+      tags:
+        - bgp_under
 
-#     - name: Enable Underlay BGP 2nd time
-#       eos_config:
-#           src: ceos/bgp_underlay.j2
-#           replace: block
-#       tags:
-#         - bgp_under
-#     tags:
-#       - underlay
+    - name: Enable Underlay BGP on Spine
+      eos_config:
+          src: ceos/bgp_underlay_spine.j2
+      when: "'spine' in inventory_hostname"
+      tags:
+        - bgp_under
 
 #   - name: Enable EVPN
 #     vars:
