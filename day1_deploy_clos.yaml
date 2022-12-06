@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/bgp_underlay_spine.j2
+      src: ceos/evpn_vrf.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
@@ -128,12 +128,6 @@
     tags:
     - ptp
 
-- hosts: poc_leaf,poc_spine
-  gather_facts: false
-  collections:
-  - arista.eos
-
-  tasks:
   # - name: Enable Vlan Interface and STP
   #   block:
   #   - name: Enable Vlan
@@ -239,37 +233,39 @@
       tags:
         - bgp_under
 
-#   - name: Enable EVPN
-#     vars:
-#       # ansible_timeout: 120
-#       # ansible_command_timeout: 120
-#       # ansible_connect_timeout: 120
-#     block:
-#     - name: Enable VRF Instance
-#       eos_config:
-#           src: ceos/evpn_vrf.j2
-#       ignore_errors: yes
-#       tags:
-#         - vrf
-#     - name: Enable Vxlan Tunneling
-#       eos_config:
-#           src: ceos/vxlan.j2
-#       ignore_errors: yes
-#       tags:
-#         - vxlan
-#     - name: Enable Unified BGP Overlay if by design
-#       eos_config:
-#           src: ceos/bgp_overlay_unified.j2
-#       tags:
-#         - bgp_over
-#       when: (features.overlay.uni_bgp is defined and features.overlay.uni_bgp|lower == "yes")
+- hosts: poc_leaf
+  gather_facts: false
+  collections:
+  - arista.eos
 
-#     - name: Enable iBGP Overlay if by design
-#       eos_config:
-#           src: ceos/bgp_overlay_ibgp.j2
-#       tags:
-#         - bgp_over
-#       when: (features.overlay.ibgp is defined and features.overlay.ibgp|lower == "yes")
+  tasks:
+  - name: Enable EVPN
+    block:
+    - name: Enable VRF Instance
+      eos_config:
+          src: ceos/evpn_vrf.j2
+      ignore_errors: yes
+      tags:
+        - vrf
+    - name: Enable Vxlan Tunneling
+      eos_config:
+          src: ceos/vxlan.j2
+      ignore_errors: yes
+      tags:
+        - vxlan
+    - name: Enable Unified BGP Overlay if by design
+      eos_config:
+          src: ceos/bgp_overlay_unified.j2
+      tags:
+        - bgp_over
+      when: (features.overlay.uni_bgp is defined and features.overlay.uni_bgp|lower == "yes")
+
+    - name: Enable iBGP Overlay if by design
+      eos_config:
+          src: ceos/bgp_overlay_ibgp.j2
+      tags:
+        - bgp_over
+      when: (features.overlay.ibgp is defined and features.overlay.ibgp|lower == "yes")
 
 #     - name: Enable EVPN Edge for Border Leaves
 #       eos_config:

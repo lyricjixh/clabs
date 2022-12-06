@@ -225,7 +225,7 @@
 - repeat plugin installation on network failure [\#84](https://github.com/cloudalchemy/ansible-grafana/pull/84) ([paulfantom](https://github.com/paulfantom))
 - simplify installation and use official ARM builds [\#83](https://github.com/cloudalchemy/ansible-grafana/pull/83) ([paulfantom](https://github.com/paulfantom))
 - use grafana\_datasource [\#81](https://github.com/cloudalchemy/ansible-grafana/pull/81) ([paulfantom](https://github.com/paulfantom))
-- allow importing local dashboards [\#80](https://github.com/cloudalchemy/ansible-grafana/pull/80) ([paulfantom](https://github.com/paulfantom))
+- allow importing local dashboards [\#80](https://github.com/cloudalchemy/ansible-grafana/pull/120) ([paulfantom](https://github.com/paulfantom))
 - Drop ansible 2.4 support [\#78](https://github.com/cloudalchemy/ansible-grafana/pull/78) ([paulfantom](https://github.com/paulfantom))
 - datasource format fix [\#76](https://github.com/cloudalchemy/ansible-grafana/pull/76) ([XooR](https://github.com/XooR))
 - Add separate grafana\_api\_url variable [\#71](https://github.com/cloudalchemy/ansible-grafana/pull/71) ([thejchap](https://github.com/thejchap))

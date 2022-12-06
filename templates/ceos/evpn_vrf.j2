@@ -5,29 +5,50 @@ Generating Multitanency VRF Intance Configuration
 ############################################}
 
 {% for vrfi in evpn.vrf %}
-ip vrf Vrf_{{ vrfi.name }}
+vrf instance {{ vrfi.name }}
 !
-interface Vlan {{ vrfi.l3_vni_vlan }}
-  description "VRF {{ vrfi.name }} Vlan"
-  ip vrf forwarding Vrf_{{ vrfi.name }}
-exit
+ip routing vrf {{ vrfi.name }}
+!
+{# interface Vlan{{ vrfi.l3_vni.vlan }}
+  description "VRF {{ vrfi.name }} L3VNI Vlan"
+  vrf {{ vrfi.name }}
+  ip address virtual {{ vrfi.l3_vni.addr_v4 }}
+{% if vrfi.l3_vni.addr_v6 %}
+  ipv6 address virtual {{ vrfi.l3_vni.addr_v6 }}
+{% endif %}
+  mtu {{ phy_mtu }}
+  no autostate
+! #}
+{% if vrfi.interfaces is defined and vrfi.interfaces %}
+{% for intf in vrfi.interfaces %}
+interface {{ intf.name }}
+  description "VRF {{ vrfi.name }} L3 Interface"
+  vrf {{ vrfi.name }}
+  ip address {{ intf.addr_v4 }}
+{% if intf.addr_v6 is defined and intf.addr_v6 %}
+  ipv6 address {{ intf.addr_v6 }}
+{% endif %}
+!
 {% endfor %}
-!
-{% for vrfi in evpn.vrf %}
+{% endif %}
 {% if vrfi.proto.static_v4 is defined and vrfi.proto.static_v4 %}
 {% for route in vrfi.proto.static_v4 %}
-ip route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+ip route vrf {{ vrfi.name }} {{ route.dest }} {{ route.nh }}
 {% endfor %}
 {% endif %}
 !
 {% if vrfi.proto.static_v6 is defined and vrfi.proto.static_v6 %}
 {% for route in vrfi.proto.static_v6 %}
-ipv6 route vrf Vrf_{{ vrfi.name }} {{ route.dest }} {{ route.nh }}
+ipv6 route vrf {{ vrfi.name }} {{ route.dest }} {{ route.nh }}
 {% endfor %}
 {% endif %}
 !
-router bgp {{ bgp.local_as }} vrf Vrf_{{ vrfi.name }}
-  address-family ipv4 unicast
+router bgp {{ bgp.local_as }}
+  vrf {{ vrfi.name }}
+    rd {{ vrfi.rd_pfx }}:{{ vrfi.l3_vni.id }}
+    route-target import evpn {{ vrfi.rt_pfx }}:{{ vrfi.l3_vni.id }}
+    route-target export evpn {{ vrfi.rt_pfx }}:{{ vrfi.l3_vni.id }}
+    !
 {% if vrfi.type5 is defined and vrfi.type5 %}
 {% for redist in vrfi.type5 %}
 {% if redist.r_map is defined and redist.r_map %}
@@ -37,36 +58,25 @@ router bgp {{ bgp.local_as }} vrf Vrf_{{ vrfi.name }}
 {% endif %}
 {% endfor %}
 {% endif %}
-  !
-  address-family l2vpn evpn
-    advertise ipv4 unicast
-  !
+    !
 {% if vrfi.proto.bgp.gw_peer_v4 is defined and vrfi.proto.bgp.gw_peer_v4 %}
 {% for gwpeer in vrfi.proto.bgp.gw_peer_v4 %}
-  neighbor {{ gwpeer.addr }}
-    remote-as {{ gwpeer.asn }}
-    no shutdown
+    neighbor {{ gwpeer.addr }} remote-as {{ gwpeer.asn }}
+    neighbor {{ gwpeer.addr }} allowas-in 2
     !
-    address-family ipv4 unicast
-      activate
-    !
-  !
+  {# address-family ipv4
+    neighbor {{ gwpeer.addr }} activate
+  ! #}
 {% endfor %}
 {% endif %}
 {% if vrfi.proto.bgp.gw_peer_v6 is defined and vrfi.proto.bgp.gw_peer_v6 %}
 {% for gwpeer in vrfi.proto.bgp.gw_peer_v6 %}
-  neighbor {{ gwpeer.addr }}
-    remote-as {{ gwpeer.asn }}
-    no shutdown
+    neighbor {{ gwpeer.addr }} remote-as {{ gwpeer.asn }}
+    neighbor {{ gwpeer.addr }} allowas-in 2
     !
-    address-family ipv4 unicast
-      no activate
+    address-family ipv6
+      neighbor {{ gwpeer.addr }} activate
     !
-    address-family ipv6 unicast
-      allowas-in 2
-      activate
-    !
-  !
 {% endfor %}
 {% endif %}
   !

@@ -219,21 +219,30 @@ evpn:
     - 
         name: "RED"
         desc: "RED_VRF"
-        l3_vni: "9001"
-        l3_vni_vlan: "901"
+        rd_pfx: "{{ lpbk1.addr_v4 }}"
+        rt_pfx: "1001"
+        l3_vni: 
+          id: "9001"
+          vlan: "901"
+        interfaces:
+        - 
+            name: "loopback901"
+            addr_v4: "10.200.200.{{ seq }}/32"
+            addr_v6: "2001:ffff:ffff::{{ seq }}/128"
         type5:
         - 
             afi: ipv4
-            r_map: 
             proto: connected
-        # - 
-        #     afi: ipv4
-        #     r_map: 
-        #     proto: static
+            r_map: 
+        - 
+            afi: ipv4
+            r_map: 
+            proto: static
         # - 
         #     afi: ipv4
         #     r_map: 
         #     proto: bgp
+
 
 #EVPN iBGP Overlay
 evpn_ibgp:
@@ -241,12 +250,14 @@ evpn_ibgp:
   rrs_v4:
     peer_group: evpn_rrs_v4
     addr:
-      - "{{ hostvars['leaf07'].lpbk0.addr_v4 }}"
-      - "{{ hostvars['leaf08'].lpbk0.addr_v4 }}"
+      - "{{ hostvars['bleaf01'].lpbk0.addr_v4 }}"
+      - "{{ hostvars['bleaf02'].lpbk0.addr_v4 }}"
   rrc_v4:
     peer_group: evpn_rrc_v4
     addr:
-      - "{{ hostvars['leaf05']['lpbk0']['addr_v4'] }}"
-      - "{{ hostvars['leaf06']['lpbk0']['addr_v4'] }}"
+      - "{{ hostvars['cleaf01']['lpbk0']['addr_v4'] }}"
+      - "{{ hostvars['cleaf02']['lpbk0']['addr_v4'] }}"
+      - "{{ hostvars['cleaf03']['lpbk0']['addr_v4'] }}"
+      - "{{ hostvars['cleaf04']['lpbk0']['addr_v4'] }}"
   peer_v4:
     peer_group: evpn_rrp_v4

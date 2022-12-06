@@ -667,7 +667,7 @@ C0103: 352 NftablesTest.testSourceDestExcludeFromAllIps: Invalid method name "te
 C0111: 352 NftablesTest.testSourceDestExcludeFromAllIps: Missing method docstring[missing-docstring]
 C0411:  26 : standard import "import logging" comes before "from lib import nacaddr"[wrong-import-order]
 ************* Module tests.lib.nsxv_functtest
-C0301:  33 : Line too long (87/80)[line-too-long]
+C0301:  33 : Line too long (87/120)[line-too-long]
 C0330:  41 : Wrong continued indentation (add 1 space).
                       help='definitions directory', default='../def')
                       ^|[bad-continuation]
@@ -677,8 +677,8 @@ C0326:  77 : Exactly one space required after assignment
 C0326: 100 : Exactly one space required after assignment
     protocol =  int(root.find('./rule/services/service/protocol').text)
              ^[bad-whitespace]
-C0301: 113 : Line too long (84/80)[line-too-long]
-C0301: 117 : Line too long (84/80)[line-too-long]
+C0301: 113 : Line too long (84/120)[line-too-long]
+C0301: 117 : Line too long (84/120)[line-too-long]
 C0103:  39 NsxvFunctionalTest.setUp: Invalid variable name "_parser"[invalid-name]
 C0103:  42 NsxvFunctionalTest.setUp: Invalid variable name "FLAGS"[invalid-name]
 W0612:  42 NsxvFunctionalTest.setUp: Unused variable 'args'[unused-variable]
@@ -739,7 +739,7 @@ C0103: 246 TermTest.testNsxvStr: Invalid method name "testNsxvStr"[invalid-name]
 C0330:  33 : Wrong continued indentation (add 1 space).
                       help='definitions directory', default='../def')
                       ^|[bad-continuation]
-C0301:  66 : Line too long (148/80)[line-too-long]
+C0301:  66 : Line too long (148/120)[line-too-long]
 C0326:  71 : Exactly one space required around assignment
     af=4
       ^[bad-whitespace]
@@ -800,8 +800,8 @@ C0103: 138 TermTest.test_TranslatePolicy: Invalid method name "test_TranslatePol
 W0612: 145 TermTest.test_TranslatePolicy: Unused variable 'header'[unused-variable]
 W0622: 172 TermTest.test_nsxv_str: Redefining built-in 'type'[redefined-builtin]
 ************* Module tests.lib.packetfilter_test
-C0301: 680 : Line too long (81/80)[line-too-long]
-C0301: 725 : Line too long (82/80)[line-too-long]
+C0301: 680 : Line too long (81/120)[line-too-long]
+C0301: 725 : Line too long (82/120)[line-too-long]
 C0111: 295 PacketFilterTest: Missing class docstring[missing-docstring]
 C0103: 300 PacketFilterTest.testTcp: Invalid method name "testTcp"[invalid-name]
 C0111: 300 PacketFilterTest.testTcp: Missing method docstring[missing-docstring]
