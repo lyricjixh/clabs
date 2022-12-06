@@ -4,87 +4,70 @@ Purpose:
 Generating BGP EVPN Overlay Configuration
 ############################################}
 router bgp {{ bgp.local_as }}
- address-family l2vpn evpn
-  advertise-all-vni
-  advertise-default-gw
-  advertise ipv4 unicast
+{% if router_reflector|lower == "no" %}
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} peer group
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} description evpn_rr_server
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} soft-reconfiguration inbound all
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} send-community
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} timers 3 9
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} bfd
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} allowas-in
+  neighbor {{ evpn_ibgp.rrs_v4.peer_group }} local-as {{ evpn_ibgp.local_asn }} no-prepend replace-as
   !
-{#
+{% for neighbor in evpn_ibgp.rrs_v4.addr %}
+  neighbor {{ neighbor }} peer-group {{ evpn_ibgp.rrs_v4.peer_group }}
+{% endfor %}
+  !
+{% elif router_reflector|lower == "yes" %}
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} peer group
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} description evpn_rr_client  
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} soft-reconfiguration inbound all
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} send-community
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} timers 3 9
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} bfd
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} allowas-in
+  neighbor {{ evpn_ibgp.rrc_v4.peer_group }} local-as {{ evpn_ibgp.local_asn }} no-prepend replace-as
+  !
+{% for neighbor in evpn_ibgp.rrs_v4.addr %}
+  neighbor {{ neighbor }} peer-group {{ evpn_ibgp.rrc_v4.peer_group }}
+{% endfor %}
+  !
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} peer group
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} description evpn_rr_peer
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} soft-reconfiguration inbound all
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} send-community
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} timers 3 9
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} bfd
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} allowas-in
+  neighbor {{ evpn_ibgp.peer_v4.peer_group }} local-as {{ evpn_ibgp.local_asn }} no-prepend replace-as
+  !
+{% for neighbor in evpn_ibgp.rrs_v4.addr %}
+{% if neighbor != lpbk0.addr_v4 %}
+  neighbor {{ neighbor }} peer-group {{ evpn_ibgp.peer_v4.peer_group }}
+  !
+{% endif %}
+{% endfor %}
+{% endif %}
 {% for vni in vxlans %}
-  vni {{ vni.id }}
+  vlan {{ vni.vlan }}
     rd {{ lpbk1.addr_v4 }}:{{ vni.id }}
     route-target both {{ vni.id }}:{{ vni.id }}
   !
 {% endfor %}
-#}
- !
+  address-family evpn
 {% if router_reflector|lower == "no" %}
- peer-group {{ evpn_ibgp.rrs_v4.peer_group }}
-  ebgp-multihop 255
-  remote-as external
-  timers 3 9
-  timers connect 30
-  update-source interface Loopback 0
-  advertisement-interval 5
-  bfd
-  capability extended-nexthop
-  local-as {{ evpn_ibgp.local_asn }}
-  !
-  address-family l2vpn evpn
-   activate
-   allowas-in 3
- !
- {% for neighbor in evpn_ibgp.rrs_v4.addr %}
- neighbor {{ neighbor }}
-  description evpn_router_reflector_server
-  peer-group {{ evpn_ibgp.rrs_v4.peer_group }}
- !
-{% endfor %}
-{% elif router_reflector|lower == "yes" %}
- peer-group {{ evpn_ibgp.rrc_v4.peer_group }}
-  ebgp-multihop 16
-  remote-as external
-  timers 3 9
-  timers connect 30
-  update-source interface Loopback 0
-  advertisement-interval 5
-  bfd
-  capability extended-nexthop
-  local-as {{ evpn_ibgp.local_asn }}
-  !
-  address-family l2vpn evpn
-   activate
-   route-reflector-client
-   allowas-in 3
- !
- peer-group {{ evpn_ibgp.peer_v4.peer_group }}
-  ebgp-multihop 16
-  remote-as external
-  update-source interface Loopback 0
-  timers 3 9
-  timers connect 30
-  advertisement-interval 5
-  bfd
-  capability extended-nexthop
-  local-as {{ evpn_ibgp.local_asn }}
-  !
-  address-family l2vpn evpn
-   activate
-   allowas-in 3
- !
-{% for neighbor in evpn_ibgp.rrc_v4.addr %}
- neighbor {{ neighbor }}
-  description evpn_router_reflector_client
-  peer-group {{ evpn_ibgp.rrc_v4.peer_group }}
- !
-{% endfor %}
-{% for neighbor in evpn_ibgp.rrs_v4.addr %}
-{% if neighbor != lpbk0.addr_v4 %}
- neighbor {{ neighbor }}
-  description evpn_router_reflector_server_peer
-  peer-group {{ evpn_ibgp.peer_v4.peer_group }}
- !
+    neighbor {{ evpn_ibgp.rrs_v4.peer_group }} activate
+{% else %}
+    neighbor {{ evpn_ibgp.rrc_v4.peer_group }} activate
+    neighbor {{ evpn_ibgp.peer_v4.peer_group }} activate
 {% endif %}
-{% endfor %}
+  !
+  address-family ipv4
+{% if router_reflector|lower == "no" %}
+    no neighbor {{ evpn_ibgp.rrs_v4.peer_group }} activate
+{% else %}
+    no neighbor {{ evpn_ibgp.rrc_v4.peer_group }} activate
+    no neighbor {{ evpn_ibgp.peer_v4.peer_group }} activate
 {% endif %}
+  !
 !
