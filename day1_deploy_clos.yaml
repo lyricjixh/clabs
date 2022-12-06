@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/evpn_vrf.j2
+      src: ceos/vxlan.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
@@ -244,13 +244,11 @@
     - name: Enable VRF Instance
       eos_config:
           src: ceos/evpn_vrf.j2
-      ignore_errors: yes
       tags:
         - vrf
     - name: Enable Vxlan Tunneling
       eos_config:
           src: ceos/vxlan.j2
-      ignore_errors: yes
       tags:
         - vxlan
     - name: Enable Unified BGP Overlay if by design

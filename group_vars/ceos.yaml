@@ -18,6 +18,7 @@ lpbk0:
     addr_v6: "{{ lpbk0_netv6 | ansible.utils.ipaddr(seq) | ansible.utils.ipaddr('address') }}"
 
 phy_mtu: 9214
+vxlan_mtu: "9100"
 
 features:
     debian: 

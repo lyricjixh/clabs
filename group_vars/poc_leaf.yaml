@@ -212,8 +212,6 @@ cluster_acl:
           state: absent
     state: present
 
-vxlan_mtu: "9100"
-
 evpn:
     vrf:
     - 
