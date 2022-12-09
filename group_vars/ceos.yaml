@@ -106,7 +106,7 @@ policy:
                 - "^$"
     prefix_list:
         -
-            name: "PFX_PFX_V4_CONNECTED"
+            name: "PFX_V4_CONNECTED"
             afi: "ipv4"
             step: 10
             prefix:
@@ -116,6 +116,9 @@ policy:
                 -
                     action: "permit"
                     range: "{{ lpbk1_netv4 }} le 32"
+                -
+                    action: "permit"
+                    range: "{{ fabric_ptp_netv4 }} le 32"
                 -
                     action: "permit"
                     range: "{{ edge_netv4 }} le 32"
@@ -228,7 +231,7 @@ policy:
             match:
                 -
                     type: "ip address prefix-list"
-                    object: "PFX_PFX_V4_CONNECTED"
+                    object: "PFX_V4_CONNECTED"
                     action:
                         type: "community community-list"
                         object: "COMM_LOCAL_ROUTE"

@@ -1,0 +1,20 @@
+---
+- hosts: dc1
+  gather_facts: false
+  collections:
+  - arista.eos
+
+  tasks:
+  - name: Generate the templated config
+    template:
+      src: ceos/bgp_overlay_ibgp.j2
+      dest: "{{ build_dir }}/{{hostname}}.conf.part"
+    tags:
+    - cfggen
+
+  - name: Display the generated config
+    debug: var=item
+    with_file:
+    - "/home/xji/devops/cfggen/{{hostname}}.conf.part"
+    tags:
+    - cfggen

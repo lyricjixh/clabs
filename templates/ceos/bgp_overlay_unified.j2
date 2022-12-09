@@ -16,19 +16,19 @@ router bgp {{ bgp.local_as }}
   !
 {% endfor %}
  !
- peer-group fabric_peer_v4
+ peer group fabric_peer_v4
   address-family l2vpn evpn
    activate
    allowas-in 1
   !
  !
- peer-group tor_peer_v4
+ peer group tor_peer_v4
   address-family l2vpn evpn
    activate
    allowas-in 1
   !
  !
- peer-group sas_peer_v4
+ peer group sas_peer_v4
   address-family l2vpn evpn
    activate
    allowas-in 1

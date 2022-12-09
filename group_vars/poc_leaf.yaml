@@ -242,20 +242,29 @@ evpn:
         #     proto: bgp
 
 
-#EVPN iBGP Overlay
+## EVPN iBGP Overlay
+## Bleaves pair as iBGP RRS, Rest VTEP leaf as RRC.
 evpn_ibgp:
   local_asn: "64999"
   rrs_v4:
-    peer_group: evpn_rrs_v4
+    peer_group: "evpn_rrs_v4"
+    remote_as:
+      - "{{ rack03_asn }}"
+      - "{{ rack03_asn }}"
     addr:
-      - "{{ hostvars['bleaf01'].lpbk0.addr_v4 }}"
-      - "{{ hostvars['bleaf02'].lpbk0.addr_v4 }}"
+      - "{{ hostvars['bleaf01']['lpbk0']['addr_v4'] }}"
+      - "{{ hostvars['bleaf02']['lpbk0']['addr_v4'] }}"
   rrc_v4:
-    peer_group: evpn_rrc_v4
+    peer_group: "evpn_rrc_v4"
+    remote_as:
+      - "{{ rack01_asn }}"
+      - "{{ rack01_asn }}"
+      - "{{ rack02_asn }}"
+      - "{{ rack02_asn }}"
     addr:
       - "{{ hostvars['cleaf01']['lpbk0']['addr_v4'] }}"
       - "{{ hostvars['cleaf02']['lpbk0']['addr_v4'] }}"
       - "{{ hostvars['cleaf03']['lpbk0']['addr_v4'] }}"
       - "{{ hostvars['cleaf04']['lpbk0']['addr_v4'] }}"
   peer_v4:
-    peer_group: evpn_rrp_v4
+    peer_group: "evpn_rrp_v4"

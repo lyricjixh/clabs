@@ -1,35 +1,41 @@
 ---
-- hosts: sw1003a
+- hosts: dc1
   connection: network_cli
   gather_facts: no
   any_errors_fatal: True
 
   tasks:
+  - name : "Remove BGPv4 Config"
+    eos_config:
+      lines:
+        - "no router bgp {{ bgp.local_as }}"
+    tags:
+      - nobgp
+
   - name : "Shutdown the BGPv4 Peer"
-    dellos10_config:
+    eos_config:
       lines:
         - "shutdown"
-      parents: ['neighbor {{ item }}']
-      before: ['router bgp {{ bgp.local_as }}']
+        - 
+      parents: ['router bgp {{ bgp.local_as }}']
       match: exact
-    with_items: "{{bgp.fabric_peer_v4}}"
-    when: peerstate == "down"
+      # prompt: "[confirm]"
+      # answer: "yes"
     notify:
-      - collect BGP status
-      - display BGP info
+    - display BGP info
+    tags:
+      - bgpdown
 
   - name : "Bringup the BGPv4 Peer"
-    dellos10_config:
+    eos_config:
       lines:
         - "no shutdown"
-      parents: ['neighbor {{ item }}']
-      before: ['router bgp {{ bgp.local_as }}']
+      parents: ['router bgp {{ bgp.local_as }}']
       match: exact
-    with_items: "{{bgp.fabric_peer_v4}}"
-    when: peerstate == "up"
     notify:
-        - collect BGP status
-        - display BGP info
+      - display BGP info
+    tags:
+      - bgpup
 
   - name: Wait 15 secs for BGP Peers coming up
     pause:
@@ -39,10 +45,9 @@
  
   handlers:
     - name: collect BGP status
-      dellos10_command:
+      eos_command:
         commands: "{{ item }}"
       with_items:
-        - 'show running-configuration bgp'
         - 'show ip bgp summary'
       register: output  
 
@@ -51,4 +56,3 @@
         var: "{{ item }}"
       with_items:
         - output.results[0].stdout_lines
-        - output.results[1].stdout_lines
