@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/bgp_overlay_ibgp.j2
+      src: ceos/route_pol.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen

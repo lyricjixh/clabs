@@ -7,7 +7,7 @@ Ansible ENV:
 * DEFAULT_VAULT_PASSWORD_FILE: ~/.vault_pass
 * DEFAULT_HOST_LIST: ~/sc_lab/inventory
 * DEFAULT_LOG_PATH: ~/LOGS/ansible.log
-* WORK_DIR: ~/cfggen/
+* BUILD_DIR: ~/cfggen/
 
 Ansible Config:
 ************

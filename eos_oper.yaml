@@ -1,5 +1,5 @@
 ---
-- hosts: dc1
+- hosts: dc1,localhost
   connection: network_cli
   gather_facts: no
   any_errors_fatal: True
@@ -42,7 +42,37 @@
       seconds: 15
     delegate_to: localhost
     when: peerstate == "up"
- 
+
+  - name: Create a directory if it does not exist
+    ansible.builtin.file:
+      path: "~xji/devops/show_tech"
+      state: directory
+      mode: '0755'
+    tags:
+    - showtech
+
+  - name: Collecting EOS Show Tech  
+    block:
+    - name: Collect show tech onto the local disk
+      vars:
+        ansible_timeout: 60
+        ansible_command_timeout: 60
+        ansible_connect_timeout: 60
+      eos_command:
+        commands: "show tech-support all > file:home/admin/show_tech_{{ inventory_hostname }}"
+
+    - name: Fetch show tech file from switch to local host 
+      ansible.builtin.expect:
+          command: "scp admin@{{ ansible_host }}:/home/admin/show_tech_{{ inventory_hostname }} /home/xji/devops/show_tech/"
+          responses:
+              '\?': "yes"
+              'Password\:': "{{ vault_ceos_password }}"
+      delegate_to: localhost
+      tags:
+      - fetch
+    tags:
+    - showtech
+
   handlers:
     - name: collect BGP status
       eos_command:
