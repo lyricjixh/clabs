@@ -4,7 +4,6 @@ Purpose:
 Generating BGP EVPN Overlay Configuration
 ############################################}
 router bgp {{ bgp.local_as }}
-  maximum-paths 4 ecmp 4
 {% if router_reflector|lower == "no" %}
   neighbor {{ evpn_ibgp.rrs_v4.peer_group }} peer group
   neighbor {{ evpn_ibgp.rrs_v4.peer_group }} description evpn_rr_server

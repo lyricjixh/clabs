@@ -16,6 +16,7 @@ router bgp {{ bgp.local_as }}
 {# neighbor fabric_peer_v4 capability extended-nexthop #}
   neighbor fabric_peer_v4 bfd
   neighbor fabric_peer_v4 allowas-in
+  neighbor fabric_peer_v4 send-community standard extended
   !
   neighbor sas_peer_v4 peer group
 {# neighbor sas_peer_v4 advertisement-interval 5 #}
@@ -24,6 +25,7 @@ router bgp {{ bgp.local_as }}
   neighbor sas_peer_v4 bfd
   neighbor sas_peer_v4 allowas-in
   neighbor sas_peer_v4 remote-as {{ bgp.sas_as }}
+  neighbor sas_peer_v4 send-community standard extended
   !
   neighbor fabric_peer_v6 peer group
 {# neighbor fabric_peer_v6 advertisement-interval 5 #}

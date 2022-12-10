@@ -1,5 +1,5 @@
 ---
-- hosts: dc1,localhost
+- hosts: dc1
   connection: network_cli
   gather_facts: no
   any_errors_fatal: True

@@ -136,6 +136,20 @@
       tags:
         - bgp_under
 
+    - name: Enable BGP FlowSpec
+      eos_config:
+          src: ceos/bgp_flowspec.j2
+      when: (features.routing.flowspec|lower == "yes")
+      tags:
+        - flow_spec
+
+    - name: Enable Unified BGP Overlay if by design
+      eos_config:
+          src: ceos/bgp_overlay_unified.j2
+      tags:
+        - bgp_over
+      when: ( features.overlay.uni_bgp|lower == "yes")
+
 - hosts: poc_leaf
   gather_facts: false
   collections:
@@ -237,19 +251,14 @@
           src: ceos/vxlan.j2
       tags:
         - vxlan
-    - name: Enable Unified BGP Overlay if by design
-      eos_config:
-          src: ceos/bgp_overlay_unified.j2
-      tags:
-        - bgp_over
-      when: (features.overlay.uni_bgp is defined and features.overlay.uni_bgp|lower == "yes")
+
 
     - name: Enable iBGP Overlay if by design
       eos_config:
           src: ceos/bgp_overlay_ibgp.j2
       tags:
         - bgp_over
-      when: (features.overlay.ibgp is defined and features.overlay.ibgp|lower == "yes")
+      when: ( features.overlay.ibgp|lower == "yes")
 
 #     - name: Enable EVPN Edge for Border Leaves
 #       eos_config:

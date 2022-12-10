@@ -59,11 +59,12 @@ features:
     routing:
         policy: "yes"
         bgp: "yes"
+        flowspec: "yes"
         ospf: "no"
     overlay:
         evpn: "yes"
-        uni_bgp: "no"   ## uni_bgp (unified bgp) and ibgp are exclusive in overlay
-        ibgp: "yes"     ## uni_bgp (unified bgp) and ibgp are exclusive in overlay
+        uni_bgp: "yes"   ## uni_bgp (unified bgp) and ibgp are exclusive in overlay
+        ibgp: "no"       ## uni_bgp (unified bgp) and ibgp are exclusive in overlay
         static_vxlan: "no"
     security:
         acl: "yes"
