@@ -300,8 +300,8 @@ v403_netv6: "2001:100:43::/64"
 # gw_ptp_netmaskv6: 80
 # gw_ptp_netv4: "10.99.1.0/24"
 # gw_ptp_netv6: "2001:2001:99::/64"
-edge_netmaskv4: 27
-edge_netmaskv6: 120
+edge_netmaskv4: 30
+edge_netmaskv6: 126
 edge_netv4: "10.99.1.0/24"
 edge_netv6: "2001:2001:99:1::/64"
 

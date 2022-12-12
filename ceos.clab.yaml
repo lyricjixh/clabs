@@ -74,15 +74,15 @@ topology:
       mgmt_ipv4: 172.100.100.251
       image: frrouting/frr:latest
       binds:
-        - files/gw01/daemons:/etc/frr/daemons
-        - files/gw01/frr.conf:/etc/frr/frr.conf
+        - files/frr_daemons:/etc/frr/daemons
+        - files/frr.conf.dc-gw01:/etc/frr/frr.conf
     dc-gw02:
       kind: linux
       image: frrouting/frr:latest
       mgmt_ipv4: 172.100.100.252
       binds:
-        - files/gw02/daemons:/etc/frr/daemons
-        - files/gw02/frr.conf:/etc/frr/frr.conf
+        - files/frr_daemons:/etc/frr/daemons
+        - files/frr.conf.dc-gw02:/etc/frr/frr.conf
     r1-vm01:
       kind: linux
       image: ubuntu_clab:latest

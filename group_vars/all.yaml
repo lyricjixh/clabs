@@ -1,7 +1,7 @@
 ---
 
 dellos_cfg_generate: True
-build_dir: ~/devops/cfggen
+build_dir: "/home/xji/devops/cfggen"
 
 ansible_python_interpreter: /usr/bin/python3
 

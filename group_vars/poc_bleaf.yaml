@@ -1,7 +1,3 @@
-## Edge assumption
-## Edge Uplink 2
-## Edge 2 BGP peers/uplink
-## only Border leaf has edge ports
 edge_link_ct: 2
 edge_offset: "{{ hostvars['bleaf01'].seq }}"
 edge_links_seq:
@@ -53,7 +49,7 @@ evpn:
             name: "loopback901"
             desc: "Loopback Interface"
             addr_v4: "10.10.201.{{ seq }}/32"
-            addr_v6: "2001:ffff:ffff::{{ seq }}/128"
+            addr_v6: "2001:ffff:ffff::{{ '%0x' % seq }}/128"
         -
             name: "eth1"
             desc: "Gateway uplink_To_GW01"
@@ -78,17 +74,17 @@ evpn:
                 gw_peer_v4:
                     - 
                         addr: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[0]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
-                        asn: "64999"
+                        asn: "{{ 65000+hostvars['dc-gw01'].seq }}"
                     - 
                         addr: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[1]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
-                        asn: "64998"
+                        asn: "{{ 65000+hostvars['dc-gw02'].seq }}"
                 gw_peer_v6:
                     - 
                         addr: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[0]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
-                        asn: "64999"
+                        asn: "{{ 65000+hostvars['dc-gw01'].seq }}"
                     - 
                         addr: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
-                        asn: "64998"
+                        asn: "{{ 65000+hostvars['dc-gw02'].seq }}"
             static_v4:
                 - 
                     dest: 0.0.0.0/0

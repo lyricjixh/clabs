@@ -32,7 +32,7 @@ trunk_port:
     - "eth2"  
 
 v101_addr_v4: "{{ v101_netv4 | ansible.utils.ipaddr(seq-100) }}"
-v101_addr_v6: "{{ v101_netv6 | ansible.utils.ipaddr(seq-100) }}"
+v101_addr_v6: "{{ v101_netv6 | ansible.utils.ipaddr('%0x' % seq-100) }}"
 v101_gw_v4: "{{ v101_netv4 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}"
 v101_gw_v6: "{{ v101_netv6 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }}"
 v101_routes_v4:

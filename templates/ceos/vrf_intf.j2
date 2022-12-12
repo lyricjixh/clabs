@@ -24,8 +24,10 @@ ip routing vrf {{ vrfi.name }}
 interface {{ intf.name }}
   description "VRF_{{ vrfi.name }} {{ intf.desc }}"
   vrf {{ vrfi.name }}
+  no ip address
   ip address {{ intf.addr_v4 }}
 {% if intf.addr_v6 is defined and intf.addr_v6 %}
+  no ipv6 address
   ipv6 address {{ intf.addr_v6 }}
 {% endif %}
 !

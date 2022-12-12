@@ -1,14 +1,12 @@
 ---
-- hosts: ceos
+- hosts: poc_gateway
   gather_facts: false
-  collections:
-  - arista.eos
 
   tasks:
   - name: Generate the templated config
     template:
       src: ceos/frr.j2
-      dest: "{{ build_dir }}/{{hostname}}.conf.part"
+      dest: "files/frr.conf.{{hostname}}"
     delegate_to: localhost
     tags:
     - cfggen
@@ -16,7 +14,6 @@
   - name: Display the generated config
     debug: var=item
     with_file:
-    - "{{ build_dir }}/{{hostname}}.conf.part"
+    - "files/frr.conf.{{hostname}}"
     tags:
     - cfggen
-
