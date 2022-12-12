@@ -260,14 +260,14 @@
         - bgp_over
       when: ( features.overlay.ibgp|lower == "yes")
 
-#     - name: Enable EVPN Edge for Border Leaves
-#       eos_config:
-#           src: ceos/evpn_edge.j2
-#       ignore_errors: yes
-#       tags:
-#         - evpn
-#     tags:
-#       - overlay
+    - name: Enable EVPN Edge for Border Leaves
+      eos_config:
+          src: ceos/evpn_edge.j2
+      ignore_errors: yes
+      tags:
+        - evpn
+    tags:
+      - overlay
 
 #   - name: Enable Security
 #     vars:
