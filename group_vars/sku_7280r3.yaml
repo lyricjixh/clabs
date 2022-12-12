@@ -15,28 +15,28 @@ breakout:
    #    start: 1
    #    end: 9
 
-trunk_port: 
-   desc: "trunk memeber port"
-   vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
-   range:
-   # -
-   #    desc: "25G Compute Port Group1"
-   #    start: 5
-   #    end: 6
+trunk_port:
+   # desc: "trunk memeber port"
+   # vlan_list: "{{ vxlans | json_query('[?state==`present`].vlan') }}"
+   # range:
+   # # -
+   # #    desc: "25G Compute Port Group1"
+   # #    start: 5
+   # #    end: 6
+   # #    state: "present"
+   # # -
+   # #    desc: "25G Compute Port Group2"
+   # #    start: 7
+   # #    end: 8
+   # #    state: "present"
+   # # port-range in same trunk
+   # port_indiv:
+   # -  desc: "trunk port to compute"
+   #    id: "1"
    #    state: "present"
-   # -
-   #    desc: "25G Compute Port Group2"
-   #    start: 7
-   #    end: 8
+   # -  desc: "trunk port to compute"
+   #    id: "2"
    #    state: "present"
-   # port-range in same trunk
-   port_indiv:
-   -  desc: "trunk port to compute"
-      id: "1"
-      state: "present"
-   -  desc: "trunk port to compute"
-      id: "2"
-      state: "present"
 
 ## define the port mapping on platform
 ports:

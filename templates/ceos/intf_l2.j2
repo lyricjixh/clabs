@@ -4,6 +4,7 @@ Purpose:
 Generating Physical Southbound Interface Configuration
 including: Computing facing port
 ############################################}
+{% if trunk_port is defined and trunk_port %}
 {% if trunk_port.range is defined and trunk_port.range %}
 {% for trange in trunk_port.range %}
 interface range eth{{trange.start}}-{{trange.end}}
@@ -37,4 +38,5 @@ interface eth{{tport.id}}
 {% endif %}
 !
 {% endfor %}
+{% endif %}
 {% endif %}

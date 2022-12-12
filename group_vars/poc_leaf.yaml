@@ -225,6 +225,7 @@ evpn:
         interfaces:
         - 
             name: "loopback901"
+            desc: "Loopback Interface"
             addr_v4: "10.200.200.{{ seq }}/32"
             addr_v6: "2001:ffff:ffff::{{ seq }}/128"
         type5:

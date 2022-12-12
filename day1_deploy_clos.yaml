@@ -143,7 +143,7 @@
       tags:
         - flow_spec
 
-    - name: Enable Unified BGP Overlay if by design
+    - name: Enable Unified BGP Overlay on both Leaf/Spine if by design
       eos_config:
           src: ceos/bgp_overlay_unified.j2
       tags:
@@ -239,19 +239,18 @@
 #       - ufd
 #       - interface
 
-  - name: Enable EVPN
+  - name: Enable EVPN on Leaves
     block:
     - name: Enable VRF Instance
       eos_config:
-          src: ceos/evpn_vrf.j2
+          src: ceos/vrf_intf.j2
       tags:
-        - vrf
+        - vrf_intf
     - name: Enable Vxlan Tunneling
       eos_config:
           src: ceos/vxlan.j2
       tags:
         - vxlan
-
 
     - name: Enable iBGP Overlay if by design
       eos_config:
@@ -260,12 +259,12 @@
         - bgp_over
       when: ( features.overlay.ibgp|lower == "yes")
 
-    - name: Enable EVPN Edge for Border Leaves
+    - name: Enable EVPN Routing
       eos_config:
-          src: ceos/evpn_edge.j2
+          src: ceos/vrf_routing.j2
       ignore_errors: yes
       tags:
-        - evpn
+        - vrf_routing
     tags:
       - overlay
 

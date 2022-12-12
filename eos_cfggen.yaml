@@ -7,7 +7,21 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/evpn_edge.j2
+      src: ceos/vrf_intf.j2
+      dest: "{{ build_dir }}/{{hostname}}.conf.part"
+    tags:
+    - cfggen
+
+  - name: Display the generated config
+    debug: var=item
+    with_file:
+    - "/home/xji/devops/cfggen/{{hostname}}.conf.part"
+    tags:
+    - cfggen
+
+  - name: Generate the templated config
+    template:
+      src: ceos/vrf_routing.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen

@@ -8,21 +8,21 @@ edge_links_seq:
     - "{{ edge_link_ct*(seq-edge_offset|int) }}"
     - "{{ edge_link_ct*(seq-edge_offset|int)+1 }}"
 
-edge_links:
-   -
-    port: "27"
-    desc: "Gateway uplink_To_CE01"
-    netv4: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[0]) }}"
-    netv6: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[0]) }}"
-    vrf: RED
-   -
-    port: "28"
-    desc: "Gateway uplink_To_CE02"
-    netv4: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[1]) }}"
-    netv6: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[1]) }}"
-    vrf: RED
+# edge_links:
+#    -
+#     port: "1"
+#     desc: "Gateway uplink_To_CE01"
+#     netv4: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[0]) }}"
+#     netv6: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[0]) }}"
+#     vrf: RED
+#    -
+#     port: "2"
+#     desc: "Gateway uplink_To_CE02"
+#     netv4: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[1]) }}"
+#     netv6: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[1]) }}"
+#     vrf: RED
 
-edge_vlans:
+# edge_vlans:
     # - 
     #     desc: "To CE01"
     #     id: "1991"
@@ -51,8 +51,19 @@ evpn:
         interfaces:
         - 
             name: "loopback901"
+            desc: "Loopback Interface"
             addr_v4: "10.10.201.{{ seq }}/32"
             addr_v6: "2001:ffff:ffff::{{ seq }}/128"
+        -
+            name: "eth1"
+            desc: "Gateway uplink_To_GW01"
+            addr_v4: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[0])|ansible.utils.ipaddr(1) }}"
+            addr_v6: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[0])|ansible.utils.ipaddr(1) }}"
+        -
+            name: "eth2"
+            desc: "Gateway uplink_To_GW02"
+            addr_v4: "{{ edge_netv4|ansible.utils.ipsubnet(edge_netmaskv4, edge_links_seq[1])|ansible.utils.ipaddr(1) }}"
+            addr_v6: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[1])|ansible.utils.ipaddr(1) }}"
         type5:
         - 
             afi: ipv4
@@ -103,6 +114,7 @@ evpn:
         interfaces:
         - 
             name: "loopback902"
+            desc: "Loopback Interface"
             addr_v4: "10.10.202.{{ seq }}/32"
             addr_v6: 
         type5:
