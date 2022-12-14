@@ -73,6 +73,15 @@
     tags:
     - showtech
 
+  - name: Delete Layer2 Port
+    eos_l2_interfaces:
+        config:
+        - name: Ethernet1
+        - name: Ethernet2
+        state: deleted
+    tags:
+      - del-layer2
+
   handlers:
     - name: collect BGP status
       eos_command:

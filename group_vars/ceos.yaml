@@ -289,6 +289,39 @@ policy:
                         type: "ipv6 next-hop"
                         object: "2001:2001::1"
 
+    peer_filter:
+        -
+            name: "compute_asn_range"
+            step: 10
+            match:
+                - 
+                    range: "64101-64199"
+                    result: "accept"
+                -
+                    range: "64901-64999"
+                    result: "accept"
+        -
+            name: "spine_asn_range"
+            step: 10
+            match:
+                - 
+                    range: "65000"
+                    result: "accept"
+        -
+            name: "leaf_asn_range"
+            step: 10
+            match:
+                - 
+                    range: "65001-65999"
+                    result: "accept"
+        -
+            name: "all_asn_range"
+            step: 10
+            match:
+                - 
+                    range: "1-4294967295"
+                    result: "accept"
+
 ceos_acl:
   - name: copp_v4
     type: ipv4

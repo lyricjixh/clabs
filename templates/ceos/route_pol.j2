@@ -32,7 +32,7 @@ ip as-path access-list {{ aspath.name }} permit {{ path }}
 {% if plist.afi == "ipv6" %}
 ipv6 prefix-list {{ plist.name }}
 {% for prefix in plist.prefix %}
- seq {{ loop.index*10 }} {{ prefix.action }} {{ prefix.range }}
+ seq {{ loop.index*plist.step }} {{ prefix.action }} {{ prefix.range }}
 {% endfor %}
 !
 {% else %}
@@ -48,7 +48,7 @@ ip prefix-list {{ plist.name }}
 {% if policy.route_map is defined and policy.route_map %}
 {% for rmap in policy.route_map %}
 {% for match in rmap.match %}
-route-map {{ rmap.name }} permit {{ loop.index*10 }}
+route-map {{ rmap.name }} permit {{ loop.index*rmap.step }}
 {% if match.type is defined and match.type %}
   match {{ match.type }} {{ match.object }}
 {% endif %}
@@ -60,4 +60,14 @@ route-map {{ rmap.name }} permit {{ loop.index*10 }}
 {% endfor %}
 {% endif %}
 !
-
+{% if policy.peer_filter is defined and policy.peer_filter %}
+{% for pfilter in policy.peer_filter %}
+peer-filter {{ pfilter.name }}
+{% if pfilter.match %}
+{% for match in pfilter.match %}
+  {{ loop.index*pfilter.step }} match as-range {{ match.range }} result {{ match.result }}
+{% endfor %}
+{% endif %}
+!
+{% endfor %}
+{% endif %}
