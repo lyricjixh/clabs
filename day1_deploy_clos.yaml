@@ -247,9 +247,14 @@
     - name: Enable EVPN Routing
       eos_config:
           src: ceos/vrf_routing.j2
-      ignore_errors: yes
       tags:
         - vrf_routing
+
+    - name: Disable EVPN ARP Suppression 
+      eos_config:
+          src: ceos/arp_suppression.j2
+      tags:
+        - evpn_arp
     tags:
       - overlay
 

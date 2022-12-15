@@ -224,6 +224,20 @@ policy:
                 -
                     action: "permit"
                     range: "{{ fabric_ptp_netv6 }} le 128"
+        -
+            name: "ARP_NO_PROXY"
+            afi: "ipv4"
+            step: 10
+            prefix:
+                -
+                    action: "deny"
+                    range: "0.0.0.0/32"
+                -
+                    action: "deny"
+                    range: "{{ v101_netv4 }} le 32"
+                -
+                    action: "deny"
+                    range: "{{ v201_netv4 }} le 32"
 
     route_map:
         -

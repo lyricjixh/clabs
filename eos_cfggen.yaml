@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/bgp_unnumbered_spine.j2
+      src: ceos/arp_suppression.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     delegate_to: localhost
     tags:

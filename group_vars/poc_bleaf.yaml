@@ -35,6 +35,8 @@ edge_links_seq:
     #     vrf: RED
 
 evpn:
+    arp_suppression:
+        pfx_list: "ARP_NO_PROXY"
     vrf:
     - 
         name: "RED"

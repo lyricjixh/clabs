@@ -213,6 +213,8 @@ cluster_acl:
     state: present
 
 evpn:
+    arp_suppression:
+        pfx_list: "ARP_NO_PROXY"
     vrf:
     - 
         name: "RED"
