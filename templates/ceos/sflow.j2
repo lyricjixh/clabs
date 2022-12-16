@@ -34,3 +34,12 @@ interface {{ port.id }}
 {% endif %}
 !
 {% endfor %}
+
+
+{# sflow sample 32768
+sflow polling-interval 5
+sflow destination 10.140.192.88
+sflow destination 127.0.0.1
+sflow source-interface Loopback0
+sflow extension bgp
+sflow run #}

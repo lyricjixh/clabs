@@ -59,6 +59,7 @@ features:
     routing:
         policy: "yes"
         bgp: "yes"
+        bgp_unno: "yes"
         flowspec: "yes"
         ospf: "no"
     overlay:
@@ -67,8 +68,8 @@ features:
         ibgp: "no"       ## uni_bgp (unified bgp) and ibgp are exclusive in overlay
         static_vxlan: "no"
     security:
-        acl: "yes"
-        copp: "yes"
+        acl: "no"
+        copp: "no"
         intf: "no"
 
 policy:

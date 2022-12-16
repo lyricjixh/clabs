@@ -5,93 +5,99 @@
   - arista.eos
 
   tasks:
-  - name: Enable IP Routing
-    eos_config:
-     lines: 
-     - ip routing
-     - ip routing vrf MGMT
-    tags:
-      - ip
-
-  - name: Enable Domain/DNS Server
-    eos_config:
-      src: ceos/domain.j2
-      # diff_against: validate_config
-      # intended_config: "/home/xji/devops/cfggen/{{hostname}}.conf.part"
-    tags:
-      - domain
-
-  - name: Enable Banner Motd
-    eos_banner:
-      banner: motd
-      text: "{{ lookup('file', 'files/banner_motd') }}"
-      state: present
-    tags:
-      - banner
-
-  - name: Enable Banner Login
-    eos_banner:
-      banner: login
-      text: "{{ lookup('file', 'files/banner_login') }}"
-      state: present
-    tags:
-      - banner
-
-  - name: Setup the local user accounts
+  - name: Enable Network Services
+    vars:
+      ansible_command_timeout: 60
     block:
-    - name: Enable all local users
+    - name: Enable IP Routing
       eos_config:
-        src: ceos/user.j2
+        lines: 
+        - ip routing
+        - ip routing vrf MGMT
+      tags:
+        - ip
 
-    - name: Add SSHKEY for Ansible user
-      arista.eos.eos_user:
-        name: ansible
-        sshkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    - name: Enable Domain/DNS Server
+      eos_config:
+        src: ceos/domain.j2
+        # diff_against: validate_config
+        # intended_config: "/home/xji/devops/cfggen/{{hostname}}.conf.part"
+      tags:
+        - domain
+
+    - name: Enable Banner Motd
+      eos_banner:
+        banner: motd
+        text: "{{ lookup('file', 'files/banner_motd') }}"
         state: present
+      tags:
+        - banner
 
-    # - name: remove all users except admin
-    #   arista.eos.eos_user:
-    #     purge: yes
-    tags:
-      - users
+    - name: Enable Banner Login
+      eos_banner:
+        banner: login
+        text: "{{ lookup('file', 'files/banner_login') }}"
+        state: present
+      tags:
+        - banner
 
-  - name: Enable NTP
-    eos_config:
-        src: ceos/ntp.j2
-    # when: (features.netserv.ntp is defined and features.netserv.ntp|lower == "yes")
-    tags:
-      - ntp
+    - name: Setup the local user accounts
+      block:
+      - name: Enable all local users
+        eos_config:
+          src: ceos/user.j2
 
-  - name: Enable Syslog
-    eos_config:
-        src: ceos/syslog.j2
-    # when: (features.netserv.syslog is defined and features.netserv.syslog|lower == "yes")
-    tags:
-    - syslog
+      - name: Add SSHKEY for Ansible user
+        arista.eos.eos_user:
+          name: ansible
+          sshkey: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+          state: present
 
-  - name: Enable SNMP
-    eos_config:
-        src: ceos/snmp.j2
-    when: (features.netserv.snmp is defined and features.netserv.snmp|lower == "yes")
-    tags:
-    - snmp
+      # - name: remove all users except admin
+      #   arista.eos.eos_user:
+      #     purge: yes
+      tags:
+        - users
 
-  - name: Enable Group & AAA
-    block:
-    - name: Enable Tacacs
+    - name: Enable NTP
       eos_config:
-          src: ceos/tacacs.j2
-      # when: (features.netserv.tacacs is defined and features.netserv.tacacs|lower == "yes")
-    - name: Enable Radius
+          src: ceos/ntp.j2
+      # when: (features.netserv.ntp is defined and features.netserv.ntp|lower == "yes")
+      tags:
+        - ntp
+
+    - name: Enable Syslog
       eos_config:
-          src: ceos/radius.j2
-      # when: (features.netserv.radius is defined and features.netserv.radius|lower == "yes")
-    - name: Enable AAA
+          src: ceos/syslog.j2
+      # when: (features.netserv.syslog is defined and features.netserv.syslog|lower == "yes")
+      tags:
+      - syslog
+
+    - name: Enable SNMP
       eos_config:
-          src: ceos/aaa.j2
-      # when: (features.netserv.aaa is defined and features.netserv.aaa|lower == "yes")
+          src: ceos/snmp.j2
+      when: (features.netserv.snmp is defined and features.netserv.snmp|lower == "yes")
+      tags:
+      - snmp
+
+    - name: Enable Group & AAA
+      block:
+      - name: Enable Tacacs
+        eos_config:
+            src: ceos/tacacs.j2
+        # when: (features.netserv.tacacs is defined and features.netserv.tacacs|lower == "yes")
+      - name: Enable Radius
+        eos_config:
+            src: ceos/radius.j2
+        # when: (features.netserv.radius is defined and features.netserv.radius|lower == "yes")
+      - name: Enable AAA
+        eos_config:
+            src: ceos/aaa.j2
+        # when: (features.netserv.aaa is defined and features.netserv.aaa|lower == "yes")
+      tags:
+        - aaa
     tags:
-      - aaa
+      - netserv
 
   - name: Enable loopback Interface
     eos_config:
@@ -183,6 +189,8 @@
         - southbound
 
   - name: Enable BGP Underlay
+    vars:
+      ansible_command_timeout: 60
     block:
     - name: Enable Routing Policy
       eos_config:
@@ -194,15 +202,11 @@
       eos_config:
           src: ceos/bgp_unnumbered_leaf.j2
       when: "'leaf' in inventory_hostname"
-      tags:
-        - bgp_under
 
     - name: Enable Underlay BGP on Spine
       eos_config:
           src: ceos/bgp_unnumbered_spine.j2
       when: "'spine' in inventory_hostname"
-      tags:
-        - bgp_under
 
     - name: Enable BGP FlowSpec
       eos_config:
@@ -217,9 +221,13 @@
       tags:
         - bgp_over
       when: ( features.overlay.uni_bgp|lower == "yes")
+    tags:
+      - bgp_under
 
 - hosts: poc_leaf
   gather_facts: false
+  vars:
+    ansible_command_timeout: 60
   collections:
   - arista.eos
 
