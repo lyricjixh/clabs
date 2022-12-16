@@ -1,7 +1,7 @@
 name: poc01
 
 mgmt:
-  network: poc-oob
+  network: poc01-oob
   ipv4_subnet: 172.100.100.0/24
   
 topology:
