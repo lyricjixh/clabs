@@ -6,7 +6,7 @@
   - name: Generate the templated config
     template:
       src: ceos/frr.j2
-      dest: "files/frr.conf.{{hostname}}"
+      dest: "topology/cfg/frr.conf.{{hostname}}"
     delegate_to: localhost
     tags:
     - cfggen
@@ -14,6 +14,6 @@
   - name: Display the generated config
     debug: var=item
     with_file:
-    - "files/frr.conf.{{hostname}}"
+    - "topology/cfg/frr.conf.{{hostname}}"
     tags:
     - cfggen
