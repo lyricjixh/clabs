@@ -1,6 +1,5 @@
 header {
   target:: arista COPP_INBOUND_V4 extended
-
 }
 
 term accept-snmp {
@@ -13,7 +12,7 @@ term accept-snmp {
 
 term accept-ntp {
   comment:: "allow_only_NTP_hosts"
-  source-address:: VTSM_NTP_HOSTS
+  source-address:: NTP_HOSTS
   protocol:: udp tcp
   destination-port:: NTP
   action:: accept
@@ -26,7 +25,7 @@ term accept-infra {
 }
 
 term default-deny {
-  comment:: "Deny_all_others."
+  comment:: "Deny_all_others"
   action:: deny
 }
 

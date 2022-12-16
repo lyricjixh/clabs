@@ -258,18 +258,18 @@
     tags:
       - overlay
 
-#   - name: Enable Security
-#     vars:
-#       # ansible_timeout: 120
-#       # ansible_command_timeout: 120
-#       # ansible_connect_timeout: 120
-#     block:
-#     - name: Enable Access List
-#       eos_config:
-#           src: ceos/acl.j2
-#       when: (features.security.acl is defined and features.security.acl|lower == "yes")
-#       tags:
-#         - acl
+  - name: Enable Security
+    vars:
+      # ansible_timeout: 120
+      ansible_command_timeout: 300
+      # ansible_connect_timeout: 120
+    block:
+    - name: Enable Access List
+      eos_config:
+          src: files/acl_file
+      when: (features.security.acl is defined and features.security.acl|lower == "yes")
+      tags:
+        - acl
 
 #     - name: Enable CoPP
 #       eos_config:

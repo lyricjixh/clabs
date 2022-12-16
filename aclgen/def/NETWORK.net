@@ -95,15 +95,15 @@ REMOTE_OFFICES = 10.100.0.0/24  # Example REMOTE OFFICES
 
 VPN_HUB = 10.100.1.0/24  # VPN HUB
 
-VTSM_OOB = 10.48.3.0/24  # DC07
-           10.48.67.0/24  # DC08
+POC_OOB =       172.100.100.0/24  # DC07
+                172.17.17.0/24  # DC08
 
-VTSM_INFRA = 10.50.1.0/24  # DC07
-             10.50.2.0/24  # DC08
-             172.16.0.0/15 # LAB
+POC_INFRA =     10.50.1.0/24  # DC07
+                10.50.2.0/24  # DC08
+                172.16.0.0/15 # LAB
 
-VTSM_NTP_HOSTS = 10.99.99.1/32  # NTP_SERVER01
-                 10.99.99.2/32  # NTP_SERVER02
+NTP_HOSTS =     10.99.99.1/32  # NTP_SERVER01
+                10.99.99.2/32  # NTP_SERVER02
 
-VTSM_SNMP_SERVERS = 10.0.144.180/32  # NTP_SERVER01
-                    192.168.3.101/32  # NTP_SERVER02
+SNMP_SERVERS =  10.0.144.180/32  # NTP_SERVER01
+                192.168.3.101/32  # NTP_SERVER02
