@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  gather_facts: no
+  connection: local
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  #     ansible_connection: local
+  #     ansible_ssh_user: xji
+  #     ansible_password: "{{ vault_xji_password }}"
+  #     ansible_become_method: sudo
+  #     ansible_become_pass: "{{ vault_xji_password }}"
+
+  tasks:
+    # - name: "just execute a ls -lrt command"
+    #   command: "pwd"
+    #   register: "output"
+
+    # - debug: var=output.stdout
+
+    - name: generate acl
+      # command: "pwd"
+      command: "/home/xji/.local/bin/aclgen"
+      args:
+        chdir: aclgen/
+      # ansible.builtin.command:
+      #   argv:
+      #     - "/home/xji/.local/bin/aclgen"
+      #     - "--base_directory aclgen/policies/"
+      #     - "--definitions_directory aclgen/def/"
+      #     - "--output_directory files/"
+      register: testout
+
+    - name: Dump the resulting ACL
+      debug:
+        msg: '{{ testout.stdout }}'

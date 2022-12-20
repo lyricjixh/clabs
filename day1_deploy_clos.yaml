@@ -269,12 +269,12 @@
   - name: Enable Security
     vars:
       # ansible_timeout: 120
-      ansible_command_timeout: 300
+      ansible_command_timeout: 120
       # ansible_connect_timeout: 120
     block:
     - name: Enable Access List
       eos_config:
-          src: files/acl_file
+          src: files/copp_acl.eacl
       when: (features.security.acl is defined and features.security.acl|lower == "yes")
       tags:
         - acl

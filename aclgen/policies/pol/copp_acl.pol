@@ -2,11 +2,18 @@ header {
   target:: arista COPP_INBOUND_V4 extended
 }
 
-term accept-snmp {
-  comment:: "allow_only_SNMP_hosts"
-  source-address:: SNMP_HOSTS
+term accept-dhcp {
+  comment:: "Optional - allow forwarding of DHCP requests."
+  destination-port:: DHCP
   protocol:: udp
-  destination-port:: SNMP
+  action:: accept
+}
+
+term accept-to-honestdns {
+  comment:: "Allow name resolution using honestdns."
+  destination-address:: GOOGLE_DNS
+  destination-port:: DNS
+  protocol:: udp
   action:: accept
 }
 
@@ -20,8 +27,30 @@ term accept-ntp {
 
 term accept-infra {
   comment:: "allow_infra"
-  source-address:: VTY_HOSTS
+  source-address:: POC_INFRA
   action:: accept
+}
+
+term accept-tcp-replies {
+  comment:: "Allow tcp replies to internal hosts."
+  destination-address:: INTERNAL
+  protocol:: tcp
+  option:: tcp-established
+  action:: accept
+}
+
+term accept-snmp {
+  comment:: "allow_only_SNMP_hosts"
+  source-address:: SNMP_HOSTS
+  protocol:: udp
+  destination-port:: SNMP
+  action:: accept
+}
+
+term deny-to-internal {
+  comment:: "Deny access to rfc1918/internal."
+  destination-address:: INTERNAL
+  action:: deny
 }
 
 term default-deny {
