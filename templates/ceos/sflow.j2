@@ -6,19 +6,30 @@ Generating Syslog Configuration
 {% if sflow.sflow_enable == "false" %}
 no sflow enable
 {% elif sflow.sflow_enable == "true" %}
+sflow hardware acceleration
+sflow run
 {% for collector in sflow.collector %}
 {% if collector.state == "absent" %}
-no sflow collector {{ collector.collector_ip }}
+no sflow destination {{ collector.collector_ip }}
 {% elif collector.state == "present" %}
 {% if sflow.vrf is defined and sflow.vrf %}
-sflow collector {{ collector.collector_ip }} vrf {{ sflow.vrf }} {{ collector.udp_port }}
+sflow destination {{ collector.collector_ip }} vrf {{ sflow.vrf }} {{ collector.udp_port }}
 {% else %}
-sflow collector {{ collector.collector_ip }} {{ collector.udp_port }}
+sflow destination {{ collector.collector_ip }} {{ collector.udp_port }}
 {% endif %}
 {% endif %}
 {% endfor %}
 {% if sflow.polling_interval is defined and sflow.polling_interval %}
 sflow polling-interval {{ sflow.polling_interval }}
+{% endif %}
+{% if sflow.sample_rate is defined and sflow.sample_rate %}
+sflow sample {{ sflow.sample_rate }}
+{% endif %}
+{% if sflow.bgp is defined and sflow.bgp|lower == "enabled" %}
+sflow extension bgp
+{% endif %}
+{% if sflow.src_intf is defined and sflow.src_intf %}
+sflow source-interface {{ sflow.src_intf }}
 {% endif %}
 !
 {% endif %}
@@ -29,17 +40,5 @@ interface {{ port.id }}
 {% elif port.state == "present" %}
  sflow enable
 {% endif %}
-{% if port.sample_rate is defined and port.sample_rate %}
- sflow sample-rate {{ port.sample_rate }}
-{% endif %}
 !
 {% endfor %}
-
-
-{# sflow sample 32768
-sflow polling-interval 5
-sflow destination 10.140.192.88
-sflow destination 127.0.0.1
-sflow source-interface Loopback0
-sflow extension bgp
-sflow run #}

@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/arp_suppression.j2
+      src: ceos/sflow.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     delegate_to: localhost
     tags:

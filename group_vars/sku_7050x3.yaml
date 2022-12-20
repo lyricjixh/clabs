@@ -75,28 +75,28 @@ trunk_bond:
 ## Sflow per SKU
 sflow_port_sku:
 -
-   id: Eth 1/1/1
+   id: Eth1
    sflow_enable : true
    ingress_enable: true
    state: present
    # polling_interval: 30
    sample_rate:
 -
-   id: Eth 1/1/2
+   id: Eth2
    sflow_enable : true
    ingress_enable: true
    state: present
    # polling_interval: 30
    sample_rate:
 -
-   id: Eth 1/1/3
+   id: Eth3
    sflow_enable : true
    ingress_enable: true
    state: present
    # polling_interval: 30
    sample_rate:
 -
-   id: Eth 1/1/4
+   id: Eth4
    sflow_enable : true
    ingress_enable: true
    state: present

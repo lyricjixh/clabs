@@ -307,22 +307,18 @@
 #     tags:
 #       - security
 
-#   - name: Enable Monitoring
-#     vars:
-#       # ansible_timeout: 120
-#       # ansible_command_timeout: 120
-#       # ansible_connect_timeout: 120
-#     block:
-#     - name: Enable Sflow
-#       vars:
-#         # ansible_timeout: 120
-#         # ansible_command_timeout: 60
-#         # ansible_connect_timeout: 60
-#       eos_config:
-#           src: ceos/sflow.j2
-#       when: (features.netserv.sflow is defined and features.netserv.sflow|lower == "yes")
-#       tags:
-#         - sflow
+  - name: Enable Monitoring
+    vars:
+      # ansible_timeout: 120
+      # ansible_command_timeout: 120
+      # ansible_connect_timeout: 120
+    block:
+    - name: Enable Sflow
+      eos_config:
+          src: ceos/sflow.j2
+      when: (features.netserv.sflow is defined and features.netserv.sflow|lower == "yes")
+      tags:
+        - sflow
 
 #     - name: Enable SPAN
 #       eos_config:

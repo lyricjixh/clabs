@@ -191,14 +191,18 @@ stp:
 
 sflow:
   sflow_enable: "true"
-  vrf: "mgmt"
-  agent_id: "loopback0"
+  vrf: 
+  src_intf: "loopback0"
   collector:
     - collector_ip: "172.100.100.249"
       udp_port: 6343
       state: present
+    - collector_ip: "172.100.99.99"
+      udp_port: 6343
+      state: present
   polling_interval: 30
   sample_rate: 1024
+  bgp: 'Enabled'
   port: "{{ sflow_port_sku }}"
 
 span: "{{ span_sku }}"

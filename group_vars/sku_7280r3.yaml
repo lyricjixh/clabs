@@ -87,28 +87,28 @@ trunk_bond:
 ## Sflow per SKU
 sflow_port_sku:
 -
-   id: Eth 1/1
+   id: Eth1
    sflow_enable : true
    ingress_enable: true
    state: present
    # polling_interval: 30
    sample_rate:
 -
-   id: Eth 1/2
+   id: Eth2
    sflow_enable : true
    ingress_enable: true
    state: present
    # polling_interval: 30
    sample_rate:
 -
-   id: Eth 1/3
+   id: Eth3
    sflow_enable : true
    ingress_enable: true
    state: present
    # polling_interval: 30
    sample_rate:
 -
-   id: Eth 1/4
+   id: Eth4
    sflow_enable : true
    ingress_enable: true
    state: present
@@ -125,7 +125,7 @@ span_sku:
     dst_ip:     "192.168.20.2"   #ERSPAN Destination ip address
     gre:        "0x88ee"         #ERSPAN destination gre-type
     queue:                       #ERSPAN destination queue
-    source:     "Eth 1/4"        #Mirror session source interface
+    source:     "Eth4"        #Mirror session source interface
     src_ip:     "10.0.2.1"       #ERSPAN source ip address
     ttl:        "10"             #ERSPAN destination ttl
     state:      "present"         #State, absent or present
@@ -133,11 +133,11 @@ span_sku:
     name: "test2"
     desitnation: "cpu"
     direction:  "both"           #Mirror session direction
-    source:     "Eth 1/5"        #Mirror session source interface
+    source:     "Eth5"        #Mirror session source interface
     state:      "present"         #State, absent or present
   -
     name: "test3"
-    desitnation: "Eth 1/16"
+    desitnation: "Eth16"
     direction:  "both"           #Mirror session direction
-    source:     "Eth 1/15"      #Mirror session source interface
+    source:     "Eth15"      #Mirror session source interface
     state:      "present"         #State, absent or present
