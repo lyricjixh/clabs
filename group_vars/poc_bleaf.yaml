@@ -39,6 +39,18 @@ evpn:
         pfx_list: "ARP_NO_PROXY"
     vrf:
     - 
+        name: "DEFAULT"
+        desc: "GLOBAL INSTANCE"
+        rd_pfx: "{{ lpbk1.addr_v4 }}"
+        rt_pfx:
+        l3_vni: 
+          id: "0"
+        rleak_rules:
+            rmap_out: "BGP-VRF-LEAK-OUT-DEFAULT"
+            rmap_in:
+            rt_import: "{{ bgp.local_as }}:999"
+            rt_export: "{{ bgp.local_as }}:999"
+    - 
         name: "RED"
         desc: "RED_VRF"
         rd_pfx: "{{ lpbk1.addr_v4 }}"
@@ -101,6 +113,11 @@ evpn:
                 - 
                     dest: 0::0/0
                     nh: "{{ edge_netv6|ansible.utils.ipsubnet(edge_netmaskv6, edge_links_seq[1]) | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
+        rleak_rules:
+            rmap_out: "BGP-VRF-LEAK-OUT-RED"
+            rmap_in:
+            rt_import: "{{ bgp.local_as }}:999"
+            rt_export: "{{ bgp.local_as }}:999"
     - 
         name: "BLUE"
         desc: "BLUE_VRF"
@@ -120,3 +137,4 @@ evpn:
             r_map: 
             afi: ipv4
             proto: "connected"
+    

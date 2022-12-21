@@ -114,6 +114,9 @@ bgp:
     -
         r_map: "LOCAL_CONNECTED_V6"
         proto: connected
+  flowspec: 
+    ipv4: "enable"
+    ipv6: "enable"
 
 # ospf Parameters
 ospf:

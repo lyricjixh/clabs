@@ -74,6 +74,18 @@ router bgp {{ bgp.local_as }}
     neighbor fabric_peer_v4 activate
     neighbor tor_peer_v4 activate
   !
+{% if bgp.flowspec.ipv4 is defined and bgp.flowspec.ipv4|lower == "enable" %}
+  address-family flow-spec ipv4
+    neighbor fabric_peer_v4 activate
+    neighbor tor_peer_v4 activate
+  !
+{% endif %}
+{% if bgp.flowspec.ipv6 is defined and bgp.flowspec.ipv6|lower == "enable" %}
+  address-family flow-spec ipv6
+    neighbor fabric_peer_v6 activate
+    neighbor tor_peer_v6 activate
+  !
+{% endif %}
 !
 
 

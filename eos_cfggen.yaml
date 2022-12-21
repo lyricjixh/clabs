@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/sflow.j2
+      src: ceos/vrf_routing.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     delegate_to: localhost
     tags:
@@ -19,4 +19,3 @@
     - "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
-

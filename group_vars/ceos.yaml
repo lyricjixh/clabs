@@ -239,6 +239,31 @@ policy:
                 -
                     action: "deny"
                     range: "{{ v201_netv4 }} le 32"
+        -
+            name: "PFX_LEAK_ROUTE_DEFAULT"
+            afi: "ipv4"
+            step: 10
+            prefix:
+                -
+                    action: "permit"
+                    range: "{{ lpbk0_netv4 }} le 32"
+                -
+                    action: "permit"
+                    range: "{{ fabric_ptp_netv4 }} le 32"
+                -
+                    action: "permit"
+                    range: "{{ edge_netv4 }} le 32"
+        -
+            name: "PFX_LEAK_ROUTE_RED"
+            afi: "ipv4"
+            step: 10
+            prefix:
+                -
+                    action: "permit"
+                    range: "{{ v101_netv4 }} le 32"
+                -
+                    action: "permit"
+                    range: "0.0.0.0/0 le 32"
 
     route_map:
         -
@@ -303,6 +328,22 @@ policy:
                     action:
                         type: "ipv6 next-hop"
                         object: "2001:2001::1"
+        -
+            name: "BGP-VRF-LEAK-OUT-DEFAULT"
+            step: 10
+            match:
+                -
+                    type: "ip address prefix-list"
+                    object: "PFX_LEAK_ROUTE_DEFAULT"
+                    action:
+        -
+            name: "BGP-VRF-LEAK-OUT-RED"
+            step: 10
+            match:
+                -
+                    type: "ip address prefix-list"
+                    object: "PFX_LEAK_ROUTE_RED"
+                    action:
 
     peer_filter:
         -
