@@ -13,9 +13,10 @@
       eos_config:
         lines: 
         - ip routing
+        - ipv6 unicast-routing
         - ip routing vrf MGMT
       tags:
-        - ip
+        - routing
 
     - name: Enable Domain/DNS Server
       eos_config:
@@ -202,11 +203,15 @@
       eos_config:
           src: ceos/bgp_unnumbered_leaf.j2
       when: "'leaf' in inventory_hostname"
+      tags:
+        - unnumber
 
     - name: Enable Underlay BGP on Spine
       eos_config:
           src: ceos/bgp_unnumbered_spine.j2
       when: "'spine' in inventory_hostname"
+      tags:
+        - unnumber
 
     - name: Enable BGP FlowSpec
       eos_config:
@@ -227,7 +232,7 @@
 - hosts: poc_leaf
   gather_facts: false
   vars:
-    ansible_command_timeout: 60
+    ansible_command_timeout: 90
   collections:
   - arista.eos
 

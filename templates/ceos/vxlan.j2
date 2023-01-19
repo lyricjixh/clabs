@@ -19,7 +19,9 @@ interface vxlan1
   vxlan vlan {{ vni.vlan }} vni {{ vni.id }}
 {% endfor %}
 {% for vrfi in evpn.vrf %}
+{% if vrfi.name|lower != "default" %}
   vxlan vrf {{ vrfi.name }} vni {{ vrfi.l3_vni.id }}
+{% endif %}
 {% endfor %}
 !
 {% for vni in vxlans %}

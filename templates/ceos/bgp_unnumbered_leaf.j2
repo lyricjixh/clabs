@@ -53,15 +53,21 @@ router bgp {{ bgp.local_as }}
 {# neighbor tor_peer_v4 capability extended-nexthop #}
   neighbor tor_peer_v4 bfd
   neighbor tor_peer_v4 allowas-in
-  neighbor tor_peer_v4 maximum-routes 1200
   neighbor tor_peer_v4 send-community standard extended
+  neighbor tor_peer_v4 remote-as {{ bgp.local_as }}
   neighbor tor_peer_v4 update-source Vlan{{ vlans.pair_vlan.id }}
   !
 {% for port in ports.fabric %}
   neighbor interface eth{{ port }} peer-group fabric_peer_v4 peer-filter spine_asn_range
 {% endfor %}
   !
-  neighbor interface vlan{{ mlag_bond.vlan }} peer-group tor_peer_v4 peer-filter leaf_asn_range
+{% if seq is even %}
+  neighbor {{ tor_pair_netv4 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }} description "tor_pair_ibgp_v4"
+  neighbor {{ tor_pair_netv4 | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }} peer group tor_peer_v4
+{% else %}
+  neighbor {{ tor_pair_netv4 | ansible.utils.ipaddr(2) | ansible.utils.ipaddr('address') }} description "tor_pair_ibgp_v4"
+  neighbor {{ tor_pair_netv4 | ansible.utils.ipaddr(2) | ansible.utils.ipaddr('address') }} peer group tor_peer_v4
+{% endif %}
   !
   address-family ipv4
     bgp next-hop address-family ipv6

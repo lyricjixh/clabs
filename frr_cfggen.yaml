@@ -5,7 +5,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/frr.j2
+      src: ceos/vrf_intf.j2
       dest: "topology/cfg/frr.conf.{{hostname}}"
     delegate_to: localhost
     tags:
