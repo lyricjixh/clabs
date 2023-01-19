@@ -106,26 +106,29 @@ sflow_port_sku:
 span_sku:
   session:
   -
-    name: "test1"
+    name: "mon_session1"
     desitnation: "erspan"
-    direction:  "both"           #Mirror session direction
+    direction:  "both"           #Mirror session direction, rx|rx|both
+    source:     "eth1"           #Mirror session source interface
+    acl_grp: "span_acl1"
     dscp:       "10"             #ERSPAN destination dscp
     dst_ip:     "192.168.20.2"   #ERSPAN Destination ip address
     gre:        "0x88ee"         #ERSPAN destination gre-type
     queue:                       #ERSPAN destination queue
-    source:     "Eth 1/4/1"      #Mirror session source interface
     src_ip:     "10.0.2.1"       #ERSPAN source ip address
     ttl:        "10"             #ERSPAN destination ttl
-    state:      "present"         #State, absent or present
+    state:      "present"        #State, absent or present
   -
-    name: "test2"
+    name: "mon_session2"
     desitnation: "cpu"
-    direction:  "both"           #Mirror session direction
-    source:     "Eth 1/4/2"      #Mirror session source interface
+    direction:  "both"            #Mirror session direction
+    source:     "eth2"            #Mirror session source interface
+    acl_grp: "span_acl2"
     state:      "present"         #State, absent or present
   -
-    name: "test3"
-    desitnation: "Eth 1/16"
+    name: "mon_session3"
+    desitnation: "eth16"
     direction:  "both"           #Mirror session direction
-    source:     "Eth 1/15"      #Mirror session source interface
+    source:     "eth15"      #Mirror session source interface
+    acl_grp: "span_acl3"
     state:      "present"         #State, absent or present

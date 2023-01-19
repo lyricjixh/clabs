@@ -6,16 +6,18 @@ Generating SPAN Configuration
 {% if span is defined and span %}
 {% for session in span.session %}
 {% if session.state == "present" %}
-mirror-session {{ session.name }}
+{% if session.acl_grp  %}
+monitor session {{ session.name }} source {{ session.source }} {{ session.direction }} ip access-group {{ session.acl_grp }}
+{% else  %}
+monitor session {{ session.name }} source {{ session.source }} {{ session.direction }}
+{% endif %}
 {% if session.desitnation == "erspan" %}
- destination erspan dst-ip {{ session.dst_ip }} src-ip {{ session.src_ip }} dscp {{ session.dscp }} ttl {{ session.ttl }} gre {{ session.gre }} source {{ session.source }} direction {{ session.direction }}
-{% elif session.desitnation|lower == "cpu" %}
- destination CPU source {{ session.source }} direction {{ session.direction }}
-{% elif "eth" in session.desitnation|lower %}
- destination {{ session.desitnation }} source {{ session.source }} direction {{ session.direction }}
+monitor session {{ session.name }} destination tunnel mode gre source {{ session.src_ip }} destination {{ session.dst_ip }} ttl {{ session.ttl }} dscp {{ session.dscp }}
+{% else %}
+monitor session {{ session.name }} destination {{ session.desitnation }}
 {% endif %}
 {% elif session.state == "absent" %}
-no mirror-session {{ session.name }}
+no monitor session {{ session.name }} 
 {% endif %}
 {% endfor %}
 !

@@ -325,25 +325,25 @@
       tags:
         - sflow
 
-#     - name: Enable SPAN
-#       eos_config:
-#         src: ceos/span.j2
-#         replace: line
-#       when: (features.netserv.span is defined and features.netserv.span|lower == "yes")
-#       tags:
-#         - span
+    - name: Enable SPAN
+      eos_config:
+        src: ceos/span.j2
+        replace: line
+      when: (features.netserv.span is defined and features.netserv.span|lower == "yes")
+      tags:
+        - span
 
-#     - name: Enable Telemetry
-#       eos_config:
-#         src: ceos/telemetry.j2
-#         # ### replace: block doesn't work!
-#         replace: line
-#       ignore_errors: yes
-#       when: (features.netserv.telemetry is defined and features.netserv.telemetry|lower == "yes")
-#       tags:
-#         - telemetry
-#     tags:
-#       - monitor
+    - name: Enable Telemetry
+      eos_config:
+        src: ceos/telemetry.j2
+        # ### replace: block doesn't work!
+        replace: line
+      ignore_errors: yes
+      when: (features.netserv.telemetry is defined and features.netserv.telemetry|lower == "yes")
+      tags:
+        - telemetry
+    tags:
+      - monitor
 
 #   - name: "Enable Services with Json Module"
 #     vars:

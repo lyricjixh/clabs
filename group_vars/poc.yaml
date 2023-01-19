@@ -208,7 +208,16 @@ sflow:
 span: "{{ span_sku }}"
 
 telemetry:
-  port: "8080"
+  transport:
+    -
+      type: "grpc"
+      name: "cust_def"
+      port: "8080"
+      vrf: "MGMT"
+  eapi: 
+    - 
+      type: "http-commands"
+      proto: "http"
   auth:
     - password
     - jwt
