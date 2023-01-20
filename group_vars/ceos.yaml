@@ -58,7 +58,7 @@ features:
         ufd: "yes"
     routing:
         policy: "yes"
-        bgp: "yes"
+        bgp_standard: "yes"
         bgp_unno: "yes"
         flowspec: "yes"
         ospf: "no"
