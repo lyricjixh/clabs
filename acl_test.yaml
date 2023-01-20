@@ -1,0 +1,42 @@
+---
+- hosts: demo
+  gather_facts: false
+  collections:
+  - arista.eos
+
+  tasks:
+  - name: Enable bunch of Vlans
+    eos_config:
+      src: ceos/dummy_vlan.j2
+    tags:
+      - vlan
+
+  - name: Enable Access List
+    eos_config:
+      src: files/copp_acl.eacl
+    tags:
+      - acl
+
+  - name: Enable Interface ACL
+    eos_config:
+      lines:
+        - ip access-group OUTBOUND_V4 out
+      parents: ['interface vlan301']
+      match: strict
+    tags:
+      - copp
+
+  - name: Collect TCAM Log
+    eos_command:
+      commands: "{{item}}"
+    loop:
+      - show platform trident tcam summary | exclude IFP|VFP
+      - show platform trident tcam acl detail
+    register: show_tcam
+    tags:
+      - display
+
+  - name: Display TCAM Output
+    debug: var=show_tcam
+    tags:
+      - display

@@ -1,8 +1,7 @@
 ! $Id:$
 ! $Date:$
 ! $Revision:$
-no ip access-list COPP_INBOUND_V4
-ip access-list COPP_INBOUND_V4
+ip access-list OUTBOUND_V4
  remark $Id:$
 
 
