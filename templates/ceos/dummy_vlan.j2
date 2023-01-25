@@ -9,8 +9,10 @@ hardware access-list resource sharing vlan in
 vlan {{ 300+n }}
 {% endfor %}
 !
-{% for n in range(10) %}
+{% for n in range(1, total_vlan+1) %}
 interface vlan{{ 300+n }}
+  no ip access-group in
+  no ip access-group out
   ip address 192.172.{{n}}.1/24
 !
 {% endfor %}

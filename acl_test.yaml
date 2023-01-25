@@ -1,42 +1,204 @@
 ---
 - hosts: demo
-  gather_facts: false
+  gather_facts: true
   collections:
   - arista.eos
 
   tasks:
+  - name: Display UUT information
+    debug:
+      msg:
+        - "The network model: {{ ansible_net_model }}"
+        - "EOS Image version: {{ ansible_net_version }}"
+    tags:
+      - version
+
   - name: Enable bunch of Vlans
     eos_config:
       src: ceos/dummy_vlan.j2
     tags:
+      - baseline
       - vlan
 
   - name: Enable Access List
     eos_config:
       src: files/copp_acl.eacl
     tags:
+      - baseline
       - acl
 
-  - name: Enable Interface ACL
-    eos_config:
-      lines:
-        - ip access-group OUTBOUND_V4 out
-      parents: ['interface vlan301']
-      match: strict
-    tags:
-      - copp
-
-  - name: Collect TCAM Log
+  - name: Snapshot original TCAM slices
     eos_command:
       commands: "{{item}}"
     loop:
-      - show platform trident tcam summary | exclude IFP|VFP
-      - show platform trident tcam acl detail
+      - show platform trident tcam acl
+      - show platform trident tcam slices
     register: show_tcam
     tags:
-      - display
+      - snapshot
 
   - name: Display TCAM Output
-    debug: var=show_tcam
+    debug:
+      msg:
+        - "{{ show_tcam.results[0].stdout_lines }}"
+        - "{{ show_tcam.results[1].stdout_lines }}"
     tags:
-      - display
+      - snapshot
+
+  - name: Egress ACL Testing
+    block:
+    - name: Enable Interface 1st ACL
+      eos_config:
+        lines:
+          - ip access-group OUTBOUND_V4 out
+        parents: ['interface vlan{{ item }}']
+      loop:
+        - 301
+      tags:
+        - intf_first
+
+    - name: Collect TCAM Log
+      eos_command:
+        commands: "{{item}}"
+      loop:
+        - show platform trident tcam acl | grep EGRESS
+        - show platform trident tcam slices | begin EFP
+      register: show_tcam
+      tags:
+        - intf_first
+
+    - name: Display TCAM Output
+      debug:
+        msg:
+          - "{{ show_tcam.results[0].stdout_lines }}"
+          - "{{ show_tcam.results[1].stdout_lines }}"
+      tags:
+        - display
+
+    - name: Enable Interface Multiple ACL
+      eos_config:
+        lines:
+          - ip access-group OUTBOUND_V4 out
+        parents: ['interface vlan{{ item }}']
+      loop:
+        - 302
+        - 303
+        - 304
+        - 305
+        - 306
+        - 307
+        - 308
+      tags:
+        - intf_acl_more
+
+    - name: Collect TCAM Log
+      eos_command:
+        commands: "{{item}}"
+      loop:
+        - show platform trident tcam acl | grep EGRESS
+        - show platform trident tcam slices | begin EFP
+      register: show_tcam
+      tags:
+        - intf_acl_more
+
+    - name: Display TCAM Output
+      debug:
+        msg:
+          - "{{ show_tcam.results[0].stdout_lines }}"
+          - "{{ show_tcam.results[1].stdout_lines }}"
+      tags:
+        - intf_acl_more
+
+    - name: Enable Interface Last ACL
+      eos_config:
+        lines:
+          - ip access-group OUTBOUND_V4 out
+        parents: ['interface vlan{{ item }}']
+      loop:
+        - 309
+        - 310
+        - 311
+      ignore_errors: yes
+      tags:
+        - intf_acl_last
+
+    - name: Collect TCAM Log
+      eos_command:
+        commands: "{{item}}"
+      loop:
+        - show platform trident tcam acl | grep EGRESS
+        - show platform trident tcam slices | begin EFP
+      register: show_tcam
+      tags:
+        - intf_acl_last
+
+    - name: Display TCAM Output
+      debug:
+        msg:
+          - "{{ show_tcam.results[0].stdout_lines }}"
+          - "{{ show_tcam.results[1].stdout_lines }}"
+      tags:
+        - intf_acl_last
+    tags:
+      - acl_egress
+
+  - name: Ingress ACL Testing
+    block:
+    - name: Enable Interface 1st ACL
+      eos_config:
+        lines:
+          - ip access-group OUTBOUND_V4 in
+        parents: ['interface vlan{{ item }}']
+      loop:
+        - 301
+      tags:
+        - intf_first
+
+    - name: Collect TCAM Log
+      eos_command:
+        commands: "{{item}}"
+      loop:
+        - show platform trident tcam acl | grep INGRESS
+        - show platform trident tcam slices
+      register: show_tcam
+      tags:
+        - intf_first
+
+    - name: Display TCAM Output
+      debug:
+        msg:
+          - "{{ show_tcam.results[0].stdout_lines }}"
+          - "{{ show_tcam.results[1].stdout_lines }}"
+      tags:
+        - intf_first
+
+    - name: Enable Interface Multiple ACL
+      eos_config:
+        lines:
+          - ip access-group OUTBOUND_V4 in
+        parents: ['interface vlan{{ item }}']
+      loop:
+        - 302
+        - 303
+      tags:
+        - intf_acl_more
+
+    - name: Collect TCAM Log
+      eos_command:
+        commands: "{{item}}"
+      loop:
+        - show platform trident tcam acl | grep INGRESS
+        - show platform trident tcam slices
+      register: show_tcam
+      tags:
+        - intf_acl_more
+
+    - name: Display TCAM Output
+      debug:
+        msg:
+          - "{{ show_tcam.results[0].stdout_lines }}"
+          - "{{ show_tcam.results[1].stdout_lines }}"
+      tags:
+        - intf_acl_more
+    tags:
+      - acl_ingress
