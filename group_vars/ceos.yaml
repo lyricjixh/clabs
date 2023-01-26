@@ -68,7 +68,7 @@ features:
         ibgp: "no"       ## uni_bgp (unified bgp) and ibgp are exclusive in overlay
         static_vxlan: "no"
     security:
-        acl: "yes"
+        acl: "no"
         copp: "no"
         intf: "no"
 
