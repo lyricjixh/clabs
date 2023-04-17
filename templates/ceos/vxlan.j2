@@ -13,6 +13,7 @@ vlan {{ vni.vlan }}
 {% endfor %}
 !
 interface vxlan1
+  vxlan virtual-router encapsulation mac-address mlag-system-id
   vxlan source-interface loopback1
   vxlan udp-port 4789
 {% for vni in vxlans %}

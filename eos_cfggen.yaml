@@ -7,7 +7,7 @@
   tasks:
   - name: Generate the templated config
     template:
-      src: ceos/dummy_vlan.j2
+      src: ceos/bgp_overlay_ibgp.j2
       dest: "{{ build_dir }}/{{hostname}}.conf.part"
     delegate_to: localhost
     tags:
@@ -19,3 +19,9 @@
     - "{{ build_dir }}/{{hostname}}.conf.part"
     tags:
     - cfggen
+
+  - name: Generate the templated config
+    eos_config:
+      src: ceos/bgp_overlay_ibgp.j2
+    tags:
+    - cfgpush

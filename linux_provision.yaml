@@ -121,7 +121,7 @@
 #         state: restarted
 
 
-- hosts: compute
+- hosts: ubuntu
   become: yes
   gather_facts: no
   vars:
